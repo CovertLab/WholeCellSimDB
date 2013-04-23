@@ -1,13 +1,14 @@
 import h5py
+import os
 import scipy.io 
 import glob
 import argparse
 import re
 
-def __state_properties(directory):
+def get_state_properties(directory): # 1
     """ 
     Returns a dict with the state names as keys, and a list of the
-    paths to property files.
+    paths to property files as values.
     """
     prop_files = glob.glob(directory+"/state-[a-zA-Z]*-[a-zA-Z]*.mat")
     state_properties = {}
@@ -16,56 +17,64 @@ def __state_properties(directory):
         state_properties.setdefault(state, []).append(prop)
     return state_properties
 
-def __create_groups(hdf_file, state_list):
+def create_state_groups(hdf_file, state_list): #1
     """
-    Creates a group in the hdf_file for each key value in the 
-    state_properties dict.
+    Creates an HDF5 group for each state in the list.
+    Returns a list of pre-existing groups.
     """
-    # For each state in list
-    #   Create new group in hdf_file
-    pass
+    pre_existing_groups = []
+    for state in state_list:
+        try:
+            hdf_file.create_group(state)
+        except ValueError:
+            pre_existing_groups.append(state)
+    return pre_existing_groups
 
-def __insert_state_datasets(hdf_file, state, properties):
+def insert_state_data(hdf_file, state, properties):
     """
-    Creates a dataset in the /group_nmae of hdf_file for each property
+    Creates a dataset in the /group_name of hdf_file for each property
     in the property_list.
     """
-    # For each property:
-    #   try to load property.mat
-    #   Convert "__data__" from numpy.ndarray to a list.
-    #   Insert list into the group named state
-    pass
+    not_loaded = []
+    for prop in properties:
+        prop_dict = None
+        prop_name = prop.split("-")[-1].split(".")[0]
+        try:
+            prop_dict = scipy.io.loadmat(prop)
+        except SystemError:
+            not_loaded.append(prop + " SystemError")
+        except MemoryError:
+            not_loaded.append(prop + " MemoryError")
+        if prop_dict:
+            if 'data' in prop_dict:
+                prop_data = prop_dict['data'].tolist()
+                hdf_file[state].create_dataset(prop_name, data=prop_data)
+            else:
+                not_loaded.append(prop) 
+    return not_loaded
 
-def main():
-    parser = argparse.ArgumentParser(description='Stuff')
-    parser.add_argument('-d', '--directory',
-                        help='Directory of WCS output files.',
-                        required=True)
-    parser.add_argument('-o', '--output',
-                        help='HDF5 output filename.',
-                        required=True)
-    args = parser.parse_args()
-    
-    # Directory of WholeCell Simulation output files.
-    directory = args.directory
+def log_dir(directory, hdf_filename):
+    """
+    Logs simulation states found in 'directory' to
+    the hdf5 file 'hdf_filename'
+    """
+    hdf_filename = re.search('.*\.hdf5$', hdf_filename) and \
+               hdf_filename or hdf_filename + ".hdf5"
+    hdf_file = h5py.File(hdf_filename, 'w')
 
-    # Name of HDF5 file.
-    filename = args.output
-    filename = re.search('.*\.hdf5$', filename) and \
-               filename or filename + ".hdf5"
+    if (os.path.exists(directory)):
+        state_properties = get_state_properties(directory)
+        
 
-    # Open HDF5 file.
-    hdf_file = h5py.File(args.output, 'w')
+        create_state_groups(hdf_file, state_properties.keys())
 
-    # Get list of all state-STATE-PROPERTY.mat files.
-    state_properties = __state_properties(directory)
+        for state, properties in state_properties.items():
+            print insert_state_data(hdf_file, state, properties) 
+    else:
+        return 1
+    return 0
 
-    # Create a group in the hdf_file for each state.
-    __create_groups(hdf_file, state_properties.keys())
-
-    for properties, state in state_properties.items():
-        __insert_state_dataset(hdf_file, state, properties) 
-
+    print "Done"
 
 
 
