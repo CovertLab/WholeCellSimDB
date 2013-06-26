@@ -1,0 +1,1207 @@
+Index,ID,Name,Type
+1,DNA_GYRASE,DNA gyrase,nascent
+2,DNA_POLYMERASE_2CORE_BETA_CLAMP_GAMMA_COMPLEX_PRIMASE,"DNA polymerase (2) core, Î²-clamp, Î³-complex, and primase",nascent
+3,DNA_POLYMERASE_CORE,DNA-directed DNA polymerase,nascent
+4,DNA_POLYMERASE_CORE_BETA_CLAMP_GAMMA_COMPLEX,"DNA polymerase core, &beta;-clamp, and &gamma;-complex",nascent
+5,DNA_POLYMERASE_CORE_BETA_CLAMP_PRIMASE,"DNA polymerase core, &beta;-clamp, and primase",nascent
+6,DNA_POLYMERASE_GAMMA_COMPLEX,DNA-directed DNA polymerase gamma complex,nascent
+7,DNA_POLYMERASE_HOLOENZYME,DNA-directed DNA polymerase holoenzyme,nascent
+8,MG_0001_048,signal recognition particle,nascent
+9,MG_0003_465,ribonuclease P,nascent
+10,MG_001_DIMER,"DNA polymerase III, beta clamp",nascent
+11,MG_005_DIMER,seryl-tRNA synthetase,nascent
+12,MG_006_DIMER,thymidylate kinase,nascent
+13,MG_008_379_TETRAMER,tRNA uridine 5-carboxymethylaminomethyl modification enzyme,nascent
+14,MG_013_DIMER,methylenetetrahydrofolate dehydrogenase/methylenetetrahydrofolate cyclohydrolase,nascent
+15,MG_014_015_DIMER,multidrug ABC transporter,nascent
+16,MG_019_DIMER,chaperone protein DnaJ,nascent
+17,MG_021_DIMER,methionyl-tRNA synthetase,nascent
+18,MG_023_DIMER,"fructose-1,6-bisphosphate aldolase, class II",nascent
+19,MG_029_DIMER,DJ-1/PfpI family protein,nascent
+20,MG_030_TRIMER,uracil phosphoribosyltransferase,nascent
+21,MG_033_TETRAMER,glycerol uptake facilitator,nascent
+22,MG_034_DIMER,thymidine kinase,nascent
+23,MG_035_DIMER,histidyl-tRNA synthetase,nascent
+24,MG_036_DIMER,aspartyl-tRNA synthetase,nascent
+25,MG_038_TETRAMER,glycerol kinase,nascent
+26,MG_039_DIMER,"FAD-dependent glycerol-3-phosphate dehydrogenase, putative",nascent
+27,MG_040_119_120_121_PENTAMER,Monosaccharide (riboside/galactoside) ABC transporter,nascent
+28,MG_041_062_429_PENTAMER,"PTS system, fructose-specific",nascent
+29,MG_041_069_429_PENTAMER,"PTS system, glucose-specific",nascent
+30,MG_042_043_044_045_PENTAMER,spermidine/putrescine (polyamine) ABC transporter,nascent
+31,MG_046_DIMER,metalloendopeptidase,nascent
+32,MG_047_TETRAMER,S-adenosylmethionine synthetase,nascent
+33,MG_049_HEXAMER,purine nucleoside phosphorylase,nascent
+34,MG_051_DIMER,pyrimidine-nucleoside phosphorylase,nascent
+35,MG_052_DIMER,cytidine deaminase,nascent
+36,MG_053_TRIMER,"phosphoglucomutase/phosphomannomutase, putative",nascent
+37,MG_055_170_277_464_476_20MER,preprotein translocase,nascent
+38,MG_058_HEXAMER,ribose-phosphate pyrophosphokinase,nascent
+39,MG_063_DIMER,"1-phosphofructokinase, putative",nascent
+40,MG_064_065_TETRAMER,ABC transporter,nascent
+41,MG_066_DIMER,transketolase,nascent
+42,MG_072_DIMER,"preprotein translocase, SecA subunit",nascent
+43,MG_073_206_421_TETRAMER,DNA incision complex,nascent
+44,MG_077_078_079_080_321_PENTAMER,oligopeptide ABC transporter,nascent
+45,MG_084_TETRAMER,tRNA(Ile)-lysidine synthetase,nascent
+46,MG_085_HEXAMER,HPr(Ser) kinase/phosphatase,nascent
+47,MG_089_DIMER,translation elongation factor G,nascent
+48,MG_091_OCTAMER,"single-strand binding protein family, octamer",nascent
+49,MG_091_TETRAMER,"single-strand binding protein family, tetramer",nascent
+50,MG_094_HEXAMER,replicative DNA helicase,nascent
+51,MG_098_099_100_TRIMER,glutamyl-tRNA(Gln) and/or aspartyl-tRNA(Asn) amidotransferase,nascent
+52,MG_102_DIMER,thioredoxin-disulfide reductase,nascent
+53,MG_102_DIMER_ox,oxidized thioredoxin-disulfide reductase,nascent
+54,MG_105_OCTAMER,putative DNA integrity scanning protein,nascent
+55,MG_106_DIMER,peptide deformylase,nascent
+56,MG_107_DIMER,guanylate kinase,nascent
+57,MG_109_DIMER,"serine/threonine protein kinase, putative",nascent
+58,MG_111_DIMER,glucose-6-phosphate isomerase,nascent
+59,MG_112_DIMER,ribulose-phosphate 3-epimerase,nascent
+60,MG_113_DIMER,asparaginyl-tRNA synthetase,nascent
+61,MG_114_DIMER,CDP-diacylglycerol--glycerol-3-phosphate 3-phosphatidyltransferase,nascent
+62,MG_118_DIMER,UDP-glucose 4-epimerase,nascent
+63,MG_123_DIMER,arginine deaminase,nascent
+64,MG_124_MONOMER_ox,oxidized thioredoxin,nascent
+65,MG_126_DIMER,tryptophanyl-tRNA synthetase,nascent
+66,MG_127_MONOMER_ox,oxidized Spx subfamily protein,nascent
+67,MG_128_HEXAMER,"inorganic polyphosphate/ATP-NAD kinase, probable",nascent
+68,MG_132_DIMER,purine nucleoside phosphoramidase,nascent
+69,MG_136_DIMER,lysyl-tRNA synthetase,nascent
+70,MG_137_DIMER,UDP-galactopyranose mutase,nascent
+71,MG_139_DIMER,ribonuclease J,nascent
+72,MG_179_180_181_TETRAMER,metal ion (cobalt) ABC transporter,nascent
+73,MG_182_DIMER,Pseudouridylate synthase,nascent
+74,MG_184_DIMER,adenine-specific DNA modification methylase,nascent
+75,MG_186_187_188_189_PENTAMER,Oligosaccharide or polyol ABC transporter,nascent
+76,MG_194_195_TETRAMER,phenylalanyl-tRNA synthetase,nascent
+77,MG_201_DIMER,co-chaperone GrpE,nascent
+78,MG_203_204_TETRAMER,topoisomerase IV,nascent
+79,MG_205_DIMER,"heat-inducible transcription repressor HrcA, putative",nascent
+80,MG_208_DIMER,glycoprotease family protein,nascent
+81,MG_213_214_298_6MER,chromosome segregation protein SMC,nascent
+82,MG_213_214_298_6MER_ADP,Chromosome Segregation Protein SMC with SCP Proteins-ADP,nascent
+83,MG_215_TETRAMER,6-phosphofructokinase,nascent
+84,MG_216_TETRAMER,pyruvate kinase,nascent
+85,MG_221_OCTAMER,mraZ protein,nascent
+86,MG_224_2MER_GTP,cell division protein ftsZ activated 2mer,nascent
+87,MG_224_3MER_GTP,cell division protein ftsZ activated 3mer,nascent
+88,MG_224_4MER_GTP,cell division protein ftsZ activated 4mer,nascent
+89,MG_224_5MER_GTP,cell division protein ftsZ activated 5mer,nascent
+90,MG_224_6MER_GTP,cell division protein ftsZ activated 6mer,nascent
+91,MG_224_7MER_GTP,cell division protein ftsZ activated 7mer,nascent
+92,MG_224_8MER_GTP,cell division protein ftsZ activated 8mer,nascent
+93,MG_224_9MER_GDP,cell division protein ftsZ deactivated 9mer,nascent
+94,MG_224_9MER_GTP,cell division protein ftsZ activated 9mer,nascent
+95,MG_224_MONOMER_GDP,cell division protein ftsZ hydrolysed,nascent
+96,MG_224_MONOMER_GTP,cell division protein ftsZ activated,nascent
+97,MG_225_DIMER,amino acid transporter,nascent
+98,MG_226_DIMER,amino acid transporter,nascent
+99,MG_227_DIMER,thymidylate synthase,nascent
+100,MG_228_TETRAMER,dihydrofolate reductase,nascent
+101,MG_229_231_TETRAMER,ribonucleoside-diphosphate reductase,nascent
+102,MG_229_231_TETRAMER_ox,oxidized ribonucleoside-diphosphate reductase,nascent
+103,MG_239_HEXAMER,ATP-dependent protease La,nascent
+104,MG_240_HEXAMER,nicotinamide-nucleotide adenylyltransferase/conserved hypothetical protein,nascent
+105,MG_244_DIMER,3-5' helicase,nascent
+106,MG_251_DIMER,glycyl-tRNA synthetase,nascent
+107,MG_252_DIMER,23S rRNA methyltransferase,nascent
+108,MG_259_TETRAMER,modification methylase,nascent
+109,MG_265_DIMER,sugar phosphatase,nascent
+110,MG_271_272_273_274_192MER,pyruvate dehydrogenase,nascent
+111,MG_271_272_273_274_192MER_ox,oxidized dihydrolipoamide dehydrogenase,nascent
+112,MG_275_TETRAMER,NADH oxidase,nascent
+113,MG_276_DIMER,adenine phosphoribosyltransferase,nascent
+114,MG_278_DIMER,GTP pyrophosphokinase,nascent
+115,MG_283_DIMER,prolyl-tRNA synthetase,nascent
+116,MG_287_MONOMER_ACP,holo acyl carrier protein,nascent
+117,MG_287_MONOMER_ddcaACP,Dodecanoyl-ACP (n-C12:0ACP),nascent
+118,MG_287_MONOMER_hdeACP,cis-hexadec-9-enoyl-[acyl-carrier protein] (n-C16:1),nascent
+119,MG_287_MONOMER_myrsACP,Myristoyl-ACP (n-C14:0ACP),nascent
+120,MG_287_MONOMER_ocdcaACP,Octadecanoyl-ACP (n-C18:0ACP),nascent
+121,MG_287_MONOMER_octeACP,cis-octadec-11-enoyl-[acyl-carrier protein] (n-C18:1),nascent
+122,MG_287_MONOMER_palmACP,Palmitoyl-ACP (n-C16:0ACP),nascent
+123,MG_287_MONOMER_tdeACP,cis-tetradec-7-enoyl-[acyl-carrier protein] (n-C14:1),nascent
+124,MG_289_290_291_PENTAMER,phosphonate ABC transporter,nascent
+125,MG_292_TETRAMER,alanyl-tRNA synthetase,nascent
+126,MG_293_DIMER,glycerophosphoryl diester phosphodiesterase family protein,nascent
+127,MG_295_MONOMER_ox,oxidized tRNA U34 sulfurtransferase,nascent
+128,MG_299_DIMER,phosphate acetyltransferase,nascent
+129,MG_301_TETRAMER,"glyceraldehyde-3-phosphate dehydrogenase, type I",nascent
+130,MG_302_303_304_TETRAMER,metal ion (cobalt) ABC transporter,nascent
+131,MG_316_DIMER,DNA internalization-related competence protein ComEC/Rec2,nascent
+132,MG_322_323_TETRAMER,"potassium uptake protein, TrkH family, putative",nascent
+133,MG_333_DIMER,"FMN-dependent NADH-azoreductase, putative",nascent
+134,MG_336_DIMER,cysteine desulfurase,nascent
+135,MG_346_DIMER,23S rRNA methyltransferase,nascent
+136,MG_347_DIMER,tRNA (guanine-N(7)-)-methyltransferase,nascent
+137,MG_349_HEXAMER,Replication initiation/membrane attachment protein,nascent
+138,MG_351_HEXAMER,inorganic pyrophosphatase,nascent
+139,MG_352_DIMER,Holliday junction endonuclease,nascent
+140,MG_353_DIMER,"DNA-binding protein HU, putative",nascent
+141,MG_355_HEXAMER,"ATP-dependent Clp protease, ATPase subunit",nascent
+142,MG_357_DIMER,acetate kinase,nascent
+143,MG_358_359_10MER,Holliday junction DNA helicase,nascent
+144,MG_367_DIMER,ribonuclease III,nascent
+145,MG_368_DIMER,fatty acid/phospholipid synthesis protein PlsX,nascent
+146,MG_369_DIMER,DAK2 phosphatase domain protein,nascent
+147,MG_372_DIMER,thiamine biosynthesis/tRNA modification protein ThiI,nascent
+148,MG_375_DIMER,threonyl-tRNA synthetase,nascent
+149,MG_376_HEXAMER,,nascent
+150,MG_382_TETRAMER,uridine kinase,nascent
+151,MG_383_DIMER,"NH(3)-dependent NAD+ synthetase, putative",nascent
+152,MG_385_DIMER,glycerophosphoryl diester phosphodiesterase family protein,nascent
+153,MG_390_DIMER,"toxin ABC transporter, ATP-binding/permease protein",nascent
+154,MG_391_HEXAMER,cytosol aminopeptidase,nascent
+155,MG_392_393_21MER,GroEL-GroES chaperonin complex,nascent
+156,MG_394_TETRAMER,serine hydroxymethyltransferase,nascent
+157,MG_396_DIMER,ribose 5-phosphate isomerase B,nascent
+158,MG_398_399_400_401_402_403_404_405_22MER,H(+)-transporting two-sector ATPase,nascent
+159,MG_407_DIMER,enolase,nascent
+160,MG_409_DIMER,"phosphate transport system regulatory protein PhoU, putative",nascent
+161,MG_410_411_412_PENTAMER,phosphate ABC transporter,nascent
+162,MG_425_DIMER,ATP-dependent RNA helicase,nascent
+163,MG_427_DIMER,osmotically inducible peroxidase,nascent
+164,MG_427_DIMER_ox,oxidized osmotically inducible peroxidase,nascent
+165,MG_428_DIMER,"LuxR bacterial regulatory protein, putative",nascent
+166,MG_431_DIMER,triosephosphate isomerase,nascent
+167,MG_433_DIMER,translation elongation factor Ts,nascent
+168,MG_434_HEXAMER,uridylate kinase,nascent
+169,MG_437_DIMER,phosphatidate cytidylyltransferase,nascent
+170,MG_445_DIMER,tRNA (guanine-N1)-methyltransferase,nascent
+171,MG_451_DIMER,translation elongation factor Tu,nascent
+172,MG_453_TETRAMER,UTP-glucose-1-phosphate uridylyltransferase,nascent
+173,MG_454_DIMER,thiol-dependent peroxidase,nascent
+174,MG_454_DIMER_ox,oxidized thiol-dependent peroxidase,nascent
+175,MG_455_DIMER,tyrosyl-tRNA synthetase,nascent
+176,MG_457_HEXAMER,ATP-dependent metalloprotease FtsH,nascent
+177,MG_458_TETRAMER,hypoxanthine phosphoribosyltransferase,nascent
+178,MG_460_TETRAMER,L-lactate dehydrogenase/malate dehydrogenase,nascent
+179,MG_467_468_526_TETRAMER,salivaricin A ABC transporter,nascent
+180,MG_469_1MER_ADP,DnaA-ADP,nascent
+181,MG_469_1MER_ATP,DnaA-ATP,nascent
+182,MG_469_2MER_1ATP_ADP,DnaA 2mer-(1)ATP-(1)ADP,nascent
+183,MG_469_2MER_ATP,DnaA-ATP 2mer,nascent
+184,MG_469_3MER_2ATP_ADP,DnaA 3mer-(2)ATP-(1)ADP,nascent
+185,MG_469_3MER_ATP,DnaA-ATP 3mer,nascent
+186,MG_469_4MER_3ATP_ADP,DnaA 4mer-(3)ATP-(1)ADP,nascent
+187,MG_469_4MER_ATP,DnaA-ATP 4mer,nascent
+188,MG_469_5MER_4ATP_ADP,DnaA 5mer-(4)ATP-(1)ADP,nascent
+189,MG_469_5MER_ATP,DnaA-ATP 5mer,nascent
+190,MG_469_6MER_5ATP_ADP,DnaA 6mer-(5)ATP-(1)ADP,nascent
+191,MG_469_6MER_ATP,DnaA-ATP 6mer,nascent
+192,MG_469_7MER_6ATP_ADP,DnaA 7mer-(6)ATP-(1)ADP,nascent
+193,MG_469_7MER_ATP,DnaA-ATP 7mer,nascent
+194,MG_482_DIMER,holo-(acyl-carrier-protein) synthase,nascent
+195,REPLISOME,Replisome,nascent
+196,RIBOSOME_30S,30S ribosomal subunit,nascent
+197,RIBOSOME_30S_IF3,30S ribosomal subunit - translation initiation factor IF-3 complex,nascent
+198,RIBOSOME_50S,50S ribosomal subunit,nascent
+199,RIBOSOME_70S,70S ribosome,nascent
+200,RNA_POLYMERASE,DNA-directed RNA polymerase,nascent
+201,RNA_POLYMERASE_HOLOENZYME,DNA-directed RNA polymerase holoenzyme,nascent
+202,DNA_GYRASE,DNA gyrase,mature
+203,DNA_POLYMERASE_2CORE_BETA_CLAMP_GAMMA_COMPLEX_PRIMASE,"DNA polymerase (2) core, Î²-clamp, Î³-complex, and primase",mature
+204,DNA_POLYMERASE_CORE,DNA-directed DNA polymerase,mature
+205,DNA_POLYMERASE_CORE_BETA_CLAMP_GAMMA_COMPLEX,"DNA polymerase core, &beta;-clamp, and &gamma;-complex",mature
+206,DNA_POLYMERASE_CORE_BETA_CLAMP_PRIMASE,"DNA polymerase core, &beta;-clamp, and primase",mature
+207,DNA_POLYMERASE_GAMMA_COMPLEX,DNA-directed DNA polymerase gamma complex,mature
+208,DNA_POLYMERASE_HOLOENZYME,DNA-directed DNA polymerase holoenzyme,mature
+209,MG_0001_048,signal recognition particle,mature
+210,MG_0003_465,ribonuclease P,mature
+211,MG_001_DIMER,"DNA polymerase III, beta clamp",mature
+212,MG_005_DIMER,seryl-tRNA synthetase,mature
+213,MG_006_DIMER,thymidylate kinase,mature
+214,MG_008_379_TETRAMER,tRNA uridine 5-carboxymethylaminomethyl modification enzyme,mature
+215,MG_013_DIMER,methylenetetrahydrofolate dehydrogenase/methylenetetrahydrofolate cyclohydrolase,mature
+216,MG_014_015_DIMER,multidrug ABC transporter,mature
+217,MG_019_DIMER,chaperone protein DnaJ,mature
+218,MG_021_DIMER,methionyl-tRNA synthetase,mature
+219,MG_023_DIMER,"fructose-1,6-bisphosphate aldolase, class II",mature
+220,MG_029_DIMER,DJ-1/PfpI family protein,mature
+221,MG_030_TRIMER,uracil phosphoribosyltransferase,mature
+222,MG_033_TETRAMER,glycerol uptake facilitator,mature
+223,MG_034_DIMER,thymidine kinase,mature
+224,MG_035_DIMER,histidyl-tRNA synthetase,mature
+225,MG_036_DIMER,aspartyl-tRNA synthetase,mature
+226,MG_038_TETRAMER,glycerol kinase,mature
+227,MG_039_DIMER,"FAD-dependent glycerol-3-phosphate dehydrogenase, putative",mature
+228,MG_040_119_120_121_PENTAMER,Monosaccharide (riboside/galactoside) ABC transporter,mature
+229,MG_041_062_429_PENTAMER,"PTS system, fructose-specific",mature
+230,MG_041_069_429_PENTAMER,"PTS system, glucose-specific",mature
+231,MG_042_043_044_045_PENTAMER,spermidine/putrescine (polyamine) ABC transporter,mature
+232,MG_046_DIMER,metalloendopeptidase,mature
+233,MG_047_TETRAMER,S-adenosylmethionine synthetase,mature
+234,MG_049_HEXAMER,purine nucleoside phosphorylase,mature
+235,MG_051_DIMER,pyrimidine-nucleoside phosphorylase,mature
+236,MG_052_DIMER,cytidine deaminase,mature
+237,MG_053_TRIMER,"phosphoglucomutase/phosphomannomutase, putative",mature
+238,MG_055_170_277_464_476_20MER,preprotein translocase,mature
+239,MG_058_HEXAMER,ribose-phosphate pyrophosphokinase,mature
+240,MG_063_DIMER,"1-phosphofructokinase, putative",mature
+241,MG_064_065_TETRAMER,ABC transporter,mature
+242,MG_066_DIMER,transketolase,mature
+243,MG_072_DIMER,"preprotein translocase, SecA subunit",mature
+244,MG_073_206_421_TETRAMER,DNA incision complex,mature
+245,MG_077_078_079_080_321_PENTAMER,oligopeptide ABC transporter,mature
+246,MG_084_TETRAMER,tRNA(Ile)-lysidine synthetase,mature
+247,MG_085_HEXAMER,HPr(Ser) kinase/phosphatase,mature
+248,MG_089_DIMER,translation elongation factor G,mature
+249,MG_091_OCTAMER,"single-strand binding protein family, octamer",mature
+250,MG_091_TETRAMER,"single-strand binding protein family, tetramer",mature
+251,MG_094_HEXAMER,replicative DNA helicase,mature
+252,MG_098_099_100_TRIMER,glutamyl-tRNA(Gln) and/or aspartyl-tRNA(Asn) amidotransferase,mature
+253,MG_102_DIMER,thioredoxin-disulfide reductase,mature
+254,MG_102_DIMER_ox,oxidized thioredoxin-disulfide reductase,mature
+255,MG_105_OCTAMER,putative DNA integrity scanning protein,mature
+256,MG_106_DIMER,peptide deformylase,mature
+257,MG_107_DIMER,guanylate kinase,mature
+258,MG_109_DIMER,"serine/threonine protein kinase, putative",mature
+259,MG_111_DIMER,glucose-6-phosphate isomerase,mature
+260,MG_112_DIMER,ribulose-phosphate 3-epimerase,mature
+261,MG_113_DIMER,asparaginyl-tRNA synthetase,mature
+262,MG_114_DIMER,CDP-diacylglycerol--glycerol-3-phosphate 3-phosphatidyltransferase,mature
+263,MG_118_DIMER,UDP-glucose 4-epimerase,mature
+264,MG_123_DIMER,arginine deaminase,mature
+265,MG_124_MONOMER_ox,oxidized thioredoxin,mature
+266,MG_126_DIMER,tryptophanyl-tRNA synthetase,mature
+267,MG_127_MONOMER_ox,oxidized Spx subfamily protein,mature
+268,MG_128_HEXAMER,"inorganic polyphosphate/ATP-NAD kinase, probable",mature
+269,MG_132_DIMER,purine nucleoside phosphoramidase,mature
+270,MG_136_DIMER,lysyl-tRNA synthetase,mature
+271,MG_137_DIMER,UDP-galactopyranose mutase,mature
+272,MG_139_DIMER,ribonuclease J,mature
+273,MG_179_180_181_TETRAMER,metal ion (cobalt) ABC transporter,mature
+274,MG_182_DIMER,Pseudouridylate synthase,mature
+275,MG_184_DIMER,adenine-specific DNA modification methylase,mature
+276,MG_186_187_188_189_PENTAMER,Oligosaccharide or polyol ABC transporter,mature
+277,MG_194_195_TETRAMER,phenylalanyl-tRNA synthetase,mature
+278,MG_201_DIMER,co-chaperone GrpE,mature
+279,MG_203_204_TETRAMER,topoisomerase IV,mature
+280,MG_205_DIMER,"heat-inducible transcription repressor HrcA, putative",mature
+281,MG_208_DIMER,glycoprotease family protein,mature
+282,MG_213_214_298_6MER,chromosome segregation protein SMC,mature
+283,MG_213_214_298_6MER_ADP,Chromosome Segregation Protein SMC with SCP Proteins-ADP,mature
+284,MG_215_TETRAMER,6-phosphofructokinase,mature
+285,MG_216_TETRAMER,pyruvate kinase,mature
+286,MG_221_OCTAMER,mraZ protein,mature
+287,MG_224_2MER_GTP,cell division protein ftsZ activated 2mer,mature
+288,MG_224_3MER_GTP,cell division protein ftsZ activated 3mer,mature
+289,MG_224_4MER_GTP,cell division protein ftsZ activated 4mer,mature
+290,MG_224_5MER_GTP,cell division protein ftsZ activated 5mer,mature
+291,MG_224_6MER_GTP,cell division protein ftsZ activated 6mer,mature
+292,MG_224_7MER_GTP,cell division protein ftsZ activated 7mer,mature
+293,MG_224_8MER_GTP,cell division protein ftsZ activated 8mer,mature
+294,MG_224_9MER_GDP,cell division protein ftsZ deactivated 9mer,mature
+295,MG_224_9MER_GTP,cell division protein ftsZ activated 9mer,mature
+296,MG_224_MONOMER_GDP,cell division protein ftsZ hydrolysed,mature
+297,MG_224_MONOMER_GTP,cell division protein ftsZ activated,mature
+298,MG_225_DIMER,amino acid transporter,mature
+299,MG_226_DIMER,amino acid transporter,mature
+300,MG_227_DIMER,thymidylate synthase,mature
+301,MG_228_TETRAMER,dihydrofolate reductase,mature
+302,MG_229_231_TETRAMER,ribonucleoside-diphosphate reductase,mature
+303,MG_229_231_TETRAMER_ox,oxidized ribonucleoside-diphosphate reductase,mature
+304,MG_239_HEXAMER,ATP-dependent protease La,mature
+305,MG_240_HEXAMER,nicotinamide-nucleotide adenylyltransferase/conserved hypothetical protein,mature
+306,MG_244_DIMER,3-5' helicase,mature
+307,MG_251_DIMER,glycyl-tRNA synthetase,mature
+308,MG_252_DIMER,23S rRNA methyltransferase,mature
+309,MG_259_TETRAMER,modification methylase,mature
+310,MG_265_DIMER,sugar phosphatase,mature
+311,MG_271_272_273_274_192MER,pyruvate dehydrogenase,mature
+312,MG_271_272_273_274_192MER_ox,oxidized dihydrolipoamide dehydrogenase,mature
+313,MG_275_TETRAMER,NADH oxidase,mature
+314,MG_276_DIMER,adenine phosphoribosyltransferase,mature
+315,MG_278_DIMER,GTP pyrophosphokinase,mature
+316,MG_283_DIMER,prolyl-tRNA synthetase,mature
+317,MG_287_MONOMER_ACP,holo acyl carrier protein,mature
+318,MG_287_MONOMER_ddcaACP,Dodecanoyl-ACP (n-C12:0ACP),mature
+319,MG_287_MONOMER_hdeACP,cis-hexadec-9-enoyl-[acyl-carrier protein] (n-C16:1),mature
+320,MG_287_MONOMER_myrsACP,Myristoyl-ACP (n-C14:0ACP),mature
+321,MG_287_MONOMER_ocdcaACP,Octadecanoyl-ACP (n-C18:0ACP),mature
+322,MG_287_MONOMER_octeACP,cis-octadec-11-enoyl-[acyl-carrier protein] (n-C18:1),mature
+323,MG_287_MONOMER_palmACP,Palmitoyl-ACP (n-C16:0ACP),mature
+324,MG_287_MONOMER_tdeACP,cis-tetradec-7-enoyl-[acyl-carrier protein] (n-C14:1),mature
+325,MG_289_290_291_PENTAMER,phosphonate ABC transporter,mature
+326,MG_292_TETRAMER,alanyl-tRNA synthetase,mature
+327,MG_293_DIMER,glycerophosphoryl diester phosphodiesterase family protein,mature
+328,MG_295_MONOMER_ox,oxidized tRNA U34 sulfurtransferase,mature
+329,MG_299_DIMER,phosphate acetyltransferase,mature
+330,MG_301_TETRAMER,"glyceraldehyde-3-phosphate dehydrogenase, type I",mature
+331,MG_302_303_304_TETRAMER,metal ion (cobalt) ABC transporter,mature
+332,MG_316_DIMER,DNA internalization-related competence protein ComEC/Rec2,mature
+333,MG_322_323_TETRAMER,"potassium uptake protein, TrkH family, putative",mature
+334,MG_333_DIMER,"FMN-dependent NADH-azoreductase, putative",mature
+335,MG_336_DIMER,cysteine desulfurase,mature
+336,MG_346_DIMER,23S rRNA methyltransferase,mature
+337,MG_347_DIMER,tRNA (guanine-N(7)-)-methyltransferase,mature
+338,MG_349_HEXAMER,Replication initiation/membrane attachment protein,mature
+339,MG_351_HEXAMER,inorganic pyrophosphatase,mature
+340,MG_352_DIMER,Holliday junction endonuclease,mature
+341,MG_353_DIMER,"DNA-binding protein HU, putative",mature
+342,MG_355_HEXAMER,"ATP-dependent Clp protease, ATPase subunit",mature
+343,MG_357_DIMER,acetate kinase,mature
+344,MG_358_359_10MER,Holliday junction DNA helicase,mature
+345,MG_367_DIMER,ribonuclease III,mature
+346,MG_368_DIMER,fatty acid/phospholipid synthesis protein PlsX,mature
+347,MG_369_DIMER,DAK2 phosphatase domain protein,mature
+348,MG_372_DIMER,thiamine biosynthesis/tRNA modification protein ThiI,mature
+349,MG_375_DIMER,threonyl-tRNA synthetase,mature
+350,MG_376_HEXAMER,,mature
+351,MG_382_TETRAMER,uridine kinase,mature
+352,MG_383_DIMER,"NH(3)-dependent NAD+ synthetase, putative",mature
+353,MG_385_DIMER,glycerophosphoryl diester phosphodiesterase family protein,mature
+354,MG_390_DIMER,"toxin ABC transporter, ATP-binding/permease protein",mature
+355,MG_391_HEXAMER,cytosol aminopeptidase,mature
+356,MG_392_393_21MER,GroEL-GroES chaperonin complex,mature
+357,MG_394_TETRAMER,serine hydroxymethyltransferase,mature
+358,MG_396_DIMER,ribose 5-phosphate isomerase B,mature
+359,MG_398_399_400_401_402_403_404_405_22MER,H(+)-transporting two-sector ATPase,mature
+360,MG_407_DIMER,enolase,mature
+361,MG_409_DIMER,"phosphate transport system regulatory protein PhoU, putative",mature
+362,MG_410_411_412_PENTAMER,phosphate ABC transporter,mature
+363,MG_425_DIMER,ATP-dependent RNA helicase,mature
+364,MG_427_DIMER,osmotically inducible peroxidase,mature
+365,MG_427_DIMER_ox,oxidized osmotically inducible peroxidase,mature
+366,MG_428_DIMER,"LuxR bacterial regulatory protein, putative",mature
+367,MG_431_DIMER,triosephosphate isomerase,mature
+368,MG_433_DIMER,translation elongation factor Ts,mature
+369,MG_434_HEXAMER,uridylate kinase,mature
+370,MG_437_DIMER,phosphatidate cytidylyltransferase,mature
+371,MG_445_DIMER,tRNA (guanine-N1)-methyltransferase,mature
+372,MG_451_DIMER,translation elongation factor Tu,mature
+373,MG_453_TETRAMER,UTP-glucose-1-phosphate uridylyltransferase,mature
+374,MG_454_DIMER,thiol-dependent peroxidase,mature
+375,MG_454_DIMER_ox,oxidized thiol-dependent peroxidase,mature
+376,MG_455_DIMER,tyrosyl-tRNA synthetase,mature
+377,MG_457_HEXAMER,ATP-dependent metalloprotease FtsH,mature
+378,MG_458_TETRAMER,hypoxanthine phosphoribosyltransferase,mature
+379,MG_460_TETRAMER,L-lactate dehydrogenase/malate dehydrogenase,mature
+380,MG_467_468_526_TETRAMER,salivaricin A ABC transporter,mature
+381,MG_469_1MER_ADP,DnaA-ADP,mature
+382,MG_469_1MER_ATP,DnaA-ATP,mature
+383,MG_469_2MER_1ATP_ADP,DnaA 2mer-(1)ATP-(1)ADP,mature
+384,MG_469_2MER_ATP,DnaA-ATP 2mer,mature
+385,MG_469_3MER_2ATP_ADP,DnaA 3mer-(2)ATP-(1)ADP,mature
+386,MG_469_3MER_ATP,DnaA-ATP 3mer,mature
+387,MG_469_4MER_3ATP_ADP,DnaA 4mer-(3)ATP-(1)ADP,mature
+388,MG_469_4MER_ATP,DnaA-ATP 4mer,mature
+389,MG_469_5MER_4ATP_ADP,DnaA 5mer-(4)ATP-(1)ADP,mature
+390,MG_469_5MER_ATP,DnaA-ATP 5mer,mature
+391,MG_469_6MER_5ATP_ADP,DnaA 6mer-(5)ATP-(1)ADP,mature
+392,MG_469_6MER_ATP,DnaA-ATP 6mer,mature
+393,MG_469_7MER_6ATP_ADP,DnaA 7mer-(6)ATP-(1)ADP,mature
+394,MG_469_7MER_ATP,DnaA-ATP 7mer,mature
+395,MG_482_DIMER,holo-(acyl-carrier-protein) synthase,mature
+396,REPLISOME,Replisome,mature
+397,RIBOSOME_30S,30S ribosomal subunit,mature
+398,RIBOSOME_30S_IF3,30S ribosomal subunit - translation initiation factor IF-3 complex,mature
+399,RIBOSOME_50S,50S ribosomal subunit,mature
+400,RIBOSOME_70S,70S ribosome,mature
+401,RNA_POLYMERASE,DNA-directed RNA polymerase,mature
+402,RNA_POLYMERASE_HOLOENZYME,DNA-directed RNA polymerase holoenzyme,mature
+403,DNA_GYRASE,DNA gyrase,inactivated
+404,DNA_POLYMERASE_2CORE_BETA_CLAMP_GAMMA_COMPLEX_PRIMASE,"DNA polymerase (2) core, Î²-clamp, Î³-complex, and primase",inactivated
+405,DNA_POLYMERASE_CORE,DNA-directed DNA polymerase,inactivated
+406,DNA_POLYMERASE_CORE_BETA_CLAMP_GAMMA_COMPLEX,"DNA polymerase core, &beta;-clamp, and &gamma;-complex",inactivated
+407,DNA_POLYMERASE_CORE_BETA_CLAMP_PRIMASE,"DNA polymerase core, &beta;-clamp, and primase",inactivated
+408,DNA_POLYMERASE_GAMMA_COMPLEX,DNA-directed DNA polymerase gamma complex,inactivated
+409,DNA_POLYMERASE_HOLOENZYME,DNA-directed DNA polymerase holoenzyme,inactivated
+410,MG_0001_048,signal recognition particle,inactivated
+411,MG_0003_465,ribonuclease P,inactivated
+412,MG_001_DIMER,"DNA polymerase III, beta clamp",inactivated
+413,MG_005_DIMER,seryl-tRNA synthetase,inactivated
+414,MG_006_DIMER,thymidylate kinase,inactivated
+415,MG_008_379_TETRAMER,tRNA uridine 5-carboxymethylaminomethyl modification enzyme,inactivated
+416,MG_013_DIMER,methylenetetrahydrofolate dehydrogenase/methylenetetrahydrofolate cyclohydrolase,inactivated
+417,MG_014_015_DIMER,multidrug ABC transporter,inactivated
+418,MG_019_DIMER,chaperone protein DnaJ,inactivated
+419,MG_021_DIMER,methionyl-tRNA synthetase,inactivated
+420,MG_023_DIMER,"fructose-1,6-bisphosphate aldolase, class II",inactivated
+421,MG_029_DIMER,DJ-1/PfpI family protein,inactivated
+422,MG_030_TRIMER,uracil phosphoribosyltransferase,inactivated
+423,MG_033_TETRAMER,glycerol uptake facilitator,inactivated
+424,MG_034_DIMER,thymidine kinase,inactivated
+425,MG_035_DIMER,histidyl-tRNA synthetase,inactivated
+426,MG_036_DIMER,aspartyl-tRNA synthetase,inactivated
+427,MG_038_TETRAMER,glycerol kinase,inactivated
+428,MG_039_DIMER,"FAD-dependent glycerol-3-phosphate dehydrogenase, putative",inactivated
+429,MG_040_119_120_121_PENTAMER,Monosaccharide (riboside/galactoside) ABC transporter,inactivated
+430,MG_041_062_429_PENTAMER,"PTS system, fructose-specific",inactivated
+431,MG_041_069_429_PENTAMER,"PTS system, glucose-specific",inactivated
+432,MG_042_043_044_045_PENTAMER,spermidine/putrescine (polyamine) ABC transporter,inactivated
+433,MG_046_DIMER,metalloendopeptidase,inactivated
+434,MG_047_TETRAMER,S-adenosylmethionine synthetase,inactivated
+435,MG_049_HEXAMER,purine nucleoside phosphorylase,inactivated
+436,MG_051_DIMER,pyrimidine-nucleoside phosphorylase,inactivated
+437,MG_052_DIMER,cytidine deaminase,inactivated
+438,MG_053_TRIMER,"phosphoglucomutase/phosphomannomutase, putative",inactivated
+439,MG_055_170_277_464_476_20MER,preprotein translocase,inactivated
+440,MG_058_HEXAMER,ribose-phosphate pyrophosphokinase,inactivated
+441,MG_063_DIMER,"1-phosphofructokinase, putative",inactivated
+442,MG_064_065_TETRAMER,ABC transporter,inactivated
+443,MG_066_DIMER,transketolase,inactivated
+444,MG_072_DIMER,"preprotein translocase, SecA subunit",inactivated
+445,MG_073_206_421_TETRAMER,DNA incision complex,inactivated
+446,MG_077_078_079_080_321_PENTAMER,oligopeptide ABC transporter,inactivated
+447,MG_084_TETRAMER,tRNA(Ile)-lysidine synthetase,inactivated
+448,MG_085_HEXAMER,HPr(Ser) kinase/phosphatase,inactivated
+449,MG_089_DIMER,translation elongation factor G,inactivated
+450,MG_091_OCTAMER,"single-strand binding protein family, octamer",inactivated
+451,MG_091_TETRAMER,"single-strand binding protein family, tetramer",inactivated
+452,MG_094_HEXAMER,replicative DNA helicase,inactivated
+453,MG_098_099_100_TRIMER,glutamyl-tRNA(Gln) and/or aspartyl-tRNA(Asn) amidotransferase,inactivated
+454,MG_102_DIMER,thioredoxin-disulfide reductase,inactivated
+455,MG_102_DIMER_ox,oxidized thioredoxin-disulfide reductase,inactivated
+456,MG_105_OCTAMER,putative DNA integrity scanning protein,inactivated
+457,MG_106_DIMER,peptide deformylase,inactivated
+458,MG_107_DIMER,guanylate kinase,inactivated
+459,MG_109_DIMER,"serine/threonine protein kinase, putative",inactivated
+460,MG_111_DIMER,glucose-6-phosphate isomerase,inactivated
+461,MG_112_DIMER,ribulose-phosphate 3-epimerase,inactivated
+462,MG_113_DIMER,asparaginyl-tRNA synthetase,inactivated
+463,MG_114_DIMER,CDP-diacylglycerol--glycerol-3-phosphate 3-phosphatidyltransferase,inactivated
+464,MG_118_DIMER,UDP-glucose 4-epimerase,inactivated
+465,MG_123_DIMER,arginine deaminase,inactivated
+466,MG_124_MONOMER_ox,oxidized thioredoxin,inactivated
+467,MG_126_DIMER,tryptophanyl-tRNA synthetase,inactivated
+468,MG_127_MONOMER_ox,oxidized Spx subfamily protein,inactivated
+469,MG_128_HEXAMER,"inorganic polyphosphate/ATP-NAD kinase, probable",inactivated
+470,MG_132_DIMER,purine nucleoside phosphoramidase,inactivated
+471,MG_136_DIMER,lysyl-tRNA synthetase,inactivated
+472,MG_137_DIMER,UDP-galactopyranose mutase,inactivated
+473,MG_139_DIMER,ribonuclease J,inactivated
+474,MG_179_180_181_TETRAMER,metal ion (cobalt) ABC transporter,inactivated
+475,MG_182_DIMER,Pseudouridylate synthase,inactivated
+476,MG_184_DIMER,adenine-specific DNA modification methylase,inactivated
+477,MG_186_187_188_189_PENTAMER,Oligosaccharide or polyol ABC transporter,inactivated
+478,MG_194_195_TETRAMER,phenylalanyl-tRNA synthetase,inactivated
+479,MG_201_DIMER,co-chaperone GrpE,inactivated
+480,MG_203_204_TETRAMER,topoisomerase IV,inactivated
+481,MG_205_DIMER,"heat-inducible transcription repressor HrcA, putative",inactivated
+482,MG_208_DIMER,glycoprotease family protein,inactivated
+483,MG_213_214_298_6MER,chromosome segregation protein SMC,inactivated
+484,MG_213_214_298_6MER_ADP,Chromosome Segregation Protein SMC with SCP Proteins-ADP,inactivated
+485,MG_215_TETRAMER,6-phosphofructokinase,inactivated
+486,MG_216_TETRAMER,pyruvate kinase,inactivated
+487,MG_221_OCTAMER,mraZ protein,inactivated
+488,MG_224_2MER_GTP,cell division protein ftsZ activated 2mer,inactivated
+489,MG_224_3MER_GTP,cell division protein ftsZ activated 3mer,inactivated
+490,MG_224_4MER_GTP,cell division protein ftsZ activated 4mer,inactivated
+491,MG_224_5MER_GTP,cell division protein ftsZ activated 5mer,inactivated
+492,MG_224_6MER_GTP,cell division protein ftsZ activated 6mer,inactivated
+493,MG_224_7MER_GTP,cell division protein ftsZ activated 7mer,inactivated
+494,MG_224_8MER_GTP,cell division protein ftsZ activated 8mer,inactivated
+495,MG_224_9MER_GDP,cell division protein ftsZ deactivated 9mer,inactivated
+496,MG_224_9MER_GTP,cell division protein ftsZ activated 9mer,inactivated
+497,MG_224_MONOMER_GDP,cell division protein ftsZ hydrolysed,inactivated
+498,MG_224_MONOMER_GTP,cell division protein ftsZ activated,inactivated
+499,MG_225_DIMER,amino acid transporter,inactivated
+500,MG_226_DIMER,amino acid transporter,inactivated
+501,MG_227_DIMER,thymidylate synthase,inactivated
+502,MG_228_TETRAMER,dihydrofolate reductase,inactivated
+503,MG_229_231_TETRAMER,ribonucleoside-diphosphate reductase,inactivated
+504,MG_229_231_TETRAMER_ox,oxidized ribonucleoside-diphosphate reductase,inactivated
+505,MG_239_HEXAMER,ATP-dependent protease La,inactivated
+506,MG_240_HEXAMER,nicotinamide-nucleotide adenylyltransferase/conserved hypothetical protein,inactivated
+507,MG_244_DIMER,3-5' helicase,inactivated
+508,MG_251_DIMER,glycyl-tRNA synthetase,inactivated
+509,MG_252_DIMER,23S rRNA methyltransferase,inactivated
+510,MG_259_TETRAMER,modification methylase,inactivated
+511,MG_265_DIMER,sugar phosphatase,inactivated
+512,MG_271_272_273_274_192MER,pyruvate dehydrogenase,inactivated
+513,MG_271_272_273_274_192MER_ox,oxidized dihydrolipoamide dehydrogenase,inactivated
+514,MG_275_TETRAMER,NADH oxidase,inactivated
+515,MG_276_DIMER,adenine phosphoribosyltransferase,inactivated
+516,MG_278_DIMER,GTP pyrophosphokinase,inactivated
+517,MG_283_DIMER,prolyl-tRNA synthetase,inactivated
+518,MG_287_MONOMER_ACP,holo acyl carrier protein,inactivated
+519,MG_287_MONOMER_ddcaACP,Dodecanoyl-ACP (n-C12:0ACP),inactivated
+520,MG_287_MONOMER_hdeACP,cis-hexadec-9-enoyl-[acyl-carrier protein] (n-C16:1),inactivated
+521,MG_287_MONOMER_myrsACP,Myristoyl-ACP (n-C14:0ACP),inactivated
+522,MG_287_MONOMER_ocdcaACP,Octadecanoyl-ACP (n-C18:0ACP),inactivated
+523,MG_287_MONOMER_octeACP,cis-octadec-11-enoyl-[acyl-carrier protein] (n-C18:1),inactivated
+524,MG_287_MONOMER_palmACP,Palmitoyl-ACP (n-C16:0ACP),inactivated
+525,MG_287_MONOMER_tdeACP,cis-tetradec-7-enoyl-[acyl-carrier protein] (n-C14:1),inactivated
+526,MG_289_290_291_PENTAMER,phosphonate ABC transporter,inactivated
+527,MG_292_TETRAMER,alanyl-tRNA synthetase,inactivated
+528,MG_293_DIMER,glycerophosphoryl diester phosphodiesterase family protein,inactivated
+529,MG_295_MONOMER_ox,oxidized tRNA U34 sulfurtransferase,inactivated
+530,MG_299_DIMER,phosphate acetyltransferase,inactivated
+531,MG_301_TETRAMER,"glyceraldehyde-3-phosphate dehydrogenase, type I",inactivated
+532,MG_302_303_304_TETRAMER,metal ion (cobalt) ABC transporter,inactivated
+533,MG_316_DIMER,DNA internalization-related competence protein ComEC/Rec2,inactivated
+534,MG_322_323_TETRAMER,"potassium uptake protein, TrkH family, putative",inactivated
+535,MG_333_DIMER,"FMN-dependent NADH-azoreductase, putative",inactivated
+536,MG_336_DIMER,cysteine desulfurase,inactivated
+537,MG_346_DIMER,23S rRNA methyltransferase,inactivated
+538,MG_347_DIMER,tRNA (guanine-N(7)-)-methyltransferase,inactivated
+539,MG_349_HEXAMER,Replication initiation/membrane attachment protein,inactivated
+540,MG_351_HEXAMER,inorganic pyrophosphatase,inactivated
+541,MG_352_DIMER,Holliday junction endonuclease,inactivated
+542,MG_353_DIMER,"DNA-binding protein HU, putative",inactivated
+543,MG_355_HEXAMER,"ATP-dependent Clp protease, ATPase subunit",inactivated
+544,MG_357_DIMER,acetate kinase,inactivated
+545,MG_358_359_10MER,Holliday junction DNA helicase,inactivated
+546,MG_367_DIMER,ribonuclease III,inactivated
+547,MG_368_DIMER,fatty acid/phospholipid synthesis protein PlsX,inactivated
+548,MG_369_DIMER,DAK2 phosphatase domain protein,inactivated
+549,MG_372_DIMER,thiamine biosynthesis/tRNA modification protein ThiI,inactivated
+550,MG_375_DIMER,threonyl-tRNA synthetase,inactivated
+551,MG_376_HEXAMER,,inactivated
+552,MG_382_TETRAMER,uridine kinase,inactivated
+553,MG_383_DIMER,"NH(3)-dependent NAD+ synthetase, putative",inactivated
+554,MG_385_DIMER,glycerophosphoryl diester phosphodiesterase family protein,inactivated
+555,MG_390_DIMER,"toxin ABC transporter, ATP-binding/permease protein",inactivated
+556,MG_391_HEXAMER,cytosol aminopeptidase,inactivated
+557,MG_392_393_21MER,GroEL-GroES chaperonin complex,inactivated
+558,MG_394_TETRAMER,serine hydroxymethyltransferase,inactivated
+559,MG_396_DIMER,ribose 5-phosphate isomerase B,inactivated
+560,MG_398_399_400_401_402_403_404_405_22MER,H(+)-transporting two-sector ATPase,inactivated
+561,MG_407_DIMER,enolase,inactivated
+562,MG_409_DIMER,"phosphate transport system regulatory protein PhoU, putative",inactivated
+563,MG_410_411_412_PENTAMER,phosphate ABC transporter,inactivated
+564,MG_425_DIMER,ATP-dependent RNA helicase,inactivated
+565,MG_427_DIMER,osmotically inducible peroxidase,inactivated
+566,MG_427_DIMER_ox,oxidized osmotically inducible peroxidase,inactivated
+567,MG_428_DIMER,"LuxR bacterial regulatory protein, putative",inactivated
+568,MG_431_DIMER,triosephosphate isomerase,inactivated
+569,MG_433_DIMER,translation elongation factor Ts,inactivated
+570,MG_434_HEXAMER,uridylate kinase,inactivated
+571,MG_437_DIMER,phosphatidate cytidylyltransferase,inactivated
+572,MG_445_DIMER,tRNA (guanine-N1)-methyltransferase,inactivated
+573,MG_451_DIMER,translation elongation factor Tu,inactivated
+574,MG_453_TETRAMER,UTP-glucose-1-phosphate uridylyltransferase,inactivated
+575,MG_454_DIMER,thiol-dependent peroxidase,inactivated
+576,MG_454_DIMER_ox,oxidized thiol-dependent peroxidase,inactivated
+577,MG_455_DIMER,tyrosyl-tRNA synthetase,inactivated
+578,MG_457_HEXAMER,ATP-dependent metalloprotease FtsH,inactivated
+579,MG_458_TETRAMER,hypoxanthine phosphoribosyltransferase,inactivated
+580,MG_460_TETRAMER,L-lactate dehydrogenase/malate dehydrogenase,inactivated
+581,MG_467_468_526_TETRAMER,salivaricin A ABC transporter,inactivated
+582,MG_469_1MER_ADP,DnaA-ADP,inactivated
+583,MG_469_1MER_ATP,DnaA-ATP,inactivated
+584,MG_469_2MER_1ATP_ADP,DnaA 2mer-(1)ATP-(1)ADP,inactivated
+585,MG_469_2MER_ATP,DnaA-ATP 2mer,inactivated
+586,MG_469_3MER_2ATP_ADP,DnaA 3mer-(2)ATP-(1)ADP,inactivated
+587,MG_469_3MER_ATP,DnaA-ATP 3mer,inactivated
+588,MG_469_4MER_3ATP_ADP,DnaA 4mer-(3)ATP-(1)ADP,inactivated
+589,MG_469_4MER_ATP,DnaA-ATP 4mer,inactivated
+590,MG_469_5MER_4ATP_ADP,DnaA 5mer-(4)ATP-(1)ADP,inactivated
+591,MG_469_5MER_ATP,DnaA-ATP 5mer,inactivated
+592,MG_469_6MER_5ATP_ADP,DnaA 6mer-(5)ATP-(1)ADP,inactivated
+593,MG_469_6MER_ATP,DnaA-ATP 6mer,inactivated
+594,MG_469_7MER_6ATP_ADP,DnaA 7mer-(6)ATP-(1)ADP,inactivated
+595,MG_469_7MER_ATP,DnaA-ATP 7mer,inactivated
+596,MG_482_DIMER,holo-(acyl-carrier-protein) synthase,inactivated
+597,REPLISOME,Replisome,inactivated
+598,RIBOSOME_30S,30S ribosomal subunit,inactivated
+599,RIBOSOME_30S_IF3,30S ribosomal subunit - translation initiation factor IF-3 complex,inactivated
+600,RIBOSOME_50S,50S ribosomal subunit,inactivated
+601,RIBOSOME_70S,70S ribosome,inactivated
+602,RNA_POLYMERASE,DNA-directed RNA polymerase,inactivated
+603,RNA_POLYMERASE_HOLOENZYME,DNA-directed RNA polymerase holoenzyme,inactivated
+604,DNA_GYRASE,DNA gyrase,bound
+605,DNA_POLYMERASE_2CORE_BETA_CLAMP_GAMMA_COMPLEX_PRIMASE,"DNA polymerase (2) core, Î²-clamp, Î³-complex, and primase",bound
+606,DNA_POLYMERASE_CORE,DNA-directed DNA polymerase,bound
+607,DNA_POLYMERASE_CORE_BETA_CLAMP_GAMMA_COMPLEX,"DNA polymerase core, &beta;-clamp, and &gamma;-complex",bound
+608,DNA_POLYMERASE_CORE_BETA_CLAMP_PRIMASE,"DNA polymerase core, &beta;-clamp, and primase",bound
+609,DNA_POLYMERASE_GAMMA_COMPLEX,DNA-directed DNA polymerase gamma complex,bound
+610,DNA_POLYMERASE_HOLOENZYME,DNA-directed DNA polymerase holoenzyme,bound
+611,MG_0001_048,signal recognition particle,bound
+612,MG_0003_465,ribonuclease P,bound
+613,MG_001_DIMER,"DNA polymerase III, beta clamp",bound
+614,MG_005_DIMER,seryl-tRNA synthetase,bound
+615,MG_006_DIMER,thymidylate kinase,bound
+616,MG_008_379_TETRAMER,tRNA uridine 5-carboxymethylaminomethyl modification enzyme,bound
+617,MG_013_DIMER,methylenetetrahydrofolate dehydrogenase/methylenetetrahydrofolate cyclohydrolase,bound
+618,MG_014_015_DIMER,multidrug ABC transporter,bound
+619,MG_019_DIMER,chaperone protein DnaJ,bound
+620,MG_021_DIMER,methionyl-tRNA synthetase,bound
+621,MG_023_DIMER,"fructose-1,6-bisphosphate aldolase, class II",bound
+622,MG_029_DIMER,DJ-1/PfpI family protein,bound
+623,MG_030_TRIMER,uracil phosphoribosyltransferase,bound
+624,MG_033_TETRAMER,glycerol uptake facilitator,bound
+625,MG_034_DIMER,thymidine kinase,bound
+626,MG_035_DIMER,histidyl-tRNA synthetase,bound
+627,MG_036_DIMER,aspartyl-tRNA synthetase,bound
+628,MG_038_TETRAMER,glycerol kinase,bound
+629,MG_039_DIMER,"FAD-dependent glycerol-3-phosphate dehydrogenase, putative",bound
+630,MG_040_119_120_121_PENTAMER,Monosaccharide (riboside/galactoside) ABC transporter,bound
+631,MG_041_062_429_PENTAMER,"PTS system, fructose-specific",bound
+632,MG_041_069_429_PENTAMER,"PTS system, glucose-specific",bound
+633,MG_042_043_044_045_PENTAMER,spermidine/putrescine (polyamine) ABC transporter,bound
+634,MG_046_DIMER,metalloendopeptidase,bound
+635,MG_047_TETRAMER,S-adenosylmethionine synthetase,bound
+636,MG_049_HEXAMER,purine nucleoside phosphorylase,bound
+637,MG_051_DIMER,pyrimidine-nucleoside phosphorylase,bound
+638,MG_052_DIMER,cytidine deaminase,bound
+639,MG_053_TRIMER,"phosphoglucomutase/phosphomannomutase, putative",bound
+640,MG_055_170_277_464_476_20MER,preprotein translocase,bound
+641,MG_058_HEXAMER,ribose-phosphate pyrophosphokinase,bound
+642,MG_063_DIMER,"1-phosphofructokinase, putative",bound
+643,MG_064_065_TETRAMER,ABC transporter,bound
+644,MG_066_DIMER,transketolase,bound
+645,MG_072_DIMER,"preprotein translocase, SecA subunit",bound
+646,MG_073_206_421_TETRAMER,DNA incision complex,bound
+647,MG_077_078_079_080_321_PENTAMER,oligopeptide ABC transporter,bound
+648,MG_084_TETRAMER,tRNA(Ile)-lysidine synthetase,bound
+649,MG_085_HEXAMER,HPr(Ser) kinase/phosphatase,bound
+650,MG_089_DIMER,translation elongation factor G,bound
+651,MG_091_OCTAMER,"single-strand binding protein family, octamer",bound
+652,MG_091_TETRAMER,"single-strand binding protein family, tetramer",bound
+653,MG_094_HEXAMER,replicative DNA helicase,bound
+654,MG_098_099_100_TRIMER,glutamyl-tRNA(Gln) and/or aspartyl-tRNA(Asn) amidotransferase,bound
+655,MG_102_DIMER,thioredoxin-disulfide reductase,bound
+656,MG_102_DIMER_ox,oxidized thioredoxin-disulfide reductase,bound
+657,MG_105_OCTAMER,putative DNA integrity scanning protein,bound
+658,MG_106_DIMER,peptide deformylase,bound
+659,MG_107_DIMER,guanylate kinase,bound
+660,MG_109_DIMER,"serine/threonine protein kinase, putative",bound
+661,MG_111_DIMER,glucose-6-phosphate isomerase,bound
+662,MG_112_DIMER,ribulose-phosphate 3-epimerase,bound
+663,MG_113_DIMER,asparaginyl-tRNA synthetase,bound
+664,MG_114_DIMER,CDP-diacylglycerol--glycerol-3-phosphate 3-phosphatidyltransferase,bound
+665,MG_118_DIMER,UDP-glucose 4-epimerase,bound
+666,MG_123_DIMER,arginine deaminase,bound
+667,MG_124_MONOMER_ox,oxidized thioredoxin,bound
+668,MG_126_DIMER,tryptophanyl-tRNA synthetase,bound
+669,MG_127_MONOMER_ox,oxidized Spx subfamily protein,bound
+670,MG_128_HEXAMER,"inorganic polyphosphate/ATP-NAD kinase, probable",bound
+671,MG_132_DIMER,purine nucleoside phosphoramidase,bound
+672,MG_136_DIMER,lysyl-tRNA synthetase,bound
+673,MG_137_DIMER,UDP-galactopyranose mutase,bound
+674,MG_139_DIMER,ribonuclease J,bound
+675,MG_179_180_181_TETRAMER,metal ion (cobalt) ABC transporter,bound
+676,MG_182_DIMER,Pseudouridylate synthase,bound
+677,MG_184_DIMER,adenine-specific DNA modification methylase,bound
+678,MG_186_187_188_189_PENTAMER,Oligosaccharide or polyol ABC transporter,bound
+679,MG_194_195_TETRAMER,phenylalanyl-tRNA synthetase,bound
+680,MG_201_DIMER,co-chaperone GrpE,bound
+681,MG_203_204_TETRAMER,topoisomerase IV,bound
+682,MG_205_DIMER,"heat-inducible transcription repressor HrcA, putative",bound
+683,MG_208_DIMER,glycoprotease family protein,bound
+684,MG_213_214_298_6MER,chromosome segregation protein SMC,bound
+685,MG_213_214_298_6MER_ADP,Chromosome Segregation Protein SMC with SCP Proteins-ADP,bound
+686,MG_215_TETRAMER,6-phosphofructokinase,bound
+687,MG_216_TETRAMER,pyruvate kinase,bound
+688,MG_221_OCTAMER,mraZ protein,bound
+689,MG_224_2MER_GTP,cell division protein ftsZ activated 2mer,bound
+690,MG_224_3MER_GTP,cell division protein ftsZ activated 3mer,bound
+691,MG_224_4MER_GTP,cell division protein ftsZ activated 4mer,bound
+692,MG_224_5MER_GTP,cell division protein ftsZ activated 5mer,bound
+693,MG_224_6MER_GTP,cell division protein ftsZ activated 6mer,bound
+694,MG_224_7MER_GTP,cell division protein ftsZ activated 7mer,bound
+695,MG_224_8MER_GTP,cell division protein ftsZ activated 8mer,bound
+696,MG_224_9MER_GDP,cell division protein ftsZ deactivated 9mer,bound
+697,MG_224_9MER_GTP,cell division protein ftsZ activated 9mer,bound
+698,MG_224_MONOMER_GDP,cell division protein ftsZ hydrolysed,bound
+699,MG_224_MONOMER_GTP,cell division protein ftsZ activated,bound
+700,MG_225_DIMER,amino acid transporter,bound
+701,MG_226_DIMER,amino acid transporter,bound
+702,MG_227_DIMER,thymidylate synthase,bound
+703,MG_228_TETRAMER,dihydrofolate reductase,bound
+704,MG_229_231_TETRAMER,ribonucleoside-diphosphate reductase,bound
+705,MG_229_231_TETRAMER_ox,oxidized ribonucleoside-diphosphate reductase,bound
+706,MG_239_HEXAMER,ATP-dependent protease La,bound
+707,MG_240_HEXAMER,nicotinamide-nucleotide adenylyltransferase/conserved hypothetical protein,bound
+708,MG_244_DIMER,3-5' helicase,bound
+709,MG_251_DIMER,glycyl-tRNA synthetase,bound
+710,MG_252_DIMER,23S rRNA methyltransferase,bound
+711,MG_259_TETRAMER,modification methylase,bound
+712,MG_265_DIMER,sugar phosphatase,bound
+713,MG_271_272_273_274_192MER,pyruvate dehydrogenase,bound
+714,MG_271_272_273_274_192MER_ox,oxidized dihydrolipoamide dehydrogenase,bound
+715,MG_275_TETRAMER,NADH oxidase,bound
+716,MG_276_DIMER,adenine phosphoribosyltransferase,bound
+717,MG_278_DIMER,GTP pyrophosphokinase,bound
+718,MG_283_DIMER,prolyl-tRNA synthetase,bound
+719,MG_287_MONOMER_ACP,holo acyl carrier protein,bound
+720,MG_287_MONOMER_ddcaACP,Dodecanoyl-ACP (n-C12:0ACP),bound
+721,MG_287_MONOMER_hdeACP,cis-hexadec-9-enoyl-[acyl-carrier protein] (n-C16:1),bound
+722,MG_287_MONOMER_myrsACP,Myristoyl-ACP (n-C14:0ACP),bound
+723,MG_287_MONOMER_ocdcaACP,Octadecanoyl-ACP (n-C18:0ACP),bound
+724,MG_287_MONOMER_octeACP,cis-octadec-11-enoyl-[acyl-carrier protein] (n-C18:1),bound
+725,MG_287_MONOMER_palmACP,Palmitoyl-ACP (n-C16:0ACP),bound
+726,MG_287_MONOMER_tdeACP,cis-tetradec-7-enoyl-[acyl-carrier protein] (n-C14:1),bound
+727,MG_289_290_291_PENTAMER,phosphonate ABC transporter,bound
+728,MG_292_TETRAMER,alanyl-tRNA synthetase,bound
+729,MG_293_DIMER,glycerophosphoryl diester phosphodiesterase family protein,bound
+730,MG_295_MONOMER_ox,oxidized tRNA U34 sulfurtransferase,bound
+731,MG_299_DIMER,phosphate acetyltransferase,bound
+732,MG_301_TETRAMER,"glyceraldehyde-3-phosphate dehydrogenase, type I",bound
+733,MG_302_303_304_TETRAMER,metal ion (cobalt) ABC transporter,bound
+734,MG_316_DIMER,DNA internalization-related competence protein ComEC/Rec2,bound
+735,MG_322_323_TETRAMER,"potassium uptake protein, TrkH family, putative",bound
+736,MG_333_DIMER,"FMN-dependent NADH-azoreductase, putative",bound
+737,MG_336_DIMER,cysteine desulfurase,bound
+738,MG_346_DIMER,23S rRNA methyltransferase,bound
+739,MG_347_DIMER,tRNA (guanine-N(7)-)-methyltransferase,bound
+740,MG_349_HEXAMER,Replication initiation/membrane attachment protein,bound
+741,MG_351_HEXAMER,inorganic pyrophosphatase,bound
+742,MG_352_DIMER,Holliday junction endonuclease,bound
+743,MG_353_DIMER,"DNA-binding protein HU, putative",bound
+744,MG_355_HEXAMER,"ATP-dependent Clp protease, ATPase subunit",bound
+745,MG_357_DIMER,acetate kinase,bound
+746,MG_358_359_10MER,Holliday junction DNA helicase,bound
+747,MG_367_DIMER,ribonuclease III,bound
+748,MG_368_DIMER,fatty acid/phospholipid synthesis protein PlsX,bound
+749,MG_369_DIMER,DAK2 phosphatase domain protein,bound
+750,MG_372_DIMER,thiamine biosynthesis/tRNA modification protein ThiI,bound
+751,MG_375_DIMER,threonyl-tRNA synthetase,bound
+752,MG_376_HEXAMER,,bound
+753,MG_382_TETRAMER,uridine kinase,bound
+754,MG_383_DIMER,"NH(3)-dependent NAD+ synthetase, putative",bound
+755,MG_385_DIMER,glycerophosphoryl diester phosphodiesterase family protein,bound
+756,MG_390_DIMER,"toxin ABC transporter, ATP-binding/permease protein",bound
+757,MG_391_HEXAMER,cytosol aminopeptidase,bound
+758,MG_392_393_21MER,GroEL-GroES chaperonin complex,bound
+759,MG_394_TETRAMER,serine hydroxymethyltransferase,bound
+760,MG_396_DIMER,ribose 5-phosphate isomerase B,bound
+761,MG_398_399_400_401_402_403_404_405_22MER,H(+)-transporting two-sector ATPase,bound
+762,MG_407_DIMER,enolase,bound
+763,MG_409_DIMER,"phosphate transport system regulatory protein PhoU, putative",bound
+764,MG_410_411_412_PENTAMER,phosphate ABC transporter,bound
+765,MG_425_DIMER,ATP-dependent RNA helicase,bound
+766,MG_427_DIMER,osmotically inducible peroxidase,bound
+767,MG_427_DIMER_ox,oxidized osmotically inducible peroxidase,bound
+768,MG_428_DIMER,"LuxR bacterial regulatory protein, putative",bound
+769,MG_431_DIMER,triosephosphate isomerase,bound
+770,MG_433_DIMER,translation elongation factor Ts,bound
+771,MG_434_HEXAMER,uridylate kinase,bound
+772,MG_437_DIMER,phosphatidate cytidylyltransferase,bound
+773,MG_445_DIMER,tRNA (guanine-N1)-methyltransferase,bound
+774,MG_451_DIMER,translation elongation factor Tu,bound
+775,MG_453_TETRAMER,UTP-glucose-1-phosphate uridylyltransferase,bound
+776,MG_454_DIMER,thiol-dependent peroxidase,bound
+777,MG_454_DIMER_ox,oxidized thiol-dependent peroxidase,bound
+778,MG_455_DIMER,tyrosyl-tRNA synthetase,bound
+779,MG_457_HEXAMER,ATP-dependent metalloprotease FtsH,bound
+780,MG_458_TETRAMER,hypoxanthine phosphoribosyltransferase,bound
+781,MG_460_TETRAMER,L-lactate dehydrogenase/malate dehydrogenase,bound
+782,MG_467_468_526_TETRAMER,salivaricin A ABC transporter,bound
+783,MG_469_1MER_ADP,DnaA-ADP,bound
+784,MG_469_1MER_ATP,DnaA-ATP,bound
+785,MG_469_2MER_1ATP_ADP,DnaA 2mer-(1)ATP-(1)ADP,bound
+786,MG_469_2MER_ATP,DnaA-ATP 2mer,bound
+787,MG_469_3MER_2ATP_ADP,DnaA 3mer-(2)ATP-(1)ADP,bound
+788,MG_469_3MER_ATP,DnaA-ATP 3mer,bound
+789,MG_469_4MER_3ATP_ADP,DnaA 4mer-(3)ATP-(1)ADP,bound
+790,MG_469_4MER_ATP,DnaA-ATP 4mer,bound
+791,MG_469_5MER_4ATP_ADP,DnaA 5mer-(4)ATP-(1)ADP,bound
+792,MG_469_5MER_ATP,DnaA-ATP 5mer,bound
+793,MG_469_6MER_5ATP_ADP,DnaA 6mer-(5)ATP-(1)ADP,bound
+794,MG_469_6MER_ATP,DnaA-ATP 6mer,bound
+795,MG_469_7MER_6ATP_ADP,DnaA 7mer-(6)ATP-(1)ADP,bound
+796,MG_469_7MER_ATP,DnaA-ATP 7mer,bound
+797,MG_482_DIMER,holo-(acyl-carrier-protein) synthase,bound
+798,REPLISOME,Replisome,bound
+799,RIBOSOME_30S,30S ribosomal subunit,bound
+800,RIBOSOME_30S_IF3,30S ribosomal subunit - translation initiation factor IF-3 complex,bound
+801,RIBOSOME_50S,50S ribosomal subunit,bound
+802,RIBOSOME_70S,70S ribosome,bound
+803,RNA_POLYMERASE,DNA-directed RNA polymerase,bound
+804,RNA_POLYMERASE_HOLOENZYME,DNA-directed RNA polymerase holoenzyme,bound
+805,DNA_GYRASE,DNA gyrase,misfolded
+806,DNA_POLYMERASE_2CORE_BETA_CLAMP_GAMMA_COMPLEX_PRIMASE,"DNA polymerase (2) core, Î²-clamp, Î³-complex, and primase",misfolded
+807,DNA_POLYMERASE_CORE,DNA-directed DNA polymerase,misfolded
+808,DNA_POLYMERASE_CORE_BETA_CLAMP_GAMMA_COMPLEX,"DNA polymerase core, &beta;-clamp, and &gamma;-complex",misfolded
+809,DNA_POLYMERASE_CORE_BETA_CLAMP_PRIMASE,"DNA polymerase core, &beta;-clamp, and primase",misfolded
+810,DNA_POLYMERASE_GAMMA_COMPLEX,DNA-directed DNA polymerase gamma complex,misfolded
+811,DNA_POLYMERASE_HOLOENZYME,DNA-directed DNA polymerase holoenzyme,misfolded
+812,MG_0001_048,signal recognition particle,misfolded
+813,MG_0003_465,ribonuclease P,misfolded
+814,MG_001_DIMER,"DNA polymerase III, beta clamp",misfolded
+815,MG_005_DIMER,seryl-tRNA synthetase,misfolded
+816,MG_006_DIMER,thymidylate kinase,misfolded
+817,MG_008_379_TETRAMER,tRNA uridine 5-carboxymethylaminomethyl modification enzyme,misfolded
+818,MG_013_DIMER,methylenetetrahydrofolate dehydrogenase/methylenetetrahydrofolate cyclohydrolase,misfolded
+819,MG_014_015_DIMER,multidrug ABC transporter,misfolded
+820,MG_019_DIMER,chaperone protein DnaJ,misfolded
+821,MG_021_DIMER,methionyl-tRNA synthetase,misfolded
+822,MG_023_DIMER,"fructose-1,6-bisphosphate aldolase, class II",misfolded
+823,MG_029_DIMER,DJ-1/PfpI family protein,misfolded
+824,MG_030_TRIMER,uracil phosphoribosyltransferase,misfolded
+825,MG_033_TETRAMER,glycerol uptake facilitator,misfolded
+826,MG_034_DIMER,thymidine kinase,misfolded
+827,MG_035_DIMER,histidyl-tRNA synthetase,misfolded
+828,MG_036_DIMER,aspartyl-tRNA synthetase,misfolded
+829,MG_038_TETRAMER,glycerol kinase,misfolded
+830,MG_039_DIMER,"FAD-dependent glycerol-3-phosphate dehydrogenase, putative",misfolded
+831,MG_040_119_120_121_PENTAMER,Monosaccharide (riboside/galactoside) ABC transporter,misfolded
+832,MG_041_062_429_PENTAMER,"PTS system, fructose-specific",misfolded
+833,MG_041_069_429_PENTAMER,"PTS system, glucose-specific",misfolded
+834,MG_042_043_044_045_PENTAMER,spermidine/putrescine (polyamine) ABC transporter,misfolded
+835,MG_046_DIMER,metalloendopeptidase,misfolded
+836,MG_047_TETRAMER,S-adenosylmethionine synthetase,misfolded
+837,MG_049_HEXAMER,purine nucleoside phosphorylase,misfolded
+838,MG_051_DIMER,pyrimidine-nucleoside phosphorylase,misfolded
+839,MG_052_DIMER,cytidine deaminase,misfolded
+840,MG_053_TRIMER,"phosphoglucomutase/phosphomannomutase, putative",misfolded
+841,MG_055_170_277_464_476_20MER,preprotein translocase,misfolded
+842,MG_058_HEXAMER,ribose-phosphate pyrophosphokinase,misfolded
+843,MG_063_DIMER,"1-phosphofructokinase, putative",misfolded
+844,MG_064_065_TETRAMER,ABC transporter,misfolded
+845,MG_066_DIMER,transketolase,misfolded
+846,MG_072_DIMER,"preprotein translocase, SecA subunit",misfolded
+847,MG_073_206_421_TETRAMER,DNA incision complex,misfolded
+848,MG_077_078_079_080_321_PENTAMER,oligopeptide ABC transporter,misfolded
+849,MG_084_TETRAMER,tRNA(Ile)-lysidine synthetase,misfolded
+850,MG_085_HEXAMER,HPr(Ser) kinase/phosphatase,misfolded
+851,MG_089_DIMER,translation elongation factor G,misfolded
+852,MG_091_OCTAMER,"single-strand binding protein family, octamer",misfolded
+853,MG_091_TETRAMER,"single-strand binding protein family, tetramer",misfolded
+854,MG_094_HEXAMER,replicative DNA helicase,misfolded
+855,MG_098_099_100_TRIMER,glutamyl-tRNA(Gln) and/or aspartyl-tRNA(Asn) amidotransferase,misfolded
+856,MG_102_DIMER,thioredoxin-disulfide reductase,misfolded
+857,MG_102_DIMER_ox,oxidized thioredoxin-disulfide reductase,misfolded
+858,MG_105_OCTAMER,putative DNA integrity scanning protein,misfolded
+859,MG_106_DIMER,peptide deformylase,misfolded
+860,MG_107_DIMER,guanylate kinase,misfolded
+861,MG_109_DIMER,"serine/threonine protein kinase, putative",misfolded
+862,MG_111_DIMER,glucose-6-phosphate isomerase,misfolded
+863,MG_112_DIMER,ribulose-phosphate 3-epimerase,misfolded
+864,MG_113_DIMER,asparaginyl-tRNA synthetase,misfolded
+865,MG_114_DIMER,CDP-diacylglycerol--glycerol-3-phosphate 3-phosphatidyltransferase,misfolded
+866,MG_118_DIMER,UDP-glucose 4-epimerase,misfolded
+867,MG_123_DIMER,arginine deaminase,misfolded
+868,MG_124_MONOMER_ox,oxidized thioredoxin,misfolded
+869,MG_126_DIMER,tryptophanyl-tRNA synthetase,misfolded
+870,MG_127_MONOMER_ox,oxidized Spx subfamily protein,misfolded
+871,MG_128_HEXAMER,"inorganic polyphosphate/ATP-NAD kinase, probable",misfolded
+872,MG_132_DIMER,purine nucleoside phosphoramidase,misfolded
+873,MG_136_DIMER,lysyl-tRNA synthetase,misfolded
+874,MG_137_DIMER,UDP-galactopyranose mutase,misfolded
+875,MG_139_DIMER,ribonuclease J,misfolded
+876,MG_179_180_181_TETRAMER,metal ion (cobalt) ABC transporter,misfolded
+877,MG_182_DIMER,Pseudouridylate synthase,misfolded
+878,MG_184_DIMER,adenine-specific DNA modification methylase,misfolded
+879,MG_186_187_188_189_PENTAMER,Oligosaccharide or polyol ABC transporter,misfolded
+880,MG_194_195_TETRAMER,phenylalanyl-tRNA synthetase,misfolded
+881,MG_201_DIMER,co-chaperone GrpE,misfolded
+882,MG_203_204_TETRAMER,topoisomerase IV,misfolded
+883,MG_205_DIMER,"heat-inducible transcription repressor HrcA, putative",misfolded
+884,MG_208_DIMER,glycoprotease family protein,misfolded
+885,MG_213_214_298_6MER,chromosome segregation protein SMC,misfolded
+886,MG_213_214_298_6MER_ADP,Chromosome Segregation Protein SMC with SCP Proteins-ADP,misfolded
+887,MG_215_TETRAMER,6-phosphofructokinase,misfolded
+888,MG_216_TETRAMER,pyruvate kinase,misfolded
+889,MG_221_OCTAMER,mraZ protein,misfolded
+890,MG_224_2MER_GTP,cell division protein ftsZ activated 2mer,misfolded
+891,MG_224_3MER_GTP,cell division protein ftsZ activated 3mer,misfolded
+892,MG_224_4MER_GTP,cell division protein ftsZ activated 4mer,misfolded
+893,MG_224_5MER_GTP,cell division protein ftsZ activated 5mer,misfolded
+894,MG_224_6MER_GTP,cell division protein ftsZ activated 6mer,misfolded
+895,MG_224_7MER_GTP,cell division protein ftsZ activated 7mer,misfolded
+896,MG_224_8MER_GTP,cell division protein ftsZ activated 8mer,misfolded
+897,MG_224_9MER_GDP,cell division protein ftsZ deactivated 9mer,misfolded
+898,MG_224_9MER_GTP,cell division protein ftsZ activated 9mer,misfolded
+899,MG_224_MONOMER_GDP,cell division protein ftsZ hydrolysed,misfolded
+900,MG_224_MONOMER_GTP,cell division protein ftsZ activated,misfolded
+901,MG_225_DIMER,amino acid transporter,misfolded
+902,MG_226_DIMER,amino acid transporter,misfolded
+903,MG_227_DIMER,thymidylate synthase,misfolded
+904,MG_228_TETRAMER,dihydrofolate reductase,misfolded
+905,MG_229_231_TETRAMER,ribonucleoside-diphosphate reductase,misfolded
+906,MG_229_231_TETRAMER_ox,oxidized ribonucleoside-diphosphate reductase,misfolded
+907,MG_239_HEXAMER,ATP-dependent protease La,misfolded
+908,MG_240_HEXAMER,nicotinamide-nucleotide adenylyltransferase/conserved hypothetical protein,misfolded
+909,MG_244_DIMER,3-5' helicase,misfolded
+910,MG_251_DIMER,glycyl-tRNA synthetase,misfolded
+911,MG_252_DIMER,23S rRNA methyltransferase,misfolded
+912,MG_259_TETRAMER,modification methylase,misfolded
+913,MG_265_DIMER,sugar phosphatase,misfolded
+914,MG_271_272_273_274_192MER,pyruvate dehydrogenase,misfolded
+915,MG_271_272_273_274_192MER_ox,oxidized dihydrolipoamide dehydrogenase,misfolded
+916,MG_275_TETRAMER,NADH oxidase,misfolded
+917,MG_276_DIMER,adenine phosphoribosyltransferase,misfolded
+918,MG_278_DIMER,GTP pyrophosphokinase,misfolded
+919,MG_283_DIMER,prolyl-tRNA synthetase,misfolded
+920,MG_287_MONOMER_ACP,holo acyl carrier protein,misfolded
+921,MG_287_MONOMER_ddcaACP,Dodecanoyl-ACP (n-C12:0ACP),misfolded
+922,MG_287_MONOMER_hdeACP,cis-hexadec-9-enoyl-[acyl-carrier protein] (n-C16:1),misfolded
+923,MG_287_MONOMER_myrsACP,Myristoyl-ACP (n-C14:0ACP),misfolded
+924,MG_287_MONOMER_ocdcaACP,Octadecanoyl-ACP (n-C18:0ACP),misfolded
+925,MG_287_MONOMER_octeACP,cis-octadec-11-enoyl-[acyl-carrier protein] (n-C18:1),misfolded
+926,MG_287_MONOMER_palmACP,Palmitoyl-ACP (n-C16:0ACP),misfolded
+927,MG_287_MONOMER_tdeACP,cis-tetradec-7-enoyl-[acyl-carrier protein] (n-C14:1),misfolded
+928,MG_289_290_291_PENTAMER,phosphonate ABC transporter,misfolded
+929,MG_292_TETRAMER,alanyl-tRNA synthetase,misfolded
+930,MG_293_DIMER,glycerophosphoryl diester phosphodiesterase family protein,misfolded
+931,MG_295_MONOMER_ox,oxidized tRNA U34 sulfurtransferase,misfolded
+932,MG_299_DIMER,phosphate acetyltransferase,misfolded
+933,MG_301_TETRAMER,"glyceraldehyde-3-phosphate dehydrogenase, type I",misfolded
+934,MG_302_303_304_TETRAMER,metal ion (cobalt) ABC transporter,misfolded
+935,MG_316_DIMER,DNA internalization-related competence protein ComEC/Rec2,misfolded
+936,MG_322_323_TETRAMER,"potassium uptake protein, TrkH family, putative",misfolded
+937,MG_333_DIMER,"FMN-dependent NADH-azoreductase, putative",misfolded
+938,MG_336_DIMER,cysteine desulfurase,misfolded
+939,MG_346_DIMER,23S rRNA methyltransferase,misfolded
+940,MG_347_DIMER,tRNA (guanine-N(7)-)-methyltransferase,misfolded
+941,MG_349_HEXAMER,Replication initiation/membrane attachment protein,misfolded
+942,MG_351_HEXAMER,inorganic pyrophosphatase,misfolded
+943,MG_352_DIMER,Holliday junction endonuclease,misfolded
+944,MG_353_DIMER,"DNA-binding protein HU, putative",misfolded
+945,MG_355_HEXAMER,"ATP-dependent Clp protease, ATPase subunit",misfolded
+946,MG_357_DIMER,acetate kinase,misfolded
+947,MG_358_359_10MER,Holliday junction DNA helicase,misfolded
+948,MG_367_DIMER,ribonuclease III,misfolded
+949,MG_368_DIMER,fatty acid/phospholipid synthesis protein PlsX,misfolded
+950,MG_369_DIMER,DAK2 phosphatase domain protein,misfolded
+951,MG_372_DIMER,thiamine biosynthesis/tRNA modification protein ThiI,misfolded
+952,MG_375_DIMER,threonyl-tRNA synthetase,misfolded
+953,MG_376_HEXAMER,,misfolded
+954,MG_382_TETRAMER,uridine kinase,misfolded
+955,MG_383_DIMER,"NH(3)-dependent NAD+ synthetase, putative",misfolded
+956,MG_385_DIMER,glycerophosphoryl diester phosphodiesterase family protein,misfolded
+957,MG_390_DIMER,"toxin ABC transporter, ATP-binding/permease protein",misfolded
+958,MG_391_HEXAMER,cytosol aminopeptidase,misfolded
+959,MG_392_393_21MER,GroEL-GroES chaperonin complex,misfolded
+960,MG_394_TETRAMER,serine hydroxymethyltransferase,misfolded
+961,MG_396_DIMER,ribose 5-phosphate isomerase B,misfolded
+962,MG_398_399_400_401_402_403_404_405_22MER,H(+)-transporting two-sector ATPase,misfolded
+963,MG_407_DIMER,enolase,misfolded
+964,MG_409_DIMER,"phosphate transport system regulatory protein PhoU, putative",misfolded
+965,MG_410_411_412_PENTAMER,phosphate ABC transporter,misfolded
+966,MG_425_DIMER,ATP-dependent RNA helicase,misfolded
+967,MG_427_DIMER,osmotically inducible peroxidase,misfolded
+968,MG_427_DIMER_ox,oxidized osmotically inducible peroxidase,misfolded
+969,MG_428_DIMER,"LuxR bacterial regulatory protein, putative",misfolded
+970,MG_431_DIMER,triosephosphate isomerase,misfolded
+971,MG_433_DIMER,translation elongation factor Ts,misfolded
+972,MG_434_HEXAMER,uridylate kinase,misfolded
+973,MG_437_DIMER,phosphatidate cytidylyltransferase,misfolded
+974,MG_445_DIMER,tRNA (guanine-N1)-methyltransferase,misfolded
+975,MG_451_DIMER,translation elongation factor Tu,misfolded
+976,MG_453_TETRAMER,UTP-glucose-1-phosphate uridylyltransferase,misfolded
+977,MG_454_DIMER,thiol-dependent peroxidase,misfolded
+978,MG_454_DIMER_ox,oxidized thiol-dependent peroxidase,misfolded
+979,MG_455_DIMER,tyrosyl-tRNA synthetase,misfolded
+980,MG_457_HEXAMER,ATP-dependent metalloprotease FtsH,misfolded
+981,MG_458_TETRAMER,hypoxanthine phosphoribosyltransferase,misfolded
+982,MG_460_TETRAMER,L-lactate dehydrogenase/malate dehydrogenase,misfolded
+983,MG_467_468_526_TETRAMER,salivaricin A ABC transporter,misfolded
+984,MG_469_1MER_ADP,DnaA-ADP,misfolded
+985,MG_469_1MER_ATP,DnaA-ATP,misfolded
+986,MG_469_2MER_1ATP_ADP,DnaA 2mer-(1)ATP-(1)ADP,misfolded
+987,MG_469_2MER_ATP,DnaA-ATP 2mer,misfolded
+988,MG_469_3MER_2ATP_ADP,DnaA 3mer-(2)ATP-(1)ADP,misfolded
+989,MG_469_3MER_ATP,DnaA-ATP 3mer,misfolded
+990,MG_469_4MER_3ATP_ADP,DnaA 4mer-(3)ATP-(1)ADP,misfolded
+991,MG_469_4MER_ATP,DnaA-ATP 4mer,misfolded
+992,MG_469_5MER_4ATP_ADP,DnaA 5mer-(4)ATP-(1)ADP,misfolded
+993,MG_469_5MER_ATP,DnaA-ATP 5mer,misfolded
+994,MG_469_6MER_5ATP_ADP,DnaA 6mer-(5)ATP-(1)ADP,misfolded
+995,MG_469_6MER_ATP,DnaA-ATP 6mer,misfolded
+996,MG_469_7MER_6ATP_ADP,DnaA 7mer-(6)ATP-(1)ADP,misfolded
+997,MG_469_7MER_ATP,DnaA-ATP 7mer,misfolded
+998,MG_482_DIMER,holo-(acyl-carrier-protein) synthase,misfolded
+999,REPLISOME,Replisome,misfolded
+1000,RIBOSOME_30S,30S ribosomal subunit,misfolded
+1001,RIBOSOME_30S_IF3,30S ribosomal subunit - translation initiation factor IF-3 complex,misfolded
+1002,RIBOSOME_50S,50S ribosomal subunit,misfolded
+1003,RIBOSOME_70S,70S ribosome,misfolded
+1004,RNA_POLYMERASE,DNA-directed RNA polymerase,misfolded
+1005,RNA_POLYMERASE_HOLOENZYME,DNA-directed RNA polymerase holoenzyme,misfolded
+1006,DNA_GYRASE,DNA gyrase,damaged
+1007,DNA_POLYMERASE_2CORE_BETA_CLAMP_GAMMA_COMPLEX_PRIMASE,"DNA polymerase (2) core, Î²-clamp, Î³-complex, and primase",damaged
+1008,DNA_POLYMERASE_CORE,DNA-directed DNA polymerase,damaged
+1009,DNA_POLYMERASE_CORE_BETA_CLAMP_GAMMA_COMPLEX,"DNA polymerase core, &beta;-clamp, and &gamma;-complex",damaged
+1010,DNA_POLYMERASE_CORE_BETA_CLAMP_PRIMASE,"DNA polymerase core, &beta;-clamp, and primase",damaged
+1011,DNA_POLYMERASE_GAMMA_COMPLEX,DNA-directed DNA polymerase gamma complex,damaged
+1012,DNA_POLYMERASE_HOLOENZYME,DNA-directed DNA polymerase holoenzyme,damaged
+1013,MG_0001_048,signal recognition particle,damaged
+1014,MG_0003_465,ribonuclease P,damaged
+1015,MG_001_DIMER,"DNA polymerase III, beta clamp",damaged
+1016,MG_005_DIMER,seryl-tRNA synthetase,damaged
+1017,MG_006_DIMER,thymidylate kinase,damaged
+1018,MG_008_379_TETRAMER,tRNA uridine 5-carboxymethylaminomethyl modification enzyme,damaged
+1019,MG_013_DIMER,methylenetetrahydrofolate dehydrogenase/methylenetetrahydrofolate cyclohydrolase,damaged
+1020,MG_014_015_DIMER,multidrug ABC transporter,damaged
+1021,MG_019_DIMER,chaperone protein DnaJ,damaged
+1022,MG_021_DIMER,methionyl-tRNA synthetase,damaged
+1023,MG_023_DIMER,"fructose-1,6-bisphosphate aldolase, class II",damaged
+1024,MG_029_DIMER,DJ-1/PfpI family protein,damaged
+1025,MG_030_TRIMER,uracil phosphoribosyltransferase,damaged
+1026,MG_033_TETRAMER,glycerol uptake facilitator,damaged
+1027,MG_034_DIMER,thymidine kinase,damaged
+1028,MG_035_DIMER,histidyl-tRNA synthetase,damaged
+1029,MG_036_DIMER,aspartyl-tRNA synthetase,damaged
+1030,MG_038_TETRAMER,glycerol kinase,damaged
+1031,MG_039_DIMER,"FAD-dependent glycerol-3-phosphate dehydrogenase, putative",damaged
+1032,MG_040_119_120_121_PENTAMER,Monosaccharide (riboside/galactoside) ABC transporter,damaged
+1033,MG_041_062_429_PENTAMER,"PTS system, fructose-specific",damaged
+1034,MG_041_069_429_PENTAMER,"PTS system, glucose-specific",damaged
+1035,MG_042_043_044_045_PENTAMER,spermidine/putrescine (polyamine) ABC transporter,damaged
+1036,MG_046_DIMER,metalloendopeptidase,damaged
+1037,MG_047_TETRAMER,S-adenosylmethionine synthetase,damaged
+1038,MG_049_HEXAMER,purine nucleoside phosphorylase,damaged
+1039,MG_051_DIMER,pyrimidine-nucleoside phosphorylase,damaged
+1040,MG_052_DIMER,cytidine deaminase,damaged
+1041,MG_053_TRIMER,"phosphoglucomutase/phosphomannomutase, putative",damaged
+1042,MG_055_170_277_464_476_20MER,preprotein translocase,damaged
+1043,MG_058_HEXAMER,ribose-phosphate pyrophosphokinase,damaged
+1044,MG_063_DIMER,"1-phosphofructokinase, putative",damaged
+1045,MG_064_065_TETRAMER,ABC transporter,damaged
+1046,MG_066_DIMER,transketolase,damaged
+1047,MG_072_DIMER,"preprotein translocase, SecA subunit",damaged
+1048,MG_073_206_421_TETRAMER,DNA incision complex,damaged
+1049,MG_077_078_079_080_321_PENTAMER,oligopeptide ABC transporter,damaged
+1050,MG_084_TETRAMER,tRNA(Ile)-lysidine synthetase,damaged
+1051,MG_085_HEXAMER,HPr(Ser) kinase/phosphatase,damaged
+1052,MG_089_DIMER,translation elongation factor G,damaged
+1053,MG_091_OCTAMER,"single-strand binding protein family, octamer",damaged
+1054,MG_091_TETRAMER,"single-strand binding protein family, tetramer",damaged
+1055,MG_094_HEXAMER,replicative DNA helicase,damaged
+1056,MG_098_099_100_TRIMER,glutamyl-tRNA(Gln) and/or aspartyl-tRNA(Asn) amidotransferase,damaged
+1057,MG_102_DIMER,thioredoxin-disulfide reductase,damaged
+1058,MG_102_DIMER_ox,oxidized thioredoxin-disulfide reductase,damaged
+1059,MG_105_OCTAMER,putative DNA integrity scanning protein,damaged
+1060,MG_106_DIMER,peptide deformylase,damaged
+1061,MG_107_DIMER,guanylate kinase,damaged
+1062,MG_109_DIMER,"serine/threonine protein kinase, putative",damaged
+1063,MG_111_DIMER,glucose-6-phosphate isomerase,damaged
+1064,MG_112_DIMER,ribulose-phosphate 3-epimerase,damaged
+1065,MG_113_DIMER,asparaginyl-tRNA synthetase,damaged
+1066,MG_114_DIMER,CDP-diacylglycerol--glycerol-3-phosphate 3-phosphatidyltransferase,damaged
+1067,MG_118_DIMER,UDP-glucose 4-epimerase,damaged
+1068,MG_123_DIMER,arginine deaminase,damaged
+1069,MG_124_MONOMER_ox,oxidized thioredoxin,damaged
+1070,MG_126_DIMER,tryptophanyl-tRNA synthetase,damaged
+1071,MG_127_MONOMER_ox,oxidized Spx subfamily protein,damaged
+1072,MG_128_HEXAMER,"inorganic polyphosphate/ATP-NAD kinase, probable",damaged
+1073,MG_132_DIMER,purine nucleoside phosphoramidase,damaged
+1074,MG_136_DIMER,lysyl-tRNA synthetase,damaged
+1075,MG_137_DIMER,UDP-galactopyranose mutase,damaged
+1076,MG_139_DIMER,ribonuclease J,damaged
+1077,MG_179_180_181_TETRAMER,metal ion (cobalt) ABC transporter,damaged
+1078,MG_182_DIMER,Pseudouridylate synthase,damaged
+1079,MG_184_DIMER,adenine-specific DNA modification methylase,damaged
+1080,MG_186_187_188_189_PENTAMER,Oligosaccharide or polyol ABC transporter,damaged
+1081,MG_194_195_TETRAMER,phenylalanyl-tRNA synthetase,damaged
+1082,MG_201_DIMER,co-chaperone GrpE,damaged
+1083,MG_203_204_TETRAMER,topoisomerase IV,damaged
+1084,MG_205_DIMER,"heat-inducible transcription repressor HrcA, putative",damaged
+1085,MG_208_DIMER,glycoprotease family protein,damaged
+1086,MG_213_214_298_6MER,chromosome segregation protein SMC,damaged
+1087,MG_213_214_298_6MER_ADP,Chromosome Segregation Protein SMC with SCP Proteins-ADP,damaged
+1088,MG_215_TETRAMER,6-phosphofructokinase,damaged
+1089,MG_216_TETRAMER,pyruvate kinase,damaged
+1090,MG_221_OCTAMER,mraZ protein,damaged
+1091,MG_224_2MER_GTP,cell division protein ftsZ activated 2mer,damaged
+1092,MG_224_3MER_GTP,cell division protein ftsZ activated 3mer,damaged
+1093,MG_224_4MER_GTP,cell division protein ftsZ activated 4mer,damaged
+1094,MG_224_5MER_GTP,cell division protein ftsZ activated 5mer,damaged
+1095,MG_224_6MER_GTP,cell division protein ftsZ activated 6mer,damaged
+1096,MG_224_7MER_GTP,cell division protein ftsZ activated 7mer,damaged
+1097,MG_224_8MER_GTP,cell division protein ftsZ activated 8mer,damaged
+1098,MG_224_9MER_GDP,cell division protein ftsZ deactivated 9mer,damaged
+1099,MG_224_9MER_GTP,cell division protein ftsZ activated 9mer,damaged
+1100,MG_224_MONOMER_GDP,cell division protein ftsZ hydrolysed,damaged
+1101,MG_224_MONOMER_GTP,cell division protein ftsZ activated,damaged
+1102,MG_225_DIMER,amino acid transporter,damaged
+1103,MG_226_DIMER,amino acid transporter,damaged
+1104,MG_227_DIMER,thymidylate synthase,damaged
+1105,MG_228_TETRAMER,dihydrofolate reductase,damaged
+1106,MG_229_231_TETRAMER,ribonucleoside-diphosphate reductase,damaged
+1107,MG_229_231_TETRAMER_ox,oxidized ribonucleoside-diphosphate reductase,damaged
+1108,MG_239_HEXAMER,ATP-dependent protease La,damaged
+1109,MG_240_HEXAMER,nicotinamide-nucleotide adenylyltransferase/conserved hypothetical protein,damaged
+1110,MG_244_DIMER,3-5' helicase,damaged
+1111,MG_251_DIMER,glycyl-tRNA synthetase,damaged
+1112,MG_252_DIMER,23S rRNA methyltransferase,damaged
+1113,MG_259_TETRAMER,modification methylase,damaged
+1114,MG_265_DIMER,sugar phosphatase,damaged
+1115,MG_271_272_273_274_192MER,pyruvate dehydrogenase,damaged
+1116,MG_271_272_273_274_192MER_ox,oxidized dihydrolipoamide dehydrogenase,damaged
+1117,MG_275_TETRAMER,NADH oxidase,damaged
+1118,MG_276_DIMER,adenine phosphoribosyltransferase,damaged
+1119,MG_278_DIMER,GTP pyrophosphokinase,damaged
+1120,MG_283_DIMER,prolyl-tRNA synthetase,damaged
+1121,MG_287_MONOMER_ACP,holo acyl carrier protein,damaged
+1122,MG_287_MONOMER_ddcaACP,Dodecanoyl-ACP (n-C12:0ACP),damaged
+1123,MG_287_MONOMER_hdeACP,cis-hexadec-9-enoyl-[acyl-carrier protein] (n-C16:1),damaged
+1124,MG_287_MONOMER_myrsACP,Myristoyl-ACP (n-C14:0ACP),damaged
+1125,MG_287_MONOMER_ocdcaACP,Octadecanoyl-ACP (n-C18:0ACP),damaged
+1126,MG_287_MONOMER_octeACP,cis-octadec-11-enoyl-[acyl-carrier protein] (n-C18:1),damaged
+1127,MG_287_MONOMER_palmACP,Palmitoyl-ACP (n-C16:0ACP),damaged
+1128,MG_287_MONOMER_tdeACP,cis-tetradec-7-enoyl-[acyl-carrier protein] (n-C14:1),damaged
+1129,MG_289_290_291_PENTAMER,phosphonate ABC transporter,damaged
+1130,MG_292_TETRAMER,alanyl-tRNA synthetase,damaged
+1131,MG_293_DIMER,glycerophosphoryl diester phosphodiesterase family protein,damaged
+1132,MG_295_MONOMER_ox,oxidized tRNA U34 sulfurtransferase,damaged
+1133,MG_299_DIMER,phosphate acetyltransferase,damaged
+1134,MG_301_TETRAMER,"glyceraldehyde-3-phosphate dehydrogenase, type I",damaged
+1135,MG_302_303_304_TETRAMER,metal ion (cobalt) ABC transporter,damaged
+1136,MG_316_DIMER,DNA internalization-related competence protein ComEC/Rec2,damaged
+1137,MG_322_323_TETRAMER,"potassium uptake protein, TrkH family, putative",damaged
+1138,MG_333_DIMER,"FMN-dependent NADH-azoreductase, putative",damaged
+1139,MG_336_DIMER,cysteine desulfurase,damaged
+1140,MG_346_DIMER,23S rRNA methyltransferase,damaged
+1141,MG_347_DIMER,tRNA (guanine-N(7)-)-methyltransferase,damaged
+1142,MG_349_HEXAMER,Replication initiation/membrane attachment protein,damaged
+1143,MG_351_HEXAMER,inorganic pyrophosphatase,damaged
+1144,MG_352_DIMER,Holliday junction endonuclease,damaged
+1145,MG_353_DIMER,"DNA-binding protein HU, putative",damaged
+1146,MG_355_HEXAMER,"ATP-dependent Clp protease, ATPase subunit",damaged
+1147,MG_357_DIMER,acetate kinase,damaged
+1148,MG_358_359_10MER,Holliday junction DNA helicase,damaged
+1149,MG_367_DIMER,ribonuclease III,damaged
+1150,MG_368_DIMER,fatty acid/phospholipid synthesis protein PlsX,damaged
+1151,MG_369_DIMER,DAK2 phosphatase domain protein,damaged
+1152,MG_372_DIMER,thiamine biosynthesis/tRNA modification protein ThiI,damaged
+1153,MG_375_DIMER,threonyl-tRNA synthetase,damaged
+1154,MG_376_HEXAMER,,damaged
+1155,MG_382_TETRAMER,uridine kinase,damaged
+1156,MG_383_DIMER,"NH(3)-dependent NAD+ synthetase, putative",damaged
+1157,MG_385_DIMER,glycerophosphoryl diester phosphodiesterase family protein,damaged
+1158,MG_390_DIMER,"toxin ABC transporter, ATP-binding/permease protein",damaged
+1159,MG_391_HEXAMER,cytosol aminopeptidase,damaged
+1160,MG_392_393_21MER,GroEL-GroES chaperonin complex,damaged
+1161,MG_394_TETRAMER,serine hydroxymethyltransferase,damaged
+1162,MG_396_DIMER,ribose 5-phosphate isomerase B,damaged
+1163,MG_398_399_400_401_402_403_404_405_22MER,H(+)-transporting two-sector ATPase,damaged
+1164,MG_407_DIMER,enolase,damaged
+1165,MG_409_DIMER,"phosphate transport system regulatory protein PhoU, putative",damaged
+1166,MG_410_411_412_PENTAMER,phosphate ABC transporter,damaged
+1167,MG_425_DIMER,ATP-dependent RNA helicase,damaged
+1168,MG_427_DIMER,osmotically inducible peroxidase,damaged
+1169,MG_427_DIMER_ox,oxidized osmotically inducible peroxidase,damaged
+1170,MG_428_DIMER,"LuxR bacterial regulatory protein, putative",damaged
+1171,MG_431_DIMER,triosephosphate isomerase,damaged
+1172,MG_433_DIMER,translation elongation factor Ts,damaged
+1173,MG_434_HEXAMER,uridylate kinase,damaged
+1174,MG_437_DIMER,phosphatidate cytidylyltransferase,damaged
+1175,MG_445_DIMER,tRNA (guanine-N1)-methyltransferase,damaged
+1176,MG_451_DIMER,translation elongation factor Tu,damaged
+1177,MG_453_TETRAMER,UTP-glucose-1-phosphate uridylyltransferase,damaged
+1178,MG_454_DIMER,thiol-dependent peroxidase,damaged
+1179,MG_454_DIMER_ox,oxidized thiol-dependent peroxidase,damaged
+1180,MG_455_DIMER,tyrosyl-tRNA synthetase,damaged
+1181,MG_457_HEXAMER,ATP-dependent metalloprotease FtsH,damaged
+1182,MG_458_TETRAMER,hypoxanthine phosphoribosyltransferase,damaged
+1183,MG_460_TETRAMER,L-lactate dehydrogenase/malate dehydrogenase,damaged
+1184,MG_467_468_526_TETRAMER,salivaricin A ABC transporter,damaged
+1185,MG_469_1MER_ADP,DnaA-ADP,damaged
+1186,MG_469_1MER_ATP,DnaA-ATP,damaged
+1187,MG_469_2MER_1ATP_ADP,DnaA 2mer-(1)ATP-(1)ADP,damaged
+1188,MG_469_2MER_ATP,DnaA-ATP 2mer,damaged
+1189,MG_469_3MER_2ATP_ADP,DnaA 3mer-(2)ATP-(1)ADP,damaged
+1190,MG_469_3MER_ATP,DnaA-ATP 3mer,damaged
+1191,MG_469_4MER_3ATP_ADP,DnaA 4mer-(3)ATP-(1)ADP,damaged
+1192,MG_469_4MER_ATP,DnaA-ATP 4mer,damaged
+1193,MG_469_5MER_4ATP_ADP,DnaA 5mer-(4)ATP-(1)ADP,damaged
+1194,MG_469_5MER_ATP,DnaA-ATP 5mer,damaged
+1195,MG_469_6MER_5ATP_ADP,DnaA 6mer-(5)ATP-(1)ADP,damaged
+1196,MG_469_6MER_ATP,DnaA-ATP 6mer,damaged
+1197,MG_469_7MER_6ATP_ADP,DnaA 7mer-(6)ATP-(1)ADP,damaged
+1198,MG_469_7MER_ATP,DnaA-ATP 7mer,damaged
+1199,MG_482_DIMER,holo-(acyl-carrier-protein) synthase,damaged
+1200,REPLISOME,Replisome,damaged
+1201,RIBOSOME_30S,30S ribosomal subunit,damaged
+1202,RIBOSOME_30S_IF3,30S ribosomal subunit - translation initiation factor IF-3 complex,damaged
+1203,RIBOSOME_50S,50S ribosomal subunit,damaged
+1204,RIBOSOME_70S,70S ribosome,damaged
+1205,RNA_POLYMERASE,DNA-directed RNA polymerase,damaged
+1206,RNA_POLYMERASE_HOLOENZYME,DNA-directed RNA polymerase holoenzyme,damaged
