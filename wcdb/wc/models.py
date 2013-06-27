@@ -74,29 +74,9 @@ class WCModel(models.Model):
     options     = models.ManyToManyField('Option')
     processes   = models.ManyToManyField('Process')
 
-    def save(self, *args, **kwargs):
-        print("Saving WCModel to database.")
-        if not self.pk: # Create a new hdf5 model file.
-            file_name = "_".join(['model', ".".join([self.name,'h5'])])
-            file_path = "/".join([HDF5_ROOT, file_name]).replace(" ", "_")
-            print("Ceating new hdf5 file for WCModel.")
-            print("File path: " + file_path)
-            try:
-                f = h5py.File(file_path, "w-")
-                f.create_group("states")
-                f.create_dataset("processes",   (1,1), maxshape=(1, None))
-                f.create_dataset("options",     (1,1), maxshape=(1, None))
-                f.create_dataset("parameter",   (1,1), maxshape=(1, None))
-                f.create_dataset("metadat",     (1,1), maxshape=(1, None))
-                f.close()
-                print("File has been created.")
-            except(IOError):
-                print "ERROR: File specified already exists."
-
-        super(WCModel, self).save(*args, **kwargs)
-
     def __unicode__(self):
         return self.name
+
 
     class Meta:
         verbose_name = 'Model'
@@ -114,27 +94,17 @@ class Simulation(models.Model):
     date = models.DateTimeField(auto_now=True, auto_now_add=True)
     user = models.ForeignKey(User, editable=False)
 
+    wcmodel = models.ForeignKey(WCModel)
+
     parameter_values = models.ManyToManyField('ParameterValue')
     option_values    = models.ManyToManyField('OptionValue')
-
 
     class Meta:
         get_latest_by = 'date'
 
-
-
-
-""" Labels """
-class LabelTableManager(models.Manager):
-    def create_label_table(self, table_name, table_dictionary):
-        label_table_name = self.create(name=table_name)
-        # Use raw SQL to create a new table. 
-
-
-class LabelTable(models.Model):
-    name = models.CharField(max_length=255)
-
-    objects = LabelTableManager()
+    
+    def __unicode__(self):
+        return self.name
 
 
 """ Property """
@@ -143,11 +113,8 @@ class StateProperty(models.Model):
     property_name = models.CharField(max_length=255)
 
     wc_model = models.ForeignKey("WCModel")
-   
-    row_label_ids = models.ForeignKey("LabelTable", related_name="row") 
-    col_label_ids = models.ForeignKey("LabelTable", related_name="col")
 
-
+    
     class Meta:
         verbose_name = 'Property'
         verbose_name_plural = 'Properties'
