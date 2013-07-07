@@ -1,5 +1,5 @@
 from django.test import TestCase
-from wc.models.models import Option
+from wc.models.models import Option, OptionValue
 
 
 class OptionModelTests(TestCase):
@@ -22,3 +22,23 @@ class OptionModelTests(TestCase):
         self.assertQuerysetEqual(
                 Option.objects.all(),
                 ['<Option: Test 1>'])
+
+
+class OptionValueModelTests(TestCase):
+    def test_create_optionvalue(self):
+        test_option = Option.objects.create(name="Option 1")
+        OptionValue.objects.create(option=test_option, value="1")
+        self.assertQuerysetEqual(
+                OptionValue.objects.all(),
+                ['<OptionValue: Option 1 = 1>'])
+
+    def test_create_two_values_for_same_option(self):
+        test_option = Option.objects.create(name="Option 1")
+        OptionValue.objects.create(option=test_option, value="1")
+        OptionValue.objects.create(option=test_option, value="2")
+        self.assertQuerysetEqual(
+                OptionValue.objects.all(),
+                ['<OptionValue: Option 1 = 1>',
+                '<OptionValue: Option 1 = 2>'])
+
+   

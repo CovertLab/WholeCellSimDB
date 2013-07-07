@@ -1,10 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import m2m_changed
-from django.dispatch import receiver
-
-import numpy
-import h5py
 
 
 """ User """
@@ -66,7 +61,7 @@ class OptionValue(models.Model):
     value = models.TextField()
 
     def __unicode__(self):
-        return self.value
+        return " = ".join([self.option.__unicode__(), self.value])
 
 
     class Meta:
@@ -83,18 +78,4 @@ class Process(models.Model):
 
     def __unicode__(self):
         return self.name
-
-
-""" Property """
-class StateProperty(models.Model):
-    state_name = models.CharField(max_length=255)
-    property_name = models.CharField(max_length=255)
-
-    def __unicode__(self):
-        return "-".join([self.state_name, self.property_name])
-    
-    class Meta:
-        verbose_name = 'Property'
-        verbose_name_plural = 'Properties'
-        app_label='wc'
 

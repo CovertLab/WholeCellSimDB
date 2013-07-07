@@ -1,6 +1,4 @@
 from django.db import models
-from wc.models.models import UserProfile, StateProperty
-from wc.models.wcmodel import WCModel
 
 
 """ Simulation """
@@ -13,7 +11,7 @@ class Simulation(models.Model):
     ip     = models.IPAddressField()
     length = models.FloatField()
     date = models.DateTimeField(auto_now=True, auto_now_add=True)
-    user = models.ForeignKey(UserProfile, editable=False)
+    user = models.ForeignKey('UserProfile', editable=False)
 
     wcmodel = models.ForeignKey('WCModel')
 
@@ -27,16 +25,3 @@ class Simulation(models.Model):
     
     def __unicode__(self):
         return self.name
-
-""" StatePropertyValue """
-class StatePropertyValue(models.Model):
-    state_property  = models.ForeignKey(StateProperty)
-    simulation      = models.ForeignKey(Simulation)
-
-    def __unicode__(self):
-        return 
-
-
-    class Meta:
-        app_label='wc'
-

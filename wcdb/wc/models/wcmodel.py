@@ -1,5 +1,4 @@
 from django.db import models
-from wc.models.models import StateProperty
 
 """ Models """
 class WCModel(models.Model):
