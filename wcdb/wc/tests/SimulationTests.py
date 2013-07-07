@@ -7,7 +7,7 @@ from wc.models.wcmodel import WCModel
 
 
 class SimulationTests(TestCase):
-    def test_create_simulation_without_stateproperties(self):
+    def test_create_simulation(self):
         test_user = User.objects.create_user(
                 'john', 'lennon@thebeatles.com', 'johnpassword')
         WCModel.objects.create(name="Test WCModel", organism="Test organism")
@@ -23,12 +23,16 @@ class SimulationTests(TestCase):
                     state_name="State A",
                     property_name="Property a"))
 
-        Simulation.objects.create(
+        Simulation.objects.create_simulation(
             name="Test Simulation 1",
+            wcmodel=test_model,
+            user=UserProfile.objects.create(user=test_user),
             batch="Batch 1",
             description="This is a test.",
             replicate_index=3,
             ip="123.14.3.0",
-            length=3.0,
-            user=UserProfile.objects.create(user=test_user),
-            wcmodel=test_model)
+            length=3.0)
+
+        self.assertQuerysetEqual(
+            Simulation.objects.all(),
+            ['<Simulation: Test Simulation 1>'])

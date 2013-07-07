@@ -13,6 +13,10 @@ class WCModel(models.Model):
     def __unicode__(self):
         return ", ".join([self.name, self.organism])
 
+    ''' Return a QuerySet of StateProperties from the specified state '''
+    def state(self, state):
+        return self.state_properties.filter(state_name=state)
+
 
     class Meta:
         verbose_name = 'Model'

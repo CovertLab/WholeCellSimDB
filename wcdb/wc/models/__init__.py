@@ -1,4 +1,4 @@
 from models         import *
-from stateproperty  import StateProperty
-from wcmodel        import WCModel
-from simulation     import Simulation 
+from stateproperty  import *
+from wcmodel        import *
+from simulation     import *
