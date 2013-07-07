@@ -1,5 +1,6 @@
 from django.test import TestCase
-from wc.models.models import Option, OptionValue
+#from wc.models.models import Option, OptionValue
+from wc.models import Option, OptionValue
 
 
 class OptionModelTests(TestCase):

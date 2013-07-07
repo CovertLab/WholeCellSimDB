@@ -1,8 +1,9 @@
 from django.test import TestCase
 
-from wc.models.models import Parameter, Option, Process
-from wc.models.stateproperty import StateProperty
-from wc.models.wcmodel import WCModel
+from wc.models import *
+#from wc.models.models import Parameter, Option, Process
+#from wc.models.stateproperty import StateProperty
+#from wc.models.wcmodel import WCModel
 
 
 

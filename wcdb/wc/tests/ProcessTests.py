@@ -1,5 +1,6 @@
 from django.test import TestCase
-from wc.models.models import Process
+#from wc.models.models import Process
+from wc.models import Process
 
 
 class ProcessModelTests(TestCase):

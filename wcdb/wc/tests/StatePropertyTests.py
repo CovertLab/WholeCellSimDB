@@ -1,8 +1,9 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
-from wc.models.models import *
-from wc.models.stateproperty import StateProperty
-from wc.models.wcmodel import WCModel
+#from wc.models.models import *
+#from wc.models.stateproperty import StateProperty
+#from wc.models.wcmodel import WCModel
+from wc.models import *
 
 
 class StatePropertyModelTests(TestCase):

@@ -1,6 +1,8 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
-from wc.models.models import UserProfile
+#from wc.models.models import UserProfile
+from wc.models import UserProfile
+
 
 class UserProfileModelTests(TestCase):
     def test_create_user_profile_without_affiliation(self):
