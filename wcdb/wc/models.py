@@ -157,15 +157,24 @@ class StatePropertyValue(models.Model):
 
 class SimulationManager(models.Manager):
     def create_simulation(self, name, wcmodel, user, batch="", description="",
-            replicate_index=0, ip='0.0.0.0', length=0.0):
-        simulation = self.create(name=name, batch=batch, wcmodel=wcmodel, 
-                                user=user, length=length, ip=ip,
-                                description=description,
-                                replicate_index=replicate_index)
+                          replicate_index=0,   ip='0.0.0.0',   length=0.0):
+
+        simulation = self.create(name=name, batch=batch,   wcmodel=wcmodel, 
+                                 user=user, length=length, ip=ip,
+                                 description=description,
+                                 replicate_index=replicate_index)
+
+        # Autocreate all StatePropertyValues
         for state_property in wcmodel.state_properties.all():
             StatePropertyValue.objects.create(
                     state_property=state_property,
                     simulation=simulation)
+
+        for option in wcmodel.options.all():
+            OptionValue.objects.create(option=option, value="")
+
+        for parameter in wcmodel.parameters.all():
+            ParameterValue.objects.create(parameter=parameter, value=0)
 
 
 """ Simulation """

@@ -16,9 +16,9 @@ class SimulationTests(TestCase):
         test_model.parameters.add(
                 Parameter.objects.create(name="Parameter A"))
         test_model.options.add(
-                Option.objects.create(name="Test Option"))
+                Option.objects.create(name="Option A"))
         test_model.processes.add(
-                Process.objects.create(name="Test Process"))
+                Process.objects.create(name="Process A"))
         test_model.state_properties.add(
                 StateProperty.objects.create(
                     state_name="State A",
@@ -49,3 +49,15 @@ class SimulationTests(TestCase):
             StatePropertyValue.objects.all(),
             ['<StatePropertyValue: Test Simulation 1| State A - Property a>',
              '<StatePropertyValue: Test Simulation 1| State A - Property b>'])
+
+    def test_parametervalues_autocreated(self):
+        simulation = Simulation.objects.get(pk=1)
+        self.assertQuerysetEqual(
+            ParameterValue.objects.all(),
+            ['<ParameterValue: Parameter A = 0.0>'])
+
+    def test_optionvalues_autocreated(self):
+        simulation = Simulation.objects.get(pk=1)
+        self.assertQuerysetEqual(
+            OptionValue.objects.all(),
+            ['<OptionValue: Option A = >'])
