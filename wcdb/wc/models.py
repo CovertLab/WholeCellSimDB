@@ -1,4 +1,4 @@
-HDF5_ROOT = "/home/hdf5"
+HDF5_ROOT = "/home/nolan/hdf5"
 from django.db import models
 from django.contrib.auth.models import User
 import h5py
@@ -24,7 +24,7 @@ class UserProfile(models.Model):
 
 """ Parameter """ 
 class Parameter(models.Model):
-    name = models.CharField(max_length=255, primary_key=True)
+    name = models.CharField(max_length=255, primary_key=True, unique=True)
 
     def __unicode__(self):
         return self.name
@@ -48,7 +48,7 @@ class ParameterValue(models.Model):
 
 """ Option """
 class Option(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, primary_key=True, unique=True)
 
     def __unicode__(self):
         return self.name
@@ -72,7 +72,7 @@ class OptionValue(models.Model):
 
 """ Process """
 class Process(models.Model):
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255, primary_key=True, unique=True)
 
     class Meta:
         verbose_name_plural = 'Processes'
@@ -109,12 +109,31 @@ class WCModel(models.Model):
     def __unicode__(self):
         return ", ".join([self.name, self.organism])
 
-    ''' Return a QuerySet of StateProperties from the specified state '''
-    def state(self, state):
-        return self.state_properties.filter(state_name=state)
+    def get_state(self, state_name):
+        """ Returns a Queryset of properties from the specified state """
+        return self.state_properties.filter(state_name=state_name)
 
-    def list_states(self, state):
-        pass
+    def get_property(self, state_name, property_name):
+        """ Returns the StatePropertyValue specified """
+        return self.state_properties.filter(state_name=state_name, 
+                                            property_name=property_name)[0]
+
+    def add_parameter(self, name):
+        parameter_added = Parameter.objects.get_or_create(name=name)
+        self.parameters.add(parameter_added)
+
+    def add_option(self, name):
+        option_added = Option.objects.get_or_create(name=name)
+        self.options.add(option_added)
+
+    def add_process(self, name):
+        process_added = Process.objects.get_or_create(name=name)
+        self.parameters.add(process_added)
+
+    def add_property(self, state_name, property_name):
+        state_property = StateProperty.objects.get_or_create(
+            state_name=state_name,
+            property_name=property_name)
 
 
     class Meta:

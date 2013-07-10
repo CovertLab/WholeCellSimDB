@@ -18,20 +18,26 @@ class WCModelTests(TestCase):
     def test_add_parameter_method(self):
         WCModel.objects.create(name="Test WCModel", organism="Test organism")
         test_model = WCModel.objects.get(pk=1)
-        test_model.parameters.add(
-                Parameter.objects.create(name="Parameter A"))
+        test_model.add_parameter("Parameter A")
+        self.assertQuerysetEqual(
+            Parameter.objects.all(),
+            ['<Parameter: Parameter A>'])
 
     def test_add_option_method(self):
         WCModel.objects.create(name="Test WCModel", organism="Test organism")
         test_model = WCModel.objects.get(pk=1)
-        test_model.options.add(
-                Option.objects.create(name="Test Option"))
+        test_model.add_option("Option A")
+        self.assertQuerysetEqual(
+            Option.objects.all(),
+            ['<Option: Option A>'])
 
     def test_add_process_method(self):
         WCModel.objects.create(name="Test WCModel", organism="Test organism")
         test_model = WCModel.objects.get(pk=1)
-        test_model.processes.add(
-                Process.objects.create(name="Test Process"))
+        test_model.add_process("Process A")
+        self.assertQuerysetEqual(
+            Process.objects.all(),
+            ['<Process: Process A>'])
 
     def test_add_stateproperty_method(self):
         WCModel.objects.create(name="Test WCModel", organism="Test organism")
@@ -41,7 +47,7 @@ class WCModelTests(TestCase):
                     state_name="State A",
                     property_name="Property a"))
 
-    def test_state_method(self):
+    def test_get_state_method(self):
         WCModel.objects.create(name="Test WCModel", organism="Test organism")
         test_model = WCModel.objects.get(pk=1)
         test_model.state_properties.add(
@@ -52,5 +58,19 @@ class WCModelTests(TestCase):
                 state_name="State B",
                 property_name="Property b"))
         self.assertQuerysetEqual(
-                test_model.state('State A'),
+                test_model.get_state('State A'),
+                ['<StateProperty: State A - Property a>'])
+
+    def test_get_property_method(self):
+        WCModel.objects.create(name="Test WCModel", organism="Test organism")
+        test_model = WCModel.objects.get(pk=1)
+        test_model.state_properties.add(
+            StateProperty.objects.create(
+                state_name="State A",
+                property_name="Property a"),
+            StateProperty.objects.create(
+                state_name="State A",
+                property_name="Property b"))
+        self.assertQuerysetEqual(
+                test_model.get_property("State A", "Property a"),
                 ['<StateProperty: State A - Property a>'])

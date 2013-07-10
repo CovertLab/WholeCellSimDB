@@ -1,4 +1,4 @@
-HDF5_ROOT = "/home/hdf5"
+HDF5_ROOT = "/home/nolan/hdf5"
 import os 
 from django.test import TestCase
 from django.contrib.auth.models import User
@@ -87,7 +87,4 @@ class SimulationTests(TestCase):
             file_exists = False
         self.assertEqual(file_exists, True)
 
-    def test_hdf5_states_created(self):
-        file_path = self.create_simulation()
-        f = h5py.File(file_path)
 
