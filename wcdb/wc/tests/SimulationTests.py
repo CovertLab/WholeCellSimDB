@@ -1,4 +1,4 @@
-HDF5_ROOT = "/home/nolan/GitRepos/WholeCellDB/wcdb/hdf5"
+HDF5_ROOT = "/home/hdf5"
 import os 
 from django.test import TestCase
 from django.contrib.auth.models import User

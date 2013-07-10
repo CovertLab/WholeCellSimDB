@@ -1,1 +1,1 @@
-HDF5_ROOT = "/home/nolan/WholeCell/wcdb/hdf5"
+HDF5_ROOT = "/home/hdf5"
