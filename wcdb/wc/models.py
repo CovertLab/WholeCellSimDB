@@ -1,5 +1,7 @@
+HDF5_ROOT = "/home/nolan/GitRepos/WholeCellDB/wcdb/hdf5"
 from django.db import models
 from django.contrib.auth.models import User
+import h5py
 
 
 """ User """
@@ -86,7 +88,7 @@ class StateProperty(models.Model):
     property_name = models.CharField(max_length=255)
 
     def __unicode__(self):
-        return " - ".join([self.state_name, self.property_name])
+        return self.state_name + " - " + self.property_name
     
     class Meta:
         verbose_name = 'Property'
@@ -111,6 +113,9 @@ class WCModel(models.Model):
     def state(self, state):
         return self.state_properties.filter(state_name=state)
 
+    def list_states(self, state):
+        pass
+
 
     class Meta:
         verbose_name = 'Model'
@@ -125,7 +130,8 @@ class StatePropertyValue(models.Model):
     
 
     def __unicode__(self):
-        return 
+        return "| ".join([self.simulation.__unicode__(),
+                          self.state_property.__unicode__()])
 
     def get_path(self):
         return "/".join(['/states', 
@@ -145,11 +151,6 @@ class StatePropertyValue(models.Model):
         return f[self.get_path()]
 
 
-    def __unicode__(self):
-        return "| ".join([self.simulation.__unicode__(), 
-                          self.state_property.__unicode__()])
-
-
     class Meta:
         app_label='wc'
 
@@ -164,22 +165,39 @@ class SimulationManager(models.Manager):
                                  description=description,
                                  replicate_index=replicate_index)
 
-        # Autocreate all StatePropertyValues
-        for state_property in wcmodel.state_properties.all():
-            StatePropertyValue.objects.create(
-                    state_property=state_property,
-                    simulation=simulation)
+        file_path = HDF5_ROOT + "/" + name.replace(" ", "_") + ".h5" 
+        hdf5_file = h5py.File(file_path) 
 
+        # Auocreate states in both Django and HDF5
+        self.__create_states(hdf5_file, simulation, 
+                           wcmodel.state_properties.all())
+            
+        # Autocreate all OptionValues
         for option in wcmodel.options.all():
             OptionValue.objects.create(option=option, value="")
 
+        # Autocreate all ParameterValues
         for parameter in wcmodel.parameters.all():
             ParameterValue.objects.create(parameter=parameter, value=0)
+
+        hdf5_file.close()
+
+    def __create_states(self, hdf5_file, simulation, state_properties):
+        for sp in state_properties:
+            StatePropertyValue.objects.create(
+                state_property=sp,
+                simulation=simulation)
+            sp_path = "/".join(["/state", 
+                                sp.state_name,
+                                sp.property_name]).replace(" ", "_")
+            hdf5_file.create_dataset(sp_path, (1,1), 'f8', 
+                                     maxshape=(None,None))
+
 
 
 """ Simulation """
 class Simulation(models.Model):
-    name            = models.CharField(max_length=255)
+    name            = models.CharField(max_length=255, unique=True)
     batch           = models.CharField(max_length=255)
     description     = models.TextField()
     replicate_index = models.PositiveIntegerField()
@@ -187,7 +205,7 @@ class Simulation(models.Model):
     ip     = models.IPAddressField()
     length = models.FloatField()
     date = models.DateTimeField(auto_now=True, auto_now_add=True)
-    user = models.ForeignKey('UserProfile', editable=False)
+    user = models.ForeignKey('UserProfile')
 
     wcmodel = models.ForeignKey('WCModel')
 
