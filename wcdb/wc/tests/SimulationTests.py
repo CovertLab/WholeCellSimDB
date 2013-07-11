@@ -1,4 +1,5 @@
 HDF5_ROOT = "/home/nolan/hdf5"
+
 import os 
 from django.test import TestCase
 from django.contrib.auth.models import User
@@ -11,20 +12,11 @@ class SimulationTests(TestCase):
                 'john', 'lennon@thebeatles.com', 'johnpassword')
         WCModel.objects.create(name="Test WCModel", organism="Test organism")
         test_model = WCModel.objects.get(pk=1)
-        test_model.parameters.add(
-                Parameter.objects.create(name="Parameter A"))
-        test_model.options.add(
-                Option.objects.create(name="Option A"))
-        test_model.processes.add(
-                Process.objects.create(name="Process A"))
-        test_model.state_properties.add(
-                StateProperty.objects.create(
-                    state_name="State A",
-                    property_name="Property a"))
-        test_model.state_properties.add(
-                StateProperty.objects.create(
-                    state_name="State A",
-                    property_name="Property b"))
+        test_model.add_parameter("Parameter A")
+        test_model.add_option("Option A")
+        test_model.add_process("Process A")
+        test_model.add_property("State A", "Property a")
+        test_model.add_property("State A", "Property b")
 
         Simulation.objects.create_simulation(
             name="Test Simulation 1",

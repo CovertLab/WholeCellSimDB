@@ -1,10 +1,5 @@
 from django.test import TestCase
-
 from wc.models import *
-#from wc.models.models import Parameter, Option, Process
-#from wc.models.stateproperty import StateProperty
-#from wc.models.wcmodel import WCModel
-
 
 
 class WCModelTests(TestCase):
@@ -39,13 +34,11 @@ class WCModelTests(TestCase):
             Process.objects.all(),
             ['<Process: Process A>'])
 
-    def test_add_stateproperty_method(self):
+    def test_add_property_method(self):
         WCModel.objects.create(name="Test WCModel", organism="Test organism")
         test_model = WCModel.objects.get(pk=1)
-        test_model.state_properties.add(
-                StateProperty.objects.create(
-                    state_name="State A",
-                    property_name="Property a"))
+        test_model.add_property(
+                    state_name="State A", property_name="Property a")
 
     def test_get_state_method(self):
         WCModel.objects.create(name="Test WCModel", organism="Test organism")
@@ -59,13 +52,8 @@ class WCModelTests(TestCase):
     def test_get_property_method(self):
         WCModel.objects.create(name="Test WCModel", organism="Test organism")
         test_model = WCModel.objects.get(pk=1)
-        test_model.state_properties.add(
-            StateProperty.objects.create(
-                state_name="State A",
-                property_name="Property a"),
-            StateProperty.objects.create(
-                state_name="State A",
-                property_name="Property b"))
+        test_model.add_property("State A", "Property a")
+        test_model.add_property("State B", "Property b")
         self.assertEqual(
                 test_model.get_property("State A", "Property a").__unicode__(),
                 'State A - Property a')

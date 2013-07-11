@@ -14,6 +14,7 @@ class StatePropertyModelTests(TestCase):
         self.assertQuerysetEqual(
                 StateProperty.objects.all(),
                 ['<StateProperty: State A - Property a>',])
+
     def test_create_two_properties_from_same_state(self):
         # Create two properties from the same state.
         StateProperty.objects.create(
@@ -80,7 +81,7 @@ def create_simulation(self):
 
 class StatePropertyValueTests(TestCase):
     def test_hdf5_state_created(self):
-        pass
-           
+        simulation = create_simulation()
+        f = h5py.File(simulation.get_path())
 
 

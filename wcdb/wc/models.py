@@ -119,16 +119,16 @@ class WCModel(models.Model):
                                             property_name=property_name)[0]
 
     def add_parameter(self, name):
-        parameter_added = Parameter.objects.get_or_create(name=name)
+        parameter_added = Parameter.objects.get_or_create(name=name)[0]
         self.parameters.add(parameter_added)
 
     def add_option(self, name):
-        option_added = Option.objects.get_or_create(name=name)
+        option_added = Option.objects.get_or_create(name=name)[0]
         self.options.add(option_added)
 
     def add_process(self, name):
-        process_added = Process.objects.get_or_create(name=name)
-        self.parameters.add(process_added)
+        process_added = Process.objects.get_or_create(name=name)[0]
+        self.processes.add(process_added)
 
     def add_property(self, state_name, property_name):
         state_property = StateProperty.objects.get_or_create(
@@ -161,6 +161,9 @@ class StatePropertyValue(models.Model):
     def file_name(self):
         return ".".join([self.simulation__name, "h5"])
 
+    def file_path(self):
+        return HDF5_ROOT + "/" + self.file_name()
+
 
     """
     This method runs the h5py code necessary to fetch the dataset
@@ -178,7 +181,7 @@ class StatePropertyValue(models.Model):
 
 class SimulationManager(models.Manager):
     def create_simulation(self, name, wcmodel, user, batch="", description="",
-                          replicate_index=0,   ip='0.0.0.0',   length=0.0):
+                          replicate_index=1,   ip='0.0.0.0',   length=1.0):
 
         simulation = self.create(name=name, batch=batch,   wcmodel=wcmodel, 
                                  user=user, length=length, ip=ip,
@@ -214,16 +217,15 @@ class SimulationManager(models.Manager):
                                      maxshape=(None,None))
 
 
-
 """ Simulation """
 class Simulation(models.Model):
     name            = models.CharField(max_length=255, unique=True)
-    batch           = models.CharField(max_length=255)
-    description     = models.TextField()
-    replicate_index = models.PositiveIntegerField()
+    batch           = models.CharField(max_length=255, default="")
+    description     = models.TextField(default="")
+    replicate_index = models.PositiveIntegerField(default=1)
 
-    ip     = models.IPAddressField()
-    length = models.FloatField()
+    ip     = models.IPAddressField(default="0.0.0.0")
+    length = models.FloatField(default=1.0)
     date = models.DateTimeField(auto_now=True, auto_now_add=True)
     user = models.ForeignKey('UserProfile')
 
@@ -233,6 +235,9 @@ class Simulation(models.Model):
     option_values    = models.ManyToManyField('OptionValue')
 
     objects = SimulationManager()
+
+    def get_path():
+        return HDF5_ROOT + "/" + self.name.replace(" ","_")
 
     def get_state(self, state_name):
         """ Returns a Queryset of properties from the specified state """
@@ -245,15 +250,14 @@ class Simulation(models.Model):
                                                     property_name=property_name)
         return self.statepropertyvalue_set.filter(
                                             state_property=state_property)[0]
-     
+
+    def __unicode__(self):
+        return self.name  
+
+
     class Meta:
         get_latest_by = 'date'
         app_label='wc'
 
     
-    def __unicode__(self):
-        return self.name
-
-
-
-
+   
