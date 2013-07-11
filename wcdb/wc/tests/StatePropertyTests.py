@@ -55,21 +55,32 @@ class StatePropertyModelTests(TestCase):
                 ['<StateProperty: State B - Property b>'])
 
 
+def create_simulation(self):
+    test_user = User.objects.create_user(
+            'john', 'lennon@thebeatles.com', 'johnpassword')
+    WCModel.objects.create(name="Test WCModel", organism="Test organism")
+    test_model = WCModel.objects.get(pk=1)
+    test_model.add_option("Test option")
+    test_model.add_parameter("Test parameter")
+    test_model.add_process("Test process")
+    test_model.add_property("State a", "Property a")
+    test_model.add_property("State a", "Property b")
+
+    simulation = Simulation.objects.create_simulation(
+        name="test",
+        batch="test",
+        description="test",
+        replicate_index=1,
+        ip='1.1.1.1',
+        length=1.0,
+        wcmodel=test_model)
+
+    return simulation
+
+
 class StatePropertyValueTests(TestCase):
-    def test_value(self):
-        test_user = User.objects.create_user(
-                'john', 'lennon@thebeatles.com', 'johnpassword')
-        WCModel.objects.create(name="Test WCModel", organism="Test organism")
-        test_model = WCModel.objects.get(pk=1)
-        test_model.parameters.add(
-            Parameter.objects.create(name="Parameter A"))
-        test_model.options.add(
-            Option.objects.create(name="Test Option"))
-        test_model.processes.add(
-        Process.objects.create(name="Test Process"))
-        test_model.state_properties.add(
-            StateProperty.objects.create(
-                state_name="State A", 
-                property_name="Property a"))
+    def test_hdf5_state_created(self):
+        pass
+           
 
 

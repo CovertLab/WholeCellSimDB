@@ -133,7 +133,8 @@ class WCModel(models.Model):
     def add_property(self, state_name, property_name):
         state_property = StateProperty.objects.get_or_create(
             state_name=state_name,
-            property_name=property_name)
+            property_name=property_name)[0]
+        self.state_properties.add(state_property)
 
 
     class Meta:
@@ -152,7 +153,7 @@ class StatePropertyValue(models.Model):
         return "| ".join([self.simulation.__unicode__(),
                           self.state_property.__unicode__()])
 
-    def get_path(self):
+    def path(self):
         return "/".join(['/states', 
                         this.stateproperty__state_name,
                         this.stateproperty__property_name])
@@ -233,6 +234,18 @@ class Simulation(models.Model):
 
     objects = SimulationManager()
 
+    def get_state(self, state_name):
+        """ Returns a Queryset of properties from the specified state """
+        return self.statepropertyvalue_set.filter(
+                                        state_property__state_name=state_name)
+
+    def get_property(self, state_name, property_name):
+        """ Returns the StatePropertyValue specified """
+        state_property = StateProperty.objects.filter(state_name=state_name,
+                                                    property_name=property_name)
+        return self.statepropertyvalue_set.filter(
+                                            state_property=state_property)[0]
+     
     class Meta:
         get_latest_by = 'date'
         app_label='wc'

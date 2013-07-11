@@ -2,10 +2,6 @@ HDF5_ROOT = "/home/nolan/hdf5"
 import os 
 from django.test import TestCase
 from django.contrib.auth.models import User
-#from wc.models.models import *
-#from wc.models.simulation import Simulation
-#from wc.models.stateproperty import StateProperty
-#from wc.models.wcmodel import WCModel
 from wc.models import *
 
 
@@ -76,6 +72,23 @@ class SimulationTests(TestCase):
         self.assertQuerysetEqual(
             OptionValue.objects.all(),
             ['<OptionValue: Option A = >'])
+        os.remove(file_path)
+
+    def test_get_state(self):
+        file_path = self.create_simulation()
+        simulation = Simulation.objects.all()[0]
+        self.assertQuerysetEqual(
+            simulation.get_state("State A"),
+            ['<StatePropertyValue: Test Simulation 1| State A - Property a>',
+             '<StatePropertyValue: Test Simulation 1| State A - Property b>'])
+        os.remove(file_path)
+
+    def test_get_property(self):
+        file_path = self.create_simulation()
+        simulation = Simulation.objects.all()[0]
+        self.assertEqual(
+            simulation.get_property("State A", "Property a").__unicode__(),
+            'Test Simulation 1| State A - Property a'),
         os.remove(file_path)
 
     def test_hdf5_file_created(self):

@@ -50,13 +50,8 @@ class WCModelTests(TestCase):
     def test_get_state_method(self):
         WCModel.objects.create(name="Test WCModel", organism="Test organism")
         test_model = WCModel.objects.get(pk=1)
-        test_model.state_properties.add(
-            StateProperty.objects.create(
-                state_name="State A",
-                property_name="Property a"),
-            StateProperty.objects.create(
-                state_name="State B",
-                property_name="Property b"))
+        test_model.add_property("State A", "Property a")
+        test_model.add_property("State B", "Property b")
         self.assertQuerysetEqual(
                 test_model.get_state('State A'),
                 ['<StateProperty: State A - Property a>'])
@@ -71,6 +66,6 @@ class WCModelTests(TestCase):
             StateProperty.objects.create(
                 state_name="State A",
                 property_name="Property b"))
-        self.assertQuerysetEqual(
-                test_model.get_property("State A", "Property a"),
-                ['<StateProperty: State A - Property a>'])
+        self.assertEqual(
+                test_model.get_property("State A", "Property a").__unicode__(),
+                'State A - Property a')
