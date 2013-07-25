@@ -146,17 +146,17 @@ class WCModel(models.Model):
 """ StatePropertyValue """
 class StatePropertyValue(models.Model):
     state_property = models.ForeignKey(StateProperty)
-    simulation      = models.ForeignKey('Simulation')
+    simulation     = models.ForeignKey('Simulation')
     
 
     def __unicode__(self):
         return "| ".join([self.simulation.__unicode__(),
                           self.state_property.__unicode__()])
 
-    def path(self):
+    def get_path(self):
         return "/".join(['/states', 
-                        this.stateproperty__state_name,
-                        this.stateproperty__property_name])
+                        self.state_property.state_name,
+                        self.state_property.property_name]).replace(" ", "_")
 
     def file_name(self):
         return ".".join([self.simulation__name, "h5"])
@@ -194,18 +194,18 @@ class SimulationManager(models.Manager):
         # Auocreate states in both Django and HDF5
         self.__create_states(hdf5_file, simulation, 
                            wcmodel.state_properties.all())
-            
+
         # Autocreate all OptionValues
         for option in wcmodel.options.all():
             option_value = OptionValue.objects.get_or_create(
                                 option=option, value="")
-            simulation.options.add(option_value)
 
         # Autocreate all ParameterValues
         for parameter in wcmodel.parameters.all():
-            parameter_value = ParameteValue.objects.get_or_create(
+            parameter_value = ParameterValue.objects.get_or_create(
                                     parameter=parameter, value=0)
 
+        hdf5_file.flush()
         hdf5_file.close()
         return simulation
 
@@ -214,9 +214,12 @@ class SimulationManager(models.Manager):
             StatePropertyValue.objects.create(
                 state_property=sp,
                 simulation=simulation)
-            sp_path = "/".join(["/state", 
+
+            # This should be done by the StatePropertyValueManager
+            sp_path = "/".join(["/states", 
                                 sp.state_name,
                                 sp.property_name]).replace(" ", "_")
+
             hdf5_file.create_dataset(sp_path, (1,1), 'f8', 
                                      maxshape=(None,None))
 
@@ -235,13 +238,13 @@ class Simulation(models.Model):
 
     wcmodel = models.ForeignKey('WCModel')
 
-    parameter_values = models.ManyToManyField('ParameterValue')
-    option_values    = models.ManyToManyField('OptionValue')
+    parameters = models.ManyToManyField('ParameterValue')
+    options = models.ManyToManyField('OptionValue')
 
     objects = SimulationManager()
 
-    def get_path():
-        return HDF5_ROOT + "/" + self.name.replace(" ","_")
+    def get_path(self):
+        return HDF5_ROOT + "/" + self.name.replace(" ","_") + ".h5"
 
     def get_state(self, state_name):
         """ Returns a Queryset of properties from the specified state """

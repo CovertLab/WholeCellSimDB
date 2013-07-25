@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 #from wc.models.wcmodel import WCModel
 from wc.models import *
 
+import os
+
 
 class StatePropertyModelTests(TestCase):
     def test_create_state_property(self):
@@ -68,21 +70,24 @@ class StatePropertyValueTests(TestCase):
         test_model.add_option("Test option")
         test_model.add_parameter("Test parameter")
         test_model.add_process("Test process")
-        test_model.add_property("State a", "Property a")
-        test_model.add_property("State a", "Property b")
+        test_model.add_property("State A", "Property a")
+        test_model.add_property("State A", "Property b")
 
         simulation = Simulation.objects.create_simulation(
-            "test",
+            "test_prop",
             test_model,
             UserProfile.objects.create(user=test_user))
-        print dir(Simulation.objects.all()[0])
 
         return simulation   
 
     def test_hdf5_state_created(self):
         simulation = self.create_simulation()
         f = h5py.File(simulation.get_path())
+
         for p in simulation.statepropertyvalue_set.all():
-            print p
+            print p.get_path()
+            self.assertEquals(p.get_path() in f, True)
 
-
+        f.flush()
+        f.close() 
+        os.remove(simulation.get_path())
