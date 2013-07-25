@@ -197,13 +197,17 @@ class SimulationManager(models.Manager):
             
         # Autocreate all OptionValues
         for option in wcmodel.options.all():
-            OptionValue.objects.create(option=option, value="")
+            option_value = OptionValue.objects.get_or_create(
+                                option=option, value="")
+            simulation.options.add(option_value)
 
         # Autocreate all ParameterValues
         for parameter in wcmodel.parameters.all():
-            ParameterValue.objects.create(parameter=parameter, value=0)
+            parameter_value = ParameteValue.objects.get_or_create(
+                                    parameter=parameter, value=0)
 
         hdf5_file.close()
+        return simulation
 
     def __create_states(self, hdf5_file, simulation, state_properties):
         for sp in state_properties:
@@ -250,6 +254,9 @@ class Simulation(models.Model):
                                                     property_name=property_name)
         return self.statepropertyvalue_set.filter(
                                             state_property=state_property)[0]
+
+    def get_file(self):
+        pass
 
     def __unicode__(self):
         return self.name  

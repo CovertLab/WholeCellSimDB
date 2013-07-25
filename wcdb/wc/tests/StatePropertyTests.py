@@ -56,32 +56,33 @@ class StatePropertyModelTests(TestCase):
                 ['<StateProperty: State B - Property b>'])
 
 
-def create_simulation(self):
-    test_user = User.objects.create_user(
-            'john', 'lennon@thebeatles.com', 'johnpassword')
-    WCModel.objects.create(name="Test WCModel", organism="Test organism")
-    test_model = WCModel.objects.get(pk=1)
-    test_model.add_option("Test option")
-    test_model.add_parameter("Test parameter")
-    test_model.add_process("Test process")
-    test_model.add_property("State a", "Property a")
-    test_model.add_property("State a", "Property b")
 
-    simulation = Simulation.objects.create_simulation(
-        name="test",
-        batch="test",
-        description="test",
-        replicate_index=1,
-        ip='1.1.1.1',
-        length=1.0,
-        wcmodel=test_model)
-
-    return simulation
 
 
 class StatePropertyValueTests(TestCase):
+    def create_simulation(self):
+        test_user = User.objects.create_user(
+                'john', 'lennon@thebeatles.com', 'johnpassword')
+        WCModel.objects.create(name="Test WCModel", organism="Test organism")
+        test_model = WCModel.objects.get(pk=1)
+        test_model.add_option("Test option")
+        test_model.add_parameter("Test parameter")
+        test_model.add_process("Test process")
+        test_model.add_property("State a", "Property a")
+        test_model.add_property("State a", "Property b")
+
+        simulation = Simulation.objects.create_simulation(
+            "test",
+            test_model,
+            UserProfile.objects.create(user=test_user))
+        print dir(Simulation.objects.all()[0])
+
+        return simulation   
+
     def test_hdf5_state_created(self):
-        simulation = create_simulation()
+        simulation = self.create_simulation()
         f = h5py.File(simulation.get_path())
+        for p in simulation.statepropertyvalue_set.all():
+            print p
 
 
