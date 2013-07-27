@@ -21,12 +21,7 @@ class SimulationTests(TestCase):
         Simulation.objects.create_simulation(
             name="Test Simulation 1",
             wcmodel=test_model,
-            user=UserProfile.objects.create(user=test_user),
-            batch="Batch 1",
-            description="This is a test.",
-            replicate_index=3,
-            ip="123.14.3.0",
-            length=3.0)
+            user=UserProfile.objects.create(user=test_user))
 
         simulation = Simulation.objects.get(pk=1)
 
@@ -83,6 +78,25 @@ class SimulationTests(TestCase):
             'Test Simulation 1| State A - Property a'),
         os.remove(file_path)
 
+    def test_set_option(self):
+        file_path = self.create_simulation()
+        simulation = Simulation.objects.all()[0]
+        print simulation.options.all()
+
+        simulation.set_option("Option A", "first")
+        simulation.set_option("Option A", "second")
+
+        os.remove(file_path)
+
+    def test_set_parameter(self):
+        file_path = self.create_simulation()
+        simulation = Simulation.objects.all()[0]
+
+        simulation.set_parameter("Parameter A", 10)
+        simulation.set_parameter("Parameter A", 20)
+
+        os.remove(file_path)
+ 
     def test_hdf5_file_created(self):
         file_path = self.create_simulation()
         file_exists = True

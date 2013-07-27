@@ -158,7 +158,7 @@ class StatePropertyValueManager(models.Manager):
         f = simulation.get_file()  # Get the simulation h5 file
 
         # Create the datset in the simulation h5 file
-        f.create_dataset(sp_path, (1,1), 'f8', maxshape=(None,None))
+        f.create_dataset(spv_path, (1,1), 'f8', maxshape=(None,None))
 
         # Make sure it's saved and closed.
         f.flush()
@@ -215,11 +215,16 @@ class SimulationManager(models.Manager):
             # then set the value to the given one. Otherwise just use
             # an empty string as the value.
             if option.name in option_values:
-                option_value = option_values[option_value]
+                option_value = option_values[option.name]
             else:
                 option_value = ""
             
-            OptionValue.objects.get_or_create(option=option, value=option_value)
+            print type(option)
+            print type(option_value)
+            o = OptionValue.objects.get_or_create(option=option, 
+                                                  value=option_value)[0]
+            print type(o)
+            simulation.options.add(o)
 
         # Autocreate all ParameterValues
         for parameter in wcmodel.parameters.all():
@@ -227,13 +232,13 @@ class SimulationManager(models.Manager):
             # then set the value to the given one. Otherwise just use
             # 0 as the value.
             if parameter.name in parameter_values:
-                parameter_value = parameter_values[parameter_value]
+                parameter_value = parameter_values[parameter.name]
             else:
                 parameter_value = 0
             
-            ParameterValue.objects.get_or_create(
-                                   parameter=parameter, value=parameter_value)
-
+            p = ParameterValue.objects.get_or_create(parameter=parameter, 
+                                                     value=parameter_value)[0]
+            simulation.parameters.add(p)
         return simulation
 
 
@@ -277,9 +282,29 @@ class Simulation(models.Model):
     def get_file(self):
         """ Returns the H5Py File object for the Simulation HDF5 file """
         if self.editable == True:
-            return h5py.File(get_path())
+            return h5py.File(self.get_path())
         else:
-            return h5py.File(get_path(), 'r')
+            return h5py.File(self.get_path(), 'r')
+
+    def set_option(self, name, value):
+        """ Set the options value. """
+        option = Option.objects.get(name=name)
+        current_value = self.options.filter(option=option)[0]
+        new_value = OptionValue.objects.get_or_create(option=option,
+                                                      value=value)[0]
+        if current_value is not new_value:
+            self.options.remove(current_value)
+            self.options.add(new_value)
+
+    def set_parameter(self, name, value):
+        """ Set the parameters value. """
+        parameter = Parameter.objects.get(name=name)
+        current_value = self.parameters.filter(parameter=parameter)[0]
+        new_value = ParameterValue.objects.get_or_create(parameter=parameter,
+                                                      value=value)[0]
+        if current_value is not new_value:
+            self.parameters.remove(current_value)
+            self.parameters.add(new_value)
 
     def __unicode__(self):
         return self.name  
