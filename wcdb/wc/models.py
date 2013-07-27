@@ -119,18 +119,22 @@ class WCModel(models.Model):
                                             property_name=property_name)[0]
 
     def add_parameter(self, name):
+        """ Adds a parameter to the wcmodel. """
         parameter_added = Parameter.objects.get_or_create(name=name)[0]
         self.parameters.add(parameter_added)
 
     def add_option(self, name):
+        """ Adds an option to the wcmodel. """
         option_added = Option.objects.get_or_create(name=name)[0]
         self.options.add(option_added)
 
     def add_process(self, name):
+        """ Adds a process to the wcmodel. """
         process_added = Process.objects.get_or_create(name=name)[0]
         self.processes.add(process_added)
 
     def add_property(self, state_name, property_name):
+        """ Adds a property to the wcmodel. """
         state_property = StateProperty.objects.get_or_create(
             state_name=state_name,
             property_name=property_name)[0]
@@ -143,33 +147,45 @@ class WCModel(models.Model):
         app_label='wc'
 
 
+class StatePropertyValueManager(models.Manager):
+    def create_property(self, simulation, state_property):
+        """ Creates a new StatePropertyValue and the associated dataset """
+        spv = StatePropertyValue.objects.create(
+                state_property=state_property,
+                simulation=simulation)
+
+        spv_path = spv.get_path()  # Get the path to the dataset
+        f = simulation.get_file()  # Get the simulation h5 file
+
+        # Create the datset in the simulation h5 file
+        f.create_dataset(sp_path, (1,1), 'f8', maxshape=(None,None))
+
+        # Make sure it's saved and closed.
+        f.flush()
+        f.close()
+
+        return spv
+
+
 """ StatePropertyValue """
 class StatePropertyValue(models.Model):
     state_property = models.ForeignKey(StateProperty)
     simulation     = models.ForeignKey('Simulation')
-    
+
+    objects = StatePropertyValueManager()
 
     def __unicode__(self):
         return "| ".join([self.simulation.__unicode__(),
                           self.state_property.__unicode__()])
 
     def get_path(self):
+        """ Get the path to the dataset within the simulation h5 file """
         return "/".join(['/states', 
                         self.state_property.state_name,
                         self.state_property.property_name]).replace(" ", "_")
 
-    def file_name(self):
-        return ".".join([self.simulation__name, "h5"])
-
-    def file_path(self):
-        return HDF5_ROOT + "/" + self.file_name()
-
-
-    """
-    This method runs the h5py code necessary to fetch the dataset
-    as a numpy array
-    """
     def dataset(self):
+        """ Returns the H5Py Dataset object for this property. """
         f = h5py.File(self.file_name(), 'r')
         return f[self.get_path()]
 
@@ -181,47 +197,44 @@ class StatePropertyValue(models.Model):
 
 class SimulationManager(models.Manager):
     def create_simulation(self, name, wcmodel, user, batch="", description="",
-                          replicate_index=1,   ip='0.0.0.0',   length=1.0):
+                          replicate_index=1,   ip='0.0.0.0',   length=1.0,
+                          option_values={}, parameter_values={}):
 
         simulation = self.create(name=name, batch=batch,   wcmodel=wcmodel, 
                                  user=user, length=length, ip=ip,
                                  description=description,
                                  replicate_index=replicate_index)
 
-        file_path = HDF5_ROOT + "/" + name.replace(" ", "_") + ".h5" 
-        hdf5_file = h5py.File(file_path) 
-
-        # Auocreate states in both Django and HDF5
-        self.__create_states(hdf5_file, simulation, 
-                           wcmodel.state_properties.all())
+        # For each state property in the model, create a new value.
+        for sp in wcmodel.state_properties.all():
+            StatePropertyValue.objects.create_property(simulation, sp)
 
         # Autocreate all OptionValues
         for option in wcmodel.options.all():
-            option_value = OptionValue.objects.get_or_create(
-                                option=option, value="")
+            # If the value was given in the Simulation creation call, 
+            # then set the value to the given one. Otherwise just use
+            # an empty string as the value.
+            if option.name in option_values:
+                option_value = option_values[option_value]
+            else:
+                option_value = ""
+            
+            OptionValue.objects.get_or_create(option=option, value=option_value)
 
         # Autocreate all ParameterValues
         for parameter in wcmodel.parameters.all():
-            parameter_value = ParameterValue.objects.get_or_create(
-                                    parameter=parameter, value=0)
+            # If the value was given in the Simulation creation call, 
+            # then set the value to the given one. Otherwise just use
+            # 0 as the value.
+            if parameter.name in parameter_values:
+                parameter_value = parameter_values[parameter_value]
+            else:
+                parameter_value = 0
+            
+            ParameterValue.objects.get_or_create(
+                                   parameter=parameter, value=parameter_value)
 
-        hdf5_file.flush()
-        hdf5_file.close()
         return simulation
-
-    def __create_states(self, hdf5_file, simulation, state_properties):
-        for sp in state_properties:
-            StatePropertyValue.objects.create(
-                state_property=sp,
-                simulation=simulation)
-
-            # This should be done by the StatePropertyValueManager
-            sp_path = "/".join(["/states", 
-                                sp.state_name,
-                                sp.property_name]).replace(" ", "_")
-
-            hdf5_file.create_dataset(sp_path, (1,1), 'f8', 
-                                     maxshape=(None,None))
 
 
 """ Simulation """
@@ -236,6 +249,8 @@ class Simulation(models.Model):
     date = models.DateTimeField(auto_now=True, auto_now_add=True)
     user = models.ForeignKey('UserProfile')
 
+    editable = models.BooleanField(default=True)
+
     wcmodel = models.ForeignKey('WCModel')
 
     parameters = models.ManyToManyField('ParameterValue')
@@ -244,6 +259,7 @@ class Simulation(models.Model):
     objects = SimulationManager()
 
     def get_path(self):
+        """ Returns the path to the HDF5 file for the Simulation """
         return HDF5_ROOT + "/" + self.name.replace(" ","_") + ".h5"
 
     def get_state(self, state_name):
@@ -254,12 +270,16 @@ class Simulation(models.Model):
     def get_property(self, state_name, property_name):
         """ Returns the StatePropertyValue specified """
         state_property = StateProperty.objects.filter(state_name=state_name,
-                                                    property_name=property_name)
+                                               property_name=property_name)
         return self.statepropertyvalue_set.filter(
-                                            state_property=state_property)[0]
+                                           state_property=state_property)[0]
 
     def get_file(self):
-        pass
+        """ Returns the H5Py File object for the Simulation HDF5 file """
+        if self.editable == True:
+            return h5py.File(get_path())
+        else:
+            return h5py.File(get_path(), 'r')
 
     def __unicode__(self):
         return self.name  
@@ -268,6 +288,3 @@ class Simulation(models.Model):
     class Meta:
         get_latest_by = 'date'
         app_label='wc'
-
-    
-   
