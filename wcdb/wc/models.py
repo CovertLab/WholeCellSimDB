@@ -186,13 +186,15 @@ class StatePropertyValue(models.Model):
 
     def dataset(self):
         """ Returns the H5Py Dataset object for this property. """
-        f = h5py.File(self.file_name(), 'r')
+        if self.simulation.__editable == True:
+            f = h5py.File(self.file_name())
+        else:
+            f = h5py.File(self.file_name(), 'r')
         return f[self.get_path()]
 
 
     class Meta:
         app_label='wc'
-
 
 
 class SimulationManager(models.Manager):
@@ -219,11 +221,8 @@ class SimulationManager(models.Manager):
             else:
                 option_value = ""
             
-            print type(option)
-            print type(option_value)
             o = OptionValue.objects.get_or_create(option=option, 
                                                   value=option_value)[0]
-            print type(o)
             simulation.options.add(o)
 
         # Autocreate all ParameterValues
@@ -244,29 +243,28 @@ class SimulationManager(models.Manager):
 
 """ Simulation """
 class Simulation(models.Model):
-    name            = models.CharField(max_length=255, unique=True)
-    batch           = models.CharField(max_length=255, default="")
-    description     = models.TextField(default="")
-    replicate_index = models.PositiveIntegerField(default=1)
-
-    ip     = models.IPAddressField(default="0.0.0.0")
-    length = models.FloatField(default=1.0)
-    date = models.DateTimeField(auto_now=True, auto_now_add=True)
-    user = models.ForeignKey('UserProfile')
-
-    editable = models.BooleanField(default=True)
-
+    # Metadata
     wcmodel = models.ForeignKey('WCModel')
+    name            = models.CharField(max_length=255, unique=True)
 
-    parameters = models.ManyToManyField('ParameterValue')
+    description     = models.TextField(default="")
+    length          = models.FloatField(default=1.0)
+    user            = models.ForeignKey('UserProfile')
+    replicate_index = models.PositiveIntegerField(default=1)
+    ip              = models.IPAddressField(default="0.0.0.0")
+    batch           = models.CharField(max_length=255, default="")
+    date            = models.DateTimeField(auto_now=True, auto_now_add=True)
+
     options = models.ManyToManyField('OptionValue')
+    parameters = models.ManyToManyField('ParameterValue')
+
+    # Internal
+    __editable = models.BooleanField(default=True)
 
     objects = SimulationManager()
 
-    def get_path(self):
-        """ Returns the path to the HDF5 file for the Simulation """
-        return HDF5_ROOT + "/" + self.name.replace(" ","_") + ".h5"
-
+    
+    # Methods for dealing with Properties
     def get_state(self, state_name):
         """ Returns a Queryset of properties from the specified state """
         return self.statepropertyvalue_set.filter(
@@ -279,26 +277,21 @@ class Simulation(models.Model):
         return self.statepropertyvalue_set.filter(
                                            state_property=state_property)[0]
 
-    def get_file(self):
-        """ Returns the H5Py File object for the Simulation HDF5 file """
-        if self.editable == True:
-            return h5py.File(self.get_path())
-        else:
-            return h5py.File(self.get_path(), 'r')
-
+    # Methods for dealing with Options and Parameters
     def set_option(self, name, value):
         """ Set the options value. """
-        option = Option.objects.get(name=name)
-        current_value = self.options.filter(option=option)[0]
+        option = Option.objects.get(name=name)  # Which option? 
+        current_value = self.options.filter(option=option)[0]  # Current val?
         new_value = OptionValue.objects.get_or_create(option=option,
                                                       value=value)[0]
-        if current_value is not new_value:
+        if current_value is not new_value:  # Only change if it's different.
             self.options.remove(current_value)
             self.options.add(new_value)
 
     def set_parameter(self, name, value):
         """ Set the parameters value. """
-        parameter = Parameter.objects.get(name=name)
+
+        parameter = Parameter.objects.get(name=name)  # Which parameter?
         current_value = self.parameters.filter(parameter=parameter)[0]
         new_value = ParameterValue.objects.get_or_create(parameter=parameter,
                                                       value=value)[0]
@@ -306,6 +299,19 @@ class Simulation(models.Model):
             self.parameters.remove(current_value)
             self.parameters.add(new_value)
 
+    # Methods for dealing with the H5 file.
+    def get_path(self):
+        """ Returns the path to the HDF5 file for the Simulation """
+        return HDF5_ROOT + "/" + self.name.replace(" ","_") + ".h5"
+
+    def get_file(self):
+        """ Returns the H5Py File object for the Simulation HDF5 file """
+        if self.__editable == True:
+            return h5py.File(self.get_path())
+        else:
+            return h5py.File(self.get_path(), 'r')
+
+    # Other classes/methods
     def __unicode__(self):
         return self.name  
 
