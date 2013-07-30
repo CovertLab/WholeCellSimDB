@@ -25,17 +25,6 @@ class UserProfile(models.Model):
 """ Parameter """ 
 class Parameter(models.Model):
     name = models.CharField(max_length=255, primary_key=True, unique=True)
-
-    def __unicode__(self):
-        return self.name
-
-
-    class Meta:
-        app_label='wc'
-
-
-class ParameterValue(models.Model):
-    parameter = models.ForeignKey('Parameter')
     value = models.FloatField()
 
     def __unicode__(self):
@@ -49,17 +38,6 @@ class ParameterValue(models.Model):
 """ Option """
 class Option(models.Model):
     name = models.CharField(max_length=255, primary_key=True, unique=True)
-
-    def __unicode__(self):
-        return self.name
-
-
-    class Meta:
-        app_label='wc'
-
-
-class OptionValue(models.Model):
-    option = models.ForeignKey('Option')
     value = models.TextField()
 
     def __unicode__(self):
@@ -80,65 +58,13 @@ class Process(models.Model):
 
     def __unicode__(self):
         return self.name
-
-
-""" StateProperty """
-class StateProperty(models.Model):
-    state_name = models.CharField(max_length=255)
-    property_name = models.CharField(max_length=255)
-
-    def __unicode__(self):
-        return self.state_name + " - " + self.property_name
-    
-    class Meta:
-        verbose_name = 'Property'
-        verbose_name_plural = 'Properties'
-        app_label='wc'
+   app_label='wc'
 
 
 """ Models """
 class WCModel(models.Model):
     name = models.CharField(max_length=255, unique=True)
     organism = models.CharField(max_length=255, default=name)
-
-    parameters  = models.ManyToManyField('Parameter')
-    options     = models.ManyToManyField('Option')
-    processes   = models.ManyToManyField('Process')
-    state_properties = models.ManyToManyField('StateProperty')
-
-    def __unicode__(self):
-        return ", ".join([self.name, self.organism])
-
-    def get_state(self, state_name):
-        """ Returns a Queryset of properties from the specified state """
-        return self.state_properties.filter(state_name=state_name)
-
-    def get_property(self, state_name, property_name):
-        """ Returns the StatePropertyValue specified """
-        return self.state_properties.filter(state_name=state_name, 
-                                            property_name=property_name)[0]
-
-    def add_parameter(self, name):
-        """ Adds a parameter to the wcmodel. """
-        parameter_added = Parameter.objects.get_or_create(name=name)[0]
-        self.parameters.add(parameter_added)
-
-    def add_option(self, name):
-        """ Adds an option to the wcmodel. """
-        option_added = Option.objects.get_or_create(name=name)[0]
-        self.options.add(option_added)
-
-    def add_process(self, name):
-        """ Adds a process to the wcmodel. """
-        process_added = Process.objects.get_or_create(name=name)[0]
-        self.processes.add(process_added)
-
-    def add_property(self, state_name, property_name):
-        """ Adds a property to the wcmodel. """
-        state_property = StateProperty.objects.get_or_create(
-            state_name=state_name,
-            property_name=property_name)[0]
-        self.state_properties.add(state_property)
 
 
     class Meta:
@@ -147,7 +73,7 @@ class WCModel(models.Model):
         app_label='wc'
 
 
-class StatePropertyValueManager(models.Manager):
+class StatePropertyManager(models.Manager):
     def create_property(self, simulation, state_property):
         """ Creates a new StatePropertyValue and the associated dataset """
         spv = StatePropertyValue.objects.create(
@@ -167,23 +93,22 @@ class StatePropertyValueManager(models.Manager):
         return spv
 
 
-""" StatePropertyValue """
-class StatePropertyValue(models.Model):
-    state_property = models.ForeignKey(StateProperty)
-    simulation     = models.ForeignKey('Simulation')
+""" StateProperty """
+class StateProperty(models.Model):
+    simulation      = models.ForeignKey('Simulation')
+    state_name      = models.CharField(max_length=255)
+    property_name   = models.CharField(max_length=255)
 
-    objects = StatePropertyValueManager()
-
-    def __unicode__(self):
-        return "| ".join([self.simulation.__unicode__(),
-                          self.state_property.__unicode__()])
-
+    objects = StatePropertyManager()
+                         
+    # Generates the path to the dataset in the h5 file.
     def get_path(self):
         """ Get the path to the dataset within the simulation h5 file """
         return "/".join(['/states', 
-                        self.state_property.state_name,
-                        self.state_property.property_name]).replace(" ", "_")
+                        self.state_name,
+                        self.property_name]).replace(" ", "_")
 
+    # Access the H5Py dataset object for this property.
     def dataset(self):
         """ Returns the H5Py Dataset object for this property. """
         if self.simulation.__editable == True:
@@ -191,6 +116,11 @@ class StatePropertyValue(models.Model):
         else:
             f = h5py.File(self.file_name(), 'r')
         return f[self.get_path()]
+
+    # Unicode
+    def __unicode__(self):
+        return self.simulation.__unicode__() + "| " + \
+               self.state_name + " " + self.property_name
 
 
     class Meta:
@@ -244,19 +174,21 @@ class SimulationManager(models.Manager):
 """ Simulation """
 class Simulation(models.Model):
     # Metadata
-    wcmodel = models.ForeignKey('WCModel')
     name            = models.CharField(max_length=255, unique=True)
-
+    model           = models.CharField(max_length=255, default="")
+    organism        = models.CharField(max_length=255, default="")
+    batch           = models.CharField(max_length=255, default="")
     description     = models.TextField(default="")
     length          = models.FloatField(default=1.0)
     user            = models.ForeignKey('UserProfile')
     replicate_index = models.PositiveIntegerField(default=1)
     ip              = models.IPAddressField(default="0.0.0.0")
-    batch           = models.CharField(max_length=255, default="")
     date            = models.DateTimeField(auto_now=True, auto_now_add=True)
 
-    options = models.ManyToManyField('OptionValue')
-    parameters = models.ManyToManyField('ParameterValue')
+    # M2M Fields
+    options     = models.ManyToManyField('Option')
+    parameters  = models.ManyToManyField('Parameter')
+    processes   = models.ManyToManyField('Process')
 
     # Internal
     __editable = models.BooleanField(default=True)
@@ -265,28 +197,56 @@ class Simulation(models.Model):
 
     
     # Methods for dealing with Properties
+    def add_property(self, state_name, property_name):
+        """ Adds a property to the wcmodel. """
+        state_property = StateProperty.objects.get_or_create(
+            state_name=state_name,
+            property_name=property_name)[0]
+        self.state_properties.add(state_property)
+
+
     def get_state(self, state_name):
         """ Returns a Queryset of properties from the specified state """
-        return self.statepropertyvalue_set.filter(
-                                        state_property__state_name=state_name)
+        return self.state_properties.filter(state_name=state_name)
 
     def get_property(self, state_name, property_name):
         """ Returns the StatePropertyValue specified """
-        state_property = StateProperty.objects.filter(state_name=state_name,
-                                               property_name=property_name)
-        return self.statepropertyvalue_set.filter(
-                                           state_property=state_property)[0]
+        return self.stateproperty_set.filter(state_name=state_name,
+                                             property_name=property_name)[0]
 
-    # Methods for dealing with Options and Parameters
+    def get_property(self, state_name, property_name):
+        """ Returns the StatePropertyValue specified """
+        return self.state_properties.filter(state_name=state_name, 
+                                            property_name=property_name)[0]
+
+    # Methods for dealing with Options 
+    def add_option(self, name, value=""):
+        """ Adds an option to the wcmodel. Returns true if it was successfully
+            added to the Simulation. """
+        option = Option.objects.get_or_create(name=name, value=value)[0]
+        if option not in self.options.all():
+            self.options.add(option)
+            return True
+        else return False
+
+    def get_option(self, name):
+        return self.options.filter(name=name)
+
     def set_option(self, name, value):
         """ Set the options value. """
-        option = Option.objects.get(name=name)  # Which option? 
-        current_value = self.options.filter(option=option)[0]  # Current val?
-        new_value = OptionValue.objects.get_or_create(option=option,
-                                                      value=value)[0]
-        if current_value is not new_value:  # Only change if it's different.
+        current= self.options.filter(name=name)[0]  # Current value?
+        if current.value != value: # Actually changing the value?
+            new_value = Option.objects.get_or_create(name=name, value=value)[0]
             self.options.remove(current_value)
             self.options.add(new_value)
+
+    # Methods for dealing with Paramters
+    def add_parameter(self, name, value=0):
+        """ Adds a parameter to the wcmodel. """
+        parameter = Parameter.objects.get_or_create(name=name, value=value)[0]
+        if parameter not in self.options.all():
+            self.options.add(parameter)
+        self.parameters.add(parameter_added)
 
     def set_parameter(self, name, value):
         """ Set the parameters value. """
@@ -315,7 +275,15 @@ class Simulation(models.Model):
     def __unicode__(self):
         return self.name  
 
+    def __unicode__(self):
+        return ", ".join([self.name, self.organism])
 
+       def add_process(self, name):
+        """ Adds a process to the wcmodel. """
+        process_added = Process.objects.get_or_create(name=name)[0]
+        self.processes.add(process_added)
+
+    
     class Meta:
         get_latest_by = 'date'
         app_label='wc'
