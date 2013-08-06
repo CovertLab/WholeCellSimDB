@@ -211,16 +211,20 @@ class SimulationTests(TestCase):
          self.assertEqual(file_exists, True)
  
     # Adding to Datasets
-#    def test_get_state(self):
-#        sim = Simulation.objects.create_simulation("Sim 1", "Mg", "Mg1",
-#            state_properties={"State A": { "Prop a": ("=f8", (2,4,100))}})
-#       
-#        _WIN_ = 10 
-#
-#        for t in [ x*_WIN_ + _WIN_ for x in range(10)]:
-#          data = numpy.random.randint(2,4,_WIN_-1)
-#          sim.get_property('State A', 'Prop a').dataset()[2,4,t-_WIN_:t] = data
-#          sim.get_file().flush()           
+     def test_adding_data(self):
+         t_end = 15
+         sim = Simulation.objects.create_simulation("Sim 2", "Mg", "Mg1",
+             state_properties={"State A": { "Prop a": ("=f8", (2,4,t_end))}})
+        
+         w = 3 
+         t = 3
+ 
+         while t <= t_end: 
+           data = numpy.random.randint(2, 4, 3)
+           sim.get_property('State A', 'Prop a').dataset()[:,:,t-w:t]=data
+           sim.get_file().flush()           
+           t += w
+         print sim.get_property('State A', 'Prop a').dataset()[:,:,:]
 
 
             
