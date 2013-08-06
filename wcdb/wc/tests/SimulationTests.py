@@ -1,109 +1,228 @@
 HDF5_ROOT = "/home/nolan/hdf5"
 
 import os 
+import numpy
 from django.test import TestCase
 from django.contrib.auth.models import User
 from wc.models import *
 
 
 class SimulationTests(TestCase):
-    def create_simulation(self):
-        test_user = User.objects.create_user(
-                'john', 'lennon@thebeatles.com', 'johnpassword')
-        WCModel.objects.create(name="Test WCModel", organism="Test organism")
-        test_model = WCModel.objects.get(pk=1)
-        test_model.add_parameter("Parameter A")
-        test_model.add_option("Option A")
-        test_model.add_process("Process A")
-        test_model.add_property("State A", "Property a")
-        test_model.add_property("State A", "Property b")
-
-        Simulation.objects.create_simulation(
-            name="Test Simulation 1",
-            wcmodel=test_model,
-            user=UserProfile.objects.create(user=test_user))
-
-        simulation = Simulation.objects.get(pk=1)
-
-        file_path = HDF5_ROOT + "/" + simulation.name.replace(" ", "_") + ".h5"
-        return file_path
-
-
-    def test_create_simulation(self):
-        file_path = self.create_simulation()
-        self.assertQuerysetEqual(
-            Simulation.objects.all(),
-            ['<Simulation: Test Simulation 1>'])
-        os.remove(file_path)
-
-
-    def test_statepropertyvalues_autocreated(self):
-        file_path = self.create_simulation()
-        self.assertQuerysetEqual(
-            StatePropertyValue.objects.all(),
-            ['<StatePropertyValue: Test Simulation 1| State A - Property a>',
-             '<StatePropertyValue: Test Simulation 1| State A - Property b>'])
-        os.remove(file_path)
-
-    def test_parametervalues_autocreated(self):
-        file_path = self.create_simulation()
-        simulation = Simulation.objects.get(pk=1)
-        self.assertQuerysetEqual(
-            ParameterValue.objects.all(),
-            ['<ParameterValue: Parameter A = 0.0>'])
-        os.remove(file_path)
-
-    def test_optionvalues_autocreated(self):
-        file_path = self.create_simulation()
-        simulation = Simulation.objects.get(pk=1)
-        self.assertQuerysetEqual(
-            OptionValue.objects.all(),
-            ['<OptionValue: Option A = >'])
-        os.remove(file_path)
-
-    def test_get_state(self):
-        file_path = self.create_simulation()
-        simulation = Simulation.objects.all()[0]
-        self.assertQuerysetEqual(
-            simulation.get_state("State A"),
-            ['<StatePropertyValue: Test Simulation 1| State A - Property a>',
-             '<StatePropertyValue: Test Simulation 1| State A - Property b>'])
-        os.remove(file_path)
-
-    def test_get_property(self):
-        file_path = self.create_simulation()
-        simulation = Simulation.objects.all()[0]
-        self.assertEqual(
-            simulation.get_property("State A", "Property a").__unicode__(),
-            'Test Simulation 1| State A - Property a'),
-        os.remove(file_path)
-
-    def test_set_option(self):
-        file_path = self.create_simulation()
-        simulation = Simulation.objects.all()[0]
-        print simulation.options.all()
-
-        simulation.set_option("Option A", "first")
-        simulation.set_option("Option A", "second")
-
-        os.remove(file_path)
-
-    def test_set_parameter(self):
-        file_path = self.create_simulation()
-        simulation = Simulation.objects.all()[0]
-
-        simulation.set_parameter("Parameter A", 10)
-        simulation.set_parameter("Parameter A", 20)
-
-        os.remove(file_path)
+     def test_create_simulation(self):
+         sim = Simulation.objects.create_simulation("Sim 1", "Mg", "Mg1")
+         self.assertQuerysetEqual(
+             Simulation.objects.all(),
+             ['<Simulation: Sim 1>'])
+         os.remove(sim._get_file_path())
  
-    def test_hdf5_file_created(self):
-        file_path = self.create_simulation()
-        file_exists = True
-        if os.path.exists(file_path):
-            os.remove(file_path)
-        else: 
-            file_exists = False
-        self.assertEqual(file_exists, True)
+     # Check opp autocreated.
+     def test_parameter_autocreated(self):
+          sim = Simulation.objects.create_simulation("Sim 1", "Mg", "Mg1",
+             parameters={"Parameter A": 0.0, "Parameter B":1.0})
+          self.assertQuerysetEqual(
+              Parameter.objects.all(),
+              [ '<Parameter: Parameter B = 1.0>',
+              '<Parameter: Parameter A = 0.0>'])
+          os.remove(sim._get_file_path())
+ 
+     def test_option_autocreated(self):
+         sim = Simulation.objects.create_simulation("Sim 1", "Mg", "Mg1",
+             options={"Option A": "value a", "Option B": "value b"})
+         self.assertQuerysetEqual(
+              Option.objects.all(),
+              ['<Option: Option B = value b>', 
+               '<Option: Option A = value a>'])
+         os.remove(sim._get_file_path())
+ 
+     def test_processes_autocreated(self):
+         sim = Simulation.objects.create_simulation("Sim 1", "Mg", "Mg1",
+             processes=["Process 1", "Process 2"])
+         self.assertQuerysetEqual(
+             Process.objects.all(),
+             ['<Process: Process 1>', '<Process: Process 2>'])
+         os.remove(sim._get_file_path())
+  
+     # Set OPP
+     def test_set_option(self):
+          sim = Simulation.objects.create_simulation("Sim 1", "Mg", "Mg1",
+             options={'Option A': 'first'})
+          self.assertQuerysetEqual(
+             Option.objects.all(),
+             ['<Option: Option A = first>'])
+          sim.set_option("Option A", "second")
+          self.assertQuerysetEqual(
+             Option.objects.all(),
+             ['<Option: Option A = first>',
+              '<Option: Option A = second>'])
+          self.assertQuerysetEqual(
+             sim.options.all(),
+             ['<Option: Option A = second>'])
+          os.remove(sim._get_file_path())
+ 
+     def test_set_option_that_doesnt_exist(self):
+          sim = Simulation.objects.create_simulation("Sim 1", "Mg", "Mg1")
+          self.assertQuerysetEqual(Option.objects.all(), [])
+          sim.set_option("Option A", "first")
+          self.assertQuerysetEqual(sim.options.all(), [])
+          self.assertQuerysetEqual(
+             Option.objects.all(),
+             ['<Option: Option A = first>'])
+          os.remove(sim._get_file_path())
+  
+     def test_set_parameter(self):
+         sim = Simulation.objects.create_simulation("Sim 1", "Mg", "Mg1",
+          parameters={'Parameter A': 1.0})
+         self.assertQuerysetEqual(
+          Parameter.objects.all(),
+          ['<Parameter: Parameter A = 1.0>'])
+ 
+         sim.set_parameter("Parameter A", 2.0)
+ 
+         self.assertQuerysetEqual(
+           Parameter.objects.all(),
+           ['<Parameter: Parameter A = 1.0>',
+            '<Parameter: Parameter A = 2.0>'])
+         self.assertQuerysetEqual(
+           sim.parameters.all(),
+           ['<Parameter: Parameter A = 2.0>'])
+         os.remove(sim._get_file_path())
+  
+     def test_set_parameter_that_doesnt_exist(self):
+         sim = Simulation.objects.create_simulation("Sim 1", "Mg", "Mg1")
+         self.assertQuerysetEqual(Parameter.objects.all(), [])
+         sim.set_parameter("Parameter A", 1.0)
+         self.assertQuerysetEqual(sim.parameters.all(), [])
+         self.assertQuerysetEqual(
+          Parameter.objects.all(),
+          ['<Parameter: Parameter A = 1.0>'])
+         os.remove(sim._get_file_path())
+ 
+     # get_opp()
+     def test_get_option(self):
+         sim = Simulation.objects.create_simulation("Sim 1", "Mg", "Mg1",
+             options={'Option A': 'first'})
+         o = Option.objects.all()[0]
+         self.assertEqual(o, sim.get_option("Option A"))
+         os.remove(sim._get_file_path())
+ 
+     def test_get_option_after_changing_value(self):
+         sim = Simulation.objects.create_simulation("Sim 1", "Mg", "Mg1",
+             options={'Option A': 'first'})
+         sim.set_option("Option A", "second")
+         o = Option.objects.filter(name="Option A", value="second")[0]
+         self.assertEqual(o, sim.get_option("Option A"))
+         os.remove(sim._get_file_path())
+ 
+     def test_get_parameter(self):
+         sim = Simulation.objects.create_simulation("Sim 1", "Mg", "Mg1",
+             parameters={'Parameter A': 1.0})
+         o = Parameter.objects.all()[0]
+         self.assertEqual(o, sim.get_parameter('Parameter A'))
+         os.remove(sim._get_file_path())
+ 
+     def test_get_parameter_after_changing_value(self):
+         sim = Simulation.objects.create_simulation('Sim 1', 'Mg', 'Mg1',
+             parameters={'Parameter A': 1.0})
+         sim.set_parameter('Parameter A', 2.0)
+         o = Parameter.objects.filter(name='Parameter A', value=2.0)[0]
+         self.assertEqual(o, sim.get_parameter('Parameter A'))
+         os.remove(sim._get_file_path())
+ 
+     def test_get_process(self):
+         sim = Simulation.objects.create_simulation("Sim 1", "Mg", "Mg1",
+             processes=['Process A'])
+         o = Process.objects.all()[0]
+         self.assertEqual(o, sim.get_process('Process A'))
+         os.remove(sim._get_file_path())
+ 
+     ##############################################################
+     # State Properties
+     ##############################################################
+     # Autocreated?
+     def test_1_state_1_property_autocreated(self):
+         sim = Simulation.objects.create_simulation("Sim 1", "Mg", "Mg1",
+             state_properties={"State A": { "Prop a": ("=f8", (1,1,100))}})
+         self.assertQuerysetEqual(
+             StateProperty.objects.all(),
+             ['<StateProperty: Sim 1 - State A - Prop a>'])
+         os.remove(sim._get_file_path())
+ 
+     def test_1_state_multi_property_autocreated(self):
+         sim = Simulation.objects.create_simulation("Sim 1", "Mg", "Mg1",
+             state_properties={"State A": { "Prop a": ("=f8", (1,1,100)),
+                                            "Prop b": ("=f8", (1,100)) }})
+         self.assertQuerysetEqual(
+             StateProperty.objects.all(),
+             ['<StateProperty: Sim 1 - State A - Prop a>',
+             '<StateProperty: Sim 1 - State A - Prop b>'])
+         os.remove(sim._get_file_path())
+  
+     def test_multi_state_multi_property_autocreated(self):
+         sim = Simulation.objects.create_simulation("Sim 1", "Mg", "Mg1",
+             state_properties={"State A": { "Prop a": ("=f8", (1,1,100)),
+                                            "Prop b": ("=f8", (1,100)) },
+                               "State B": { "Prop c": ("=f8", (4,5,100))}})
+         self.assertQuerysetEqual(
+             StateProperty.objects.all(),
+             ['<StateProperty: Sim 1 - State A - Prop a>',
+             '<StateProperty: Sim 1 - State A - Prop b>',
+             '<StateProperty: Sim 1 - State B - Prop c>'])
+         os.remove(sim._get_file_path())
+ 
+     #### Methods ####
+     def test_get_state(self):
+         sim = Simulation.objects.create_simulation("Sim 1", "Mg", "Mg1",
+             state_properties={"State A": { "Prop a": ("=f8", (1,1,100)),
+                                            "Prop b": ("=f8", (1,100)) },
+                               "State B": { "Prop c": ("=f8", (4,5,100))}})
+         self.assertQuerysetEqual(
+             sim.get_state("State A"),
+             ['<StateProperty: Sim 1 - State A - Prop a>',
+             '<StateProperty: Sim 1 - State A - Prop b>'])
+         os.remove(sim._get_file_path())
+ 
+     def test_add_state(self):
+         sim = Simulation.objects.create_simulation("Sim 1", "Mg", "Mg1")
+         # Finish this later. 
+         os.remove(sim._get_file_path())
+ 
+     def test_get_state(self):
+         sim = Simulation.objects.create_simulation("Sim 1", "Mg", "Mg1",
+             state_properties={"State A": { "Prop a": ("=f8", (1,1,100)),
+                                            "Prop b": ("=f8", (1,100)) },
+                               "State B": { "Prop c": ("=f8", (4,5,100))}})
+         self.assertEqual(
+             sim.get_property("State A", "Prop a"), 
+             StateProperty.objects.get(state_name="State A", 
+                                         property_name="Prop a"))
+         os.remove(sim._get_file_path())
+ 
+     
+     def test_hdf5_file_created(self):
+         sim = Simulation.objects.create_simulation("Sim 1", "Mg", "Mg1",
+             state_properties={"State A": { "Prop a": ("=f8", (1,1,100)),
+                                            "Prop b": ("=f8", (1,100)) },
+                               "State B": { "Prop c": ("=f8", (4,5,100))}})
+         file_exists = True
+         if os.path.exists(sim._get_file_path()):
+             os.remove(sim._get_file_path())
+         else: 
+             file_exists = False
+         self.assertEqual(file_exists, True)
+ 
+    # Adding to Datasets
+#    def test_get_state(self):
+#        sim = Simulation.objects.create_simulation("Sim 1", "Mg", "Mg1",
+#            state_properties={"State A": { "Prop a": ("=f8", (2,4,100))}})
+#       
+#        _WIN_ = 10 
+#
+#        for t in [ x*_WIN_ + _WIN_ for x in range(10)]:
+#          data = numpy.random.randint(2,4,_WIN_-1)
+#          sim.get_property('State A', 'Prop a').dataset()[2,4,t-_WIN_:t] = data
+#          sim.get_file().flush()           
 
 
+            
+
+        

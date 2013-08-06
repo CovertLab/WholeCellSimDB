@@ -24,11 +24,11 @@ class UserProfile(models.Model):
 
 """ Parameter """ 
 class Parameter(models.Model):
-    name = models.CharField(max_length=255, primary_key=True, unique=True)
+    name = models.CharField(max_length=255)
     value = models.FloatField()
 
     def __unicode__(self):
-        return " = ".join([self.parameter.__unicode__(), str(self.value)])
+        return " = ".join([self.name, str(self.value)])
 
 
     class Meta:
@@ -37,11 +37,11 @@ class Parameter(models.Model):
 
 """ Option """
 class Option(models.Model):
-    name = models.CharField(max_length=255, primary_key=True, unique=True)
+    name = models.CharField(max_length=255)
     value = models.TextField()
 
     def __unicode__(self):
-        return " = ".join([self.option.__unicode__(), self.value])
+        return " = ".join([self.name, self.value])
 
 
     class Meta:
@@ -58,33 +58,23 @@ class Process(models.Model):
 
     def __unicode__(self):
         return self.name
-   app_label='wc'
 
 
-""" Models """
-class WCModel(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    organism = models.CharField(max_length=255, default=name)
-
-
-    class Meta:
-        verbose_name = 'Model'
-        verbose_name_plural = 'Models'
-        app_label='wc'
-
-
+""" StateProperty """
 class StatePropertyManager(models.Manager):
-    def create_property(self, simulation, state_property):
+    def create_property(self, simulation, state_name, property_name,
+                        value_type='f8', dimensions=(1,1,1)):
         """ Creates a new StatePropertyValue and the associated dataset """
-        spv = StatePropertyValue.objects.create(
-                state_property=state_property,
-                simulation=simulation)
+        spv = self.create(
+                simulation=simulation,
+                state_name=state_name,
+                property_name=property_name)
 
         spv_path = spv.get_path()  # Get the path to the dataset
         f = simulation.get_file()  # Get the simulation h5 file
 
         # Create the datset in the simulation h5 file
-        f.create_dataset(spv_path, (1,1), 'f8', maxshape=(None,None))
+        f.create_dataset(spv_path, dimensions, value_type)
 
         # Make sure it's saved and closed.
         f.flush()
@@ -93,7 +83,6 @@ class StatePropertyManager(models.Manager):
         return spv
 
 
-""" StateProperty """
 class StateProperty(models.Model):
     simulation      = models.ForeignKey('Simulation')
     state_name      = models.CharField(max_length=255)
@@ -105,22 +94,20 @@ class StateProperty(models.Model):
     def get_path(self):
         """ Get the path to the dataset within the simulation h5 file """
         return "/".join(['/states', 
-                        self.state_name,
-                        self.property_name]).replace(" ", "_")
+                         self.state_name,
+                         self.property_name]).replace(" ", "_")
 
     # Access the H5Py dataset object for this property.
     def dataset(self):
         """ Returns the H5Py Dataset object for this property. """
-        if self.simulation.__editable == True:
-            f = h5py.File(self.file_name())
-        else:
-            f = h5py.File(self.file_name(), 'r')
+        f = self.simulation.get_file()
         return f[self.get_path()]
 
     # Unicode
     def __unicode__(self):
-        return self.simulation.__unicode__() + "| " + \
-               self.state_name + " " + self.property_name
+        return " - ".join([self.simulation.name, 
+                           self.state_name, 
+                           self.property_name])
 
 
     class Meta:
@@ -128,48 +115,35 @@ class StateProperty(models.Model):
 
 
 class SimulationManager(models.Manager):
-    def create_simulation(self, name, wcmodel, user, batch="", description="",
-                          replicate_index=1,   ip='0.0.0.0',   length=1.0,
-                          option_values={}, parameter_values={}):
+    def create_simulation(self, name, organism, model, replicate_index=1,
+                          description="", ip='0.0.0.0', batch="", length=1.0,
+                          options={},     parameters={}, processes=[], 
+                          state_properties={}):
 
-        simulation = self.create(name=name, batch=batch,   wcmodel=wcmodel, 
-                                 user=user, length=length, ip=ip,
+        simulation = self.create(name=name, batch=batch,   model=model, 
+                                 length=length, ip=ip,
                                  description=description,
                                  replicate_index=replicate_index)
 
-        # For each state property in the model, create a new value.
-        for sp in wcmodel.state_properties.all():
-            StatePropertyValue.objects.create_property(simulation, sp)
+        f = simulation.get_file()    
 
-        # Autocreate all OptionValues
-        for option in wcmodel.options.all():
-            # If the value was given in the Simulation creation call, 
-            # then set the value to the given one. Otherwise just use
-            # an empty string as the value.
-            if option.name in option_values:
-                option_value = option_values[option.name]
-            else:
-                option_value = ""
-            
-            o = OptionValue.objects.get_or_create(option=option, 
-                                                  value=option_value)[0]
-            simulation.options.add(o)
+        for s, pd in state_properties.iteritems():
+            for p, d in pd.iteritems():
+                simulation.add_property(s, p, d[0], d[1])
 
-        # Autocreate all ParameterValues
-        for parameter in wcmodel.parameters.all():
-            # If the value was given in the Simulation creation call, 
-            # then set the value to the given one. Otherwise just use
-            # 0 as the value.
-            if parameter.name in parameter_values:
-                parameter_value = parameter_values[parameter.name]
-            else:
-                parameter_value = 0
-            
-            p = ParameterValue.objects.get_or_create(parameter=parameter, 
-                                                     value=parameter_value)[0]
-            simulation.parameters.add(p)
+        for name, value in options.iteritems():
+            simulation.add_option(name=name, value=value)
+
+        for name, value in parameters.iteritems():
+            simulation.add_parameter(name=name, value=value)
+
+        for name in processes:
+            simulation.add_process(name=name)
+
+        f.flush()
+        f.close() 
+
         return simulation
-
 
 """ Simulation """
 class Simulation(models.Model):
@@ -180,7 +154,7 @@ class Simulation(models.Model):
     batch           = models.CharField(max_length=255, default="")
     description     = models.TextField(default="")
     length          = models.FloatField(default=1.0)
-    user            = models.ForeignKey('UserProfile')
+    #user            = models.ForeignKey('UserProfile')
     replicate_index = models.PositiveIntegerField(default=1)
     ip              = models.IPAddressField(default="0.0.0.0")
     date            = models.DateTimeField(auto_now=True, auto_now_add=True)
@@ -191,99 +165,118 @@ class Simulation(models.Model):
     processes   = models.ManyToManyField('Process')
 
     # Internal
-    __editable = models.BooleanField(default=True)
+    _file_permissions = models.CharField(max_length=3, default="a")
 
     objects = SimulationManager()
 
     
-    # Methods for dealing with Properties
-    def add_property(self, state_name, property_name):
-        """ Adds a property to the wcmodel. """
-        state_property = StateProperty.objects.get_or_create(
-            state_name=state_name,
-            property_name=property_name)[0]
-        self.state_properties.add(state_property)
-
-
+    # Methods for dealing with State-Properties
+    # States
     def get_state(self, state_name):
         """ Returns a Queryset of properties from the specified state """
         return self.state_properties.filter(state_name=state_name)
+
+    def add_state(self, state_name):
+        if self._file_permissions == 'a':
+            f = self.get_file()
+            g = f.create_group('/states/' + state_name) 
+            f.flush()
+            return g
+
+    # Properties
+    def add_property(self, s, p, dim, val_type):
+        """ Adds a property to the wcmodel. """
+        StateProperty.objects.create_property(self, s, p, dim, val_type)
+
 
     def get_property(self, state_name, property_name):
         """ Returns the StatePropertyValue specified """
         return self.stateproperty_set.filter(state_name=state_name,
                                              property_name=property_name)[0]
 
-    def get_property(self, state_name, property_name):
-        """ Returns the StatePropertyValue specified """
-        return self.state_properties.filter(state_name=state_name, 
-                                            property_name=property_name)[0]
+    ########################################################################
+    # General methods for dealing with Options, Parameters, and Processes. #
+    def add_opp(self, cls, field, name, value=''):
+        """ If the opp is added to the simulation that object is returned,
+        however, if the opp already exists then nothing is returned.  """
+        try: 
+            o = cls.objects.get_or_create(name=name, value=value)[0]
+        except:
+            o = cls.objects.get_or_create(name=name)[0]
+        
+        if o not in field.all():
+            field.add(o)
+            return o
+
+    def set_opp(self, cls, field, name, value):
+        """ If the opp is set it returns the opp object with that value.
+        However, if the new value is the same as the old one, or if the 
+        opp isn't part of this simulation then nothing is returned. """
+        try:
+            new = cls.objects.get_or_create(name=name, value=value)[0]
+            current = field.filter(name=name)[0]
+            if new.value != current.value:
+                field.remove(current)
+                field.add(new)
+                return new
+        except: pass
 
     # Methods for dealing with Options 
     def add_option(self, name, value=""):
         """ Adds an option to the wcmodel. Returns true if it was successfully
-            added to the Simulation. """
-        option = Option.objects.get_or_create(name=name, value=value)[0]
-        if option not in self.options.all():
-            self.options.add(option)
-            return True
-        else return False
+        added to the Simulation. """
+        if type(value) == str:
+            self.add_opp(Option, self.options, name, value)
 
     def get_option(self, name):
-        return self.options.filter(name=name)
+        return self.options.filter(name=name)[0]
 
     def set_option(self, name, value):
         """ Set the options value. """
-        current= self.options.filter(name=name)[0]  # Current value?
-        if current.value != value: # Actually changing the value?
-            new_value = Option.objects.get_or_create(name=name, value=value)[0]
-            self.options.remove(current_value)
-            self.options.add(new_value)
+        if type(value) == str:
+            self.set_opp(Option, self.options, name, value)
 
     # Methods for dealing with Paramters
     def add_parameter(self, name, value=0):
-        """ Adds a parameter to the wcmodel. """
-        parameter = Parameter.objects.get_or_create(name=name, value=value)[0]
-        if parameter not in self.options.all():
-            self.options.add(parameter)
-        self.parameters.add(parameter_added)
+        """ Adds a parameter to the Simulation. """
+        if type(value) == float:
+            self.add_opp(Parameter, self.parameters, name, value)
+
+    def get_parameter(self, name):
+        """ Returns the parameter with the submitted name. """
+        return self.parameters.filter(name=name)[0]
 
     def set_parameter(self, name, value):
         """ Set the parameters value. """
+        if type(value) == float:
+            self.set_opp(Parameter, self.parameters, name, value)
 
-        parameter = Parameter.objects.get(name=name)  # Which parameter?
-        current_value = self.parameters.filter(parameter=parameter)[0]
-        new_value = ParameterValue.objects.get_or_create(parameter=parameter,
-                                                      value=value)[0]
-        if current_value is not new_value:
-            self.parameters.remove(current_value)
-            self.parameters.add(new_value)
+    # Methods for dealing with Process 
+    def add_process(self, name):
+        """ Adds a process to the Simulation. """
+        self.add_opp(Process, self.processes, name)
 
-    # Methods for dealing with the H5 file.
-    def get_path(self):
+    def get_process(self, name):
+        return self.processes.filter(name=name)[0]
+
+    ########################################
+    # Methods for dealing with the H5 file.#
+    def _get_file_path(self):
         """ Returns the path to the HDF5 file for the Simulation """
         return HDF5_ROOT + "/" + self.name.replace(" ","_") + ".h5"
 
     def get_file(self):
         """ Returns the H5Py File object for the Simulation HDF5 file """
-        if self.__editable == True:
-            return h5py.File(self.get_path())
-        else:
-            return h5py.File(self.get_path(), 'r')
+        return h5py.File(self._get_file_path(), self._file_permissions)
+
+    def lock_file(self):
+        self._file_permissions = "r"
 
     # Other classes/methods
     def __unicode__(self):
-        return self.name  
+        return self.name
 
-    def __unicode__(self):
-        return ", ".join([self.name, self.organism])
 
-       def add_process(self, name):
-        """ Adds a process to the wcmodel. """
-        process_added = Process.objects.get_or_create(name=name)[0]
-        self.processes.add(process_added)
-
-    
     class Meta:
         get_latest_by = 'date'
         app_label='wc'

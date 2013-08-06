@@ -1,5 +1,4 @@
 from django.test import TestCase
-#from wc.models.models import Process
 from wc.models import Process
 
 
