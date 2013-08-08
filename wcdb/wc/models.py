@@ -77,7 +77,7 @@ class State(models.Model):
 """ StateProperty """
 class PropertyManager(models.Manager):
     def create_property(self, simulation, state_name, property_name,
-                        value_type, dimensions):
+                        dimensions, value_type):
         """ Creates a new StatePropertyValue and the associated dataset """
         s_obj = State.objects.get_or_create(name=state_name, 
                                             simulation=simulation)[0]
@@ -86,7 +86,7 @@ class PropertyManager(models.Manager):
         f = simulation.h5file  # Get the simulation h5 file
 
         # Create the datset in the simulation h5 file
-        f.create_dataset(p_obj.path, dimensions, value_type)
+        f.create_dataset(p_obj.path, shape=dimensions, dtype=value_type)
 
         # Make sure it's saved and closed.
         f.flush()
@@ -99,7 +99,8 @@ class Property(models.Model):
     name  = models.CharField(max_length=255)
     state = models.ForeignKey('State')
 
-    _k = models.IntegerField(default=0) # The ammount of the time dimension filled.
+    # Number of indices filled in in the time dimension.
+    _k = models.IntegerField(default=0) 
 
     objects = PropertyManager()
                          
@@ -109,6 +110,10 @@ class Property(models.Model):
         """ Get the path to the dataset within the simulation h5 file """
         return "/".join([self.state.path,
                          self.name]).replace(" ", "_")
+
+    @property
+    def shape(self):
+        return self.dataset.shape
 
     # Access the H5Py dataset object for this property.
     @property
@@ -124,8 +129,8 @@ class Property(models.Model):
             try:
                 lts = ts.shape[-1] # Length of the time dimension.
                 self.dataset[...,self._k:self._k+lts] = ts
-                self._k += lts
                 self.state.simulation.h5file.flush()
+                self._k += lts
             except:
                 pass
         else: 
@@ -143,13 +148,13 @@ class Property(models.Model):
 
 
 class SimulationManager(models.Manager):
-    def create_simulation(self, name, organism, model, replicate_index=1,
+    def create_simulation(self, name, organism, model, replicate_index=1, t=1,
                           description="", ip='0.0.0.0', batch="", length=1.0,
                           options={},     parameters={}, processes=[], 
                           state_properties={}):
 
         simulation = self.create(name=name, batch=batch,   model=model, 
-                                 length=length, ip=ip,
+                                 length=length, ip=ip, t=t,
                                  description=description,
                                  replicate_index=replicate_index)
 
@@ -157,7 +162,8 @@ class SimulationManager(models.Manager):
 
         for s, pd in state_properties.iteritems():
             for p, d in pd.iteritems():
-                simulation.add_property(s, p, d[0], d[1])
+                dim = d[0] + (t,)
+                simulation.add_property(s, p, dim, d[1])
 
         for name, value in options.iteritems():
             simulation.add_option(name=name, value=value)
@@ -186,6 +192,7 @@ class Simulation(models.Model):
     replicate_index = models.PositiveIntegerField(default=1)
     ip              = models.IPAddressField(default="0.0.0.0")
     date            = models.DateTimeField(auto_now=True, auto_now_add=True)
+    t               = models.PositiveIntegerField()
 
     # M2M Fields
     options     = models.ManyToManyField('Option')
@@ -290,14 +297,15 @@ class Simulation(models.Model):
 
     ########################################
     # Methods for dealing with the H5 file.#
-    def _get_file_path(self):
+    @property
+    def file_path(self):
         """ Returns the path to the HDF5 file for the Simulation """
         return HDF5_ROOT + "/" + self.name.replace(" ","_") + ".h5"
 
     @property
     def h5file(self):
         """ Returns the H5Py File object for the Simulation HDF5 file """
-        return h5py.File(self._get_file_path(), self._file_permissions)
+        return h5py.File(self.file_path, self._file_permissions)
 
     def lock_file(self):
         self._file_permissions = "r"
