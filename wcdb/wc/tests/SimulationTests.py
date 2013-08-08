@@ -212,18 +212,15 @@ class SimulationTests(TestCase):
  
     # Adding to Datasets
      def test_adding_data(self):
-         t_end = 15
+         t_end = 4
          sim = Simulation.objects.create_simulation("Sim 2", "Mg", "Mg1",
-             state_properties={"State A": { "Prop a": ("=f8", (2,4,t_end))}})
+             state_properties={"State A": { "Prop a": ("=f8", (2,3,t_end))}})
+         
+         p = sim.get_property('State A', 'Prop a')
         
-         w = 3 
-         t = 3
- 
-         while t <= t_end: 
-           data = numpy.random.randint(2, 4, 3)
-           sim.get_property('State A', 'Prop a').add_data(data)
-           t += w
-         print sim.get_property('State A', 'Prop a').dataset[:]
+         print p.dataset[:]
+         print p.dataset[...,0]
+
 
 
             
