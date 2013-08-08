@@ -1,7 +1,7 @@
 HDF5_ROOT = "/home/nolan/hdf5"
 
 import os 
-import numpy
+import numpy as np
 from django.test import TestCase
 from django.contrib.auth.models import User
 from wc.models import *
@@ -218,8 +218,12 @@ class SimulationTests(TestCase):
          
          p = sim.get_property('State A', 'Prop a')
         
-         p.add_data([[0,1,2],[3,4,5]])
-         print p.dataset[:]
+         p.add_data(np.array([[[0],[1],[2]],[[3],[4],[5]]]))
+         p.add_data(np.array([[[10],[11],[12]],[[13],[14],[15]]]))
+         p.add_data(np.array([[[20],[22],[22]],[[23],[24],[25]]]))
+         p.add_data(np.array([[[10],[11],[12]],[[13],[14],[15]]]))
+         # This last one doesn't add anything to it.
+         p.add_data(np.array([[[30],[33],[32]],[[33],[34],[35]]]))
 
 
 

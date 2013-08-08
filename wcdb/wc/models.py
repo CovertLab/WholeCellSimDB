@@ -119,12 +119,15 @@ class Property(models.Model):
 
     def add_data(self, ts):
         """ Accepts a numpy array and attempts to add it to the dataset. """
-        
         # If all dimensions, except the time dimension, are equal.
         if ts.shape[:-1] == self.dataset.shape[:-1]:
-            lts = ts.shape[-1] # Length of the time dimension.
-            self.dataset[...,self.k:self.k+lts]
-            self.state.simulation.h5file.flush()
+            try:
+                lts = ts.shape[-1] # Length of the time dimension.
+                self.dataset[...,self._k:self._k+lts] = ts
+                self._k += lts
+                self.state.simulation.h5file.flush()
+            except:
+                pass
         else: 
             return False
 
