@@ -218,8 +218,8 @@ class SimulationTests(TestCase):
          
          p = sim.get_property('State A', 'Prop a')
         
+         p.add_data([[0,1,2],[3,4,5]])
          print p.dataset[:]
-         print p.dataset[...,0]
 
 
 
