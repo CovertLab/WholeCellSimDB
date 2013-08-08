@@ -60,55 +60,80 @@ class Process(models.Model):
         return self.name
 
 
-""" StateProperty """
-class StatePropertyManager(models.Manager):
-    def create_property(self, simulation, state_name, property_name,
-                        value_type='f8', dimensions=(1,1,1)):
-        """ Creates a new StatePropertyValue and the associated dataset """
-        spv = self.create(
-                simulation=simulation,
-                state_name=state_name,
-                property_name=property_name)
+class State(models.Model):
+    name = models.CharField(max_length=255)
+    simulation = models.ForeignKey('Simulation')
+     
+    @property
+    def path(self):
+        """ Get the path to the dataset within the simulation h5 file """
+        return "/".join(['/states', self.name]).replace(" ", "_")
 
-        spv_path = spv.get_path()  # Get the path to the dataset
-        f = simulation.get_file()  # Get the simulation h5 file
+    # Unicode
+    def __unicode__(self):
+        return " - ".join([self.simulation.name, 
+                           self.name])
+
+""" StateProperty """
+class PropertyManager(models.Manager):
+    def create_property(self, simulation, state_name, property_name,
+                        value_type, dimensions):
+        """ Creates a new StatePropertyValue and the associated dataset """
+        s_obj = State.objects.get_or_create(name=state_name, 
+                                            simulation=simulation)[0]
+        p_obj = self.create(name=property_name, state=s_obj)
+
+        f = simulation.h5file  # Get the simulation h5 file
 
         # Create the datset in the simulation h5 file
-        f.create_dataset(spv_path, dimensions, value_type)
+        f.create_dataset(p_obj.path, dimensions, value_type)
 
         # Make sure it's saved and closed.
         f.flush()
         f.close()
 
-        return spv
+        return p_obj
 
 
-class StateProperty(models.Model):
-    simulation      = models.ForeignKey('Simulation')
-    state_name      = models.CharField(max_length=255)
-    property_name   = models.CharField(max_length=255)
+class Property(models.Model):
+    name  = models.CharField(max_length=255)
+    state = models.ForeignKey('State')
 
-    objects = StatePropertyManager()
+    _k = models.IntegerField(default=0) # The ammount of the time dimension filled.
+
+    objects = PropertyManager()
                          
     # Generates the path to the dataset in the h5 file.
-    def get_path(self):
+    @property
+    def path(self):
         """ Get the path to the dataset within the simulation h5 file """
-        return "/".join(['/states', 
-                         self.state_name,
-                         self.property_name]).replace(" ", "_")
+        return "/".join([self.state.path,
+                         self.name]).replace(" ", "_")
 
     # Access the H5Py dataset object for this property.
+    @property
     def dataset(self):
         """ Returns the H5Py Dataset object for this property. """
-        f = self.simulation.get_file()
-        return f[self.get_path()]
+        f = self.state.simulation.h5file
+        return f[self.path]
+
+    def add_data(self, ts):
+        """ Accepts a numpy array and attempts to add it to the dataset. """
+        
+        # If all dimensions, except the time dimension, are equal.
+        if ts.shape[:-1] == self.dataset.shape[:-1]:
+            lts = ts.shape[-1] # Length of the time dimension.
+            self.dataset[...,self.k:self.k+lts]
+            self.state.simulation.h5file.flush()
+        else: 
+            return False
+
 
     # Unicode
     def __unicode__(self):
-        return " - ".join([self.simulation.name, 
-                           self.state_name, 
-                           self.property_name])
-
+        return " - ".join([self.state.simulation.name, 
+                           self.state.name, 
+                           self.name])
 
     class Meta:
         app_label='wc'
@@ -125,7 +150,7 @@ class SimulationManager(models.Manager):
                                  description=description,
                                  replicate_index=replicate_index)
 
-        f = simulation.get_file()    
+        f = simulation.h5file 
 
         for s, pd in state_properties.iteritems():
             for p, d in pd.iteritems():
@@ -174,11 +199,12 @@ class Simulation(models.Model):
     # States
     def get_state(self, state_name):
         """ Returns a Queryset of properties from the specified state """
-        return self.state_properties.filter(state_name=state_name)
+        return self.state_set.get(state_name=state_name)
 
     def add_state(self, state_name):
+        State.objects.create(name=state_name, simulation=self)
         if self._file_permissions == 'a':
-            f = self.get_file()
+            f = self.h5file
             g = f.create_group('/states/' + state_name) 
             f.flush()
             return g
@@ -186,13 +212,13 @@ class Simulation(models.Model):
     # Properties
     def add_property(self, s, p, dim, val_type):
         """ Adds a property to the wcmodel. """
-        StateProperty.objects.create_property(self, s, p, dim, val_type)
+        p_obj = Property.objects.create_property(self, s, p, dim, val_type)
 
 
     def get_property(self, state_name, property_name):
         """ Returns the StatePropertyValue specified """
-        return self.stateproperty_set.filter(state_name=state_name,
-                                             property_name=property_name)[0]
+        s = self.state_set.get(name=state_name)
+        return s.property_set.get(name=property_name)
 
     ########################################################################
     # General methods for dealing with Options, Parameters, and Processes. #
@@ -265,7 +291,8 @@ class Simulation(models.Model):
         """ Returns the path to the HDF5 file for the Simulation """
         return HDF5_ROOT + "/" + self.name.replace(" ","_") + ".h5"
 
-    def get_file(self):
+    @property
+    def h5file(self):
         """ Returns the H5Py File object for the Simulation HDF5 file """
         return h5py.File(self._get_file_path(), self._file_permissions)
 

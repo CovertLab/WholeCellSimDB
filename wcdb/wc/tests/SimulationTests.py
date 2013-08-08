@@ -143,8 +143,8 @@ class SimulationTests(TestCase):
          sim = Simulation.objects.create_simulation("Sim 1", "Mg", "Mg1",
              state_properties={"State A": { "Prop a": ("=f8", (1,1,100))}})
          self.assertQuerysetEqual(
-             StateProperty.objects.all(),
-             ['<StateProperty: Sim 1 - State A - Prop a>'])
+             Property.objects.all(),
+             ['<Property: Sim 1 - State A - Prop a>'])
          os.remove(sim._get_file_path())
  
      def test_1_state_multi_property_autocreated(self):
@@ -152,9 +152,9 @@ class SimulationTests(TestCase):
              state_properties={"State A": { "Prop a": ("=f8", (1,1,100)),
                                             "Prop b": ("=f8", (1,100)) }})
          self.assertQuerysetEqual(
-             StateProperty.objects.all(),
-             ['<StateProperty: Sim 1 - State A - Prop a>',
-             '<StateProperty: Sim 1 - State A - Prop b>'])
+             Property.objects.all(),
+             ['<Property: Sim 1 - State A - Prop a>',
+             '<Property: Sim 1 - State A - Prop b>'])
          os.remove(sim._get_file_path())
   
      def test_multi_state_multi_property_autocreated(self):
@@ -163,10 +163,10 @@ class SimulationTests(TestCase):
                                             "Prop b": ("=f8", (1,100)) },
                                "State B": { "Prop c": ("=f8", (4,5,100))}})
          self.assertQuerysetEqual(
-             StateProperty.objects.all(),
-             ['<StateProperty: Sim 1 - State A - Prop a>',
-             '<StateProperty: Sim 1 - State A - Prop b>',
-             '<StateProperty: Sim 1 - State B - Prop c>'])
+             Property.objects.all(),
+             ['<Property: Sim 1 - State A - Prop a>',
+             '<Property: Sim 1 - State A - Prop b>',
+             '<Property: Sim 1 - State B - Prop c>'])
          os.remove(sim._get_file_path())
  
      #### Methods ####
@@ -177,8 +177,8 @@ class SimulationTests(TestCase):
                                "State B": { "Prop c": ("=f8", (4,5,100))}})
          self.assertQuerysetEqual(
              sim.get_state("State A"),
-             ['<StateProperty: Sim 1 - State A - Prop a>',
-             '<StateProperty: Sim 1 - State A - Prop b>'])
+             ['<Property: Sim 1 - State A - Prop a>',
+             '<Property: Sim 1 - State A - Prop b>'])
          os.remove(sim._get_file_path())
  
      def test_add_state(self):
@@ -193,8 +193,8 @@ class SimulationTests(TestCase):
                                "State B": { "Prop c": ("=f8", (4,5,100))}})
          self.assertEqual(
              sim.get_property("State A", "Prop a"), 
-             StateProperty.objects.get(state_name="State A", 
-                                         property_name="Prop a"))
+             Property.objects.get(state__name="State A", 
+                                         name="Prop a"))
          os.remove(sim._get_file_path())
  
      
@@ -221,10 +221,9 @@ class SimulationTests(TestCase):
  
          while t <= t_end: 
            data = numpy.random.randint(2, 4, 3)
-           sim.get_property('State A', 'Prop a').dataset()[:,:,t-w:t]=data
-           sim.get_file().flush()           
+           sim.get_property('State A', 'Prop a').add_data(data)
            t += w
-         print sim.get_property('State A', 'Prop a').dataset()[:,:,:]
+         print sim.get_property('State A', 'Prop a').dataset[:]
 
 
             
