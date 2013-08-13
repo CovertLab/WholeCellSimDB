@@ -6,8 +6,8 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     # Examples:
-    # url(r'^$', 'wcdb.views.home', name='home'),
-    # url(r'^wcdb/', include('wcdb.foo.urls')),
+    # url(r'^$', 'WholeCellDB.views.home', name='home'),
+    # url(r'^WholeCellDB/', include('WholeCellDB.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

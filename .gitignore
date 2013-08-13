@@ -28,6 +28,7 @@
 *.sqlite
 *.hdf5
 *.hdf4
+*.db
 
 # OS generated files #
 ######################

@@ -1,4 +1,4 @@
-# Django settings for wcdb project.
+# Django settings for WholeCellDB project.
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -102,10 +102,10 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'wcdb.urls'
+ROOT_URLCONF = 'WholeCellDB.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
-WSGI_APPLICATION = 'wcdb.wsgi.application'
+WSGI_APPLICATION = 'WholeCellDB.wsgi.application'
 
 HDF5_ROOT = "/home/nolan/hdf5"
 
