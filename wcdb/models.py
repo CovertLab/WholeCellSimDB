@@ -19,7 +19,7 @@ class UserProfile(models.Model):
     class Meta:
         ordering = ['user__last_name', 'user__first_name']
         get_latest_by = 'user__date_joined'
-        app_label='wc'
+        app_label='wcdb'
 
 
 """ Parameter """ 
@@ -32,7 +32,7 @@ class Parameter(models.Model):
 
 
     class Meta:
-        app_label='wc'
+        app_label='wcdb'
 
 
 """ Option """
@@ -45,7 +45,7 @@ class Option(models.Model):
 
 
     class Meta:
-        app_label='wc'
+        app_label='wcdb'
 
 
 """ Process """
@@ -54,7 +54,7 @@ class Process(models.Model):
 
     class Meta:
         verbose_name_plural = 'Processes'
-        app_label='wc'
+        app_label='wcdb'
 
     def __unicode__(self):
         return self.name
@@ -144,7 +144,7 @@ class Property(models.Model):
                            self.name])
 
     class Meta:
-        app_label='wc'
+        app_label='wcdb'
 
 
 class SimulationManager(models.Manager):
@@ -317,4 +317,4 @@ class Simulation(models.Model):
 
     class Meta:
         get_latest_by = 'date'
-        app_label='wc'
+        app_label='wcdb'

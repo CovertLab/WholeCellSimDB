@@ -1,5 +1,5 @@
 from django.test import TestCase
-from wc.models import Parameter
+from wcdb.models import Parameter
 
 
 class ParameterModelTests(TestCase):

@@ -1,5 +1,5 @@
 from django.test import TestCase
-from wc.models import Option
+from wcdb.models import Option
 
 
 class OptionModelTests(TestCase):

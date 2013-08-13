@@ -4,7 +4,7 @@ import os
 import numpy as np
 from django.test import TestCase
 from django.contrib.auth.models import User
-from wc.models import *
+from wcdb.models import *
 
 
 class SimulationTests(TestCase):

@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
-from wc.models import *
+from wcdb.models import *
 
 import os
 

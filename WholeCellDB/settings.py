@@ -12,7 +12,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '/home/nolan/GitRepos/WholeCellDB/wcdb/database.db',                      # Or path to database file if using sqlite3.
+        'NAME': '/home/nolan/GitRepos/WholeCellDB/database.db',                      # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
         'USER': '',
         'PASSWORD': '',
@@ -62,12 +62,6 @@ MEDIA_URL = ''
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/var/www/example.com/static/"
 STATIC_ROOT = ''
-
-# Absolute path to directory containing HDF5 files.
-HDF5_ROOT='/home/nolan/wcdb/hdf5/'
-
-# Absolute path to directory used for testing HDF5 files.
-HDF5_TEST='/home/nolan/wcdb/hdf5/test/'
 
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
@@ -130,7 +124,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
-    'wc',
+    'wcdb',
 )
 
 # A sample logging configuration. The only tangible logging
