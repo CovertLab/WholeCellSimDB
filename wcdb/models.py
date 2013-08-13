@@ -1,8 +1,8 @@
-HDF5_ROOT = "/home/nolan/hdf5"
 from django.db import models
 from django.contrib.auth.models import User
 import h5py
 
+HDF5_ROOT = "/home/nolan/hdf5"
 
 """ User """
 class UserProfile(models.Model):

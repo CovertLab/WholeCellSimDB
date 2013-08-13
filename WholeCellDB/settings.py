@@ -107,6 +107,8 @@ ROOT_URLCONF = 'wcdb.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'wcdb.wsgi.application'
 
+HDF5_ROOT = "/home/nolan/hdf5"
+
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
