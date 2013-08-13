@@ -1,0 +1,21 @@
+============
+WholeCellDB
+============
+
+WholeCellDB is a standalone Django project.
+
+Prerequisites
+-------------
+
+python 2.7
+Django 1.5
+python-numpy
+python-h5py
+
+
+Quick Start
+-----------
+
+1. Setup your databse in the DATABASE dict in WholeCellDB/settings.py. For more information on how you can do this, visit https://docs.djangoproject.com/en/1.5/intro/tutorial01/#database-setup
+
+2.
