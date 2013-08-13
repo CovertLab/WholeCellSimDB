@@ -1,5 +1,3 @@
-HDF5_ROOT = "/home/nolan/hdf5"
-
 import os 
 import numpy as np
 from django.test import TestCase
