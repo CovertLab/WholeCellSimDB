@@ -1,23 +1,16 @@
 #!/usr/bin/env python
-"""
-This is the models module for the Whole Cell DB. 
-"""
 from django.db import models
 from django.contrib.auth.models import User
 import h5py
 
 HDF5_ROOT = "/home/nolan/hdf5"
 
-__author__ = "Nolan Phillips"
-__credits__ = ["Nolan Phillips", "Yingwei Wang", "Jonathan Karr"]
-__version__ = "1.0.1"
-__maintainer__ = "Nolan Phillips"
-__email__ = "ncphillips@upei.ca"
-__status__ = "Development"
-__date__ = "Tue Aug 13 22:22:18 ADT 2013"
-
-""" User """
 class UserProfile(models.Model):
+    """ 
+    User 
+
+    This model is currently not being used by anything.
+    """
     user = models.OneToOneField(User)
     affiliation = models.CharField(max_length=255, 
                                    blank=True, default='')
@@ -34,8 +27,14 @@ class UserProfile(models.Model):
         app_label='wcdb'
 
 
-""" Parameter """ 
 class Parameter(models.Model):
+    """ 
+    Parameter
+
+    Each Whole Cell Model (WCM) will have a set of Parameters. Because the 
+    number of parameters may change depending on the WCM, they are stored
+    internally in their own as Django models.
+    """ 
     name = models.CharField(max_length=255)
     value = models.FloatField()
 
@@ -47,8 +46,15 @@ class Parameter(models.Model):
         app_label='wcdb'
 
 
-""" Option """
 class Option(models.Model):
+    """ 
+    Option 
+
+    Each Whole Cell Model (WCM) will have a set of Options. Because the 
+    number of options may change depending on the WCM, they are stored
+    internally in their own as Django models.
+    """ 
+
     name = models.CharField(max_length=255)
     value = models.TextField()
 
@@ -62,6 +68,13 @@ class Option(models.Model):
 
 """ Process """
 class Process(models.Model):
+    """ 
+    Process 
+
+    Each Whole Cell Model (WCM) will have a set of Process. Because the 
+    number of processes may change depending on the WCM, they are stored
+    internally in their own as Django models.
+    """ 
     name = models.CharField(max_length=255, primary_key=True, unique=True)
 
     class Meta:
@@ -73,6 +86,11 @@ class Process(models.Model):
 
 
 class State(models.Model):
+    """
+    State
+
+    States are groups of paramters. 
+    """
     name = models.CharField(max_length=255)
     simulation = models.ForeignKey('Simulation')
      
@@ -86,7 +104,6 @@ class State(models.Model):
         return " - ".join([self.simulation.name, 
                            self.name])
 
-""" StateProperty """
 class PropertyManager(models.Manager):
     def create_property(self, simulation, state_name, property_name,
                         dimensions, dtype):
@@ -122,6 +139,10 @@ class PropertyManager(models.Manager):
 
 
 class Property(models.Model):
+    """
+    Property
+
+    """
     name  = models.CharField(max_length=255)
     state = models.ForeignKey('State')
 
@@ -139,6 +160,7 @@ class Property(models.Model):
 
     @property
     def shape(self):
+        """ The shape of the property's dataset """
         return self.dataset.shape
 
     # Access the H5Py dataset object for this property.
@@ -230,8 +252,11 @@ class SimulationManager(models.Manager):
 
         return simulation
 
-""" Simulation """
 class Simulation(models.Model):
+    """ 
+    Simulation 
+
+    """
     # Metadata
     name            = models.CharField(max_length=255, unique=True)
     model           = models.CharField(max_length=255, default="")
@@ -259,10 +284,10 @@ class Simulation(models.Model):
     # Methods for dealing with State-Properties
     # States
     def get_state(self, state_name):
-        """ Returns a Queryset of properties from the specified state """
         return self.state_set.get(state_name=state_name)
 
     def add_state(self, state_name):
+        """ This stuff should be in a State Manager. """
         State.objects.create(name=state_name, simulation=self)
         if self._file_permissions == 'a':
             f = self.h5file
@@ -271,13 +296,38 @@ class Simulation(models.Model):
             return g
 
     # Properties
-    def add_property(self, s, p, dim, dtype):
-        """ Adds a property to the wcmodel. """
-        p_obj = Property.objects.create_property(self, s, p, dim, dtype)
+    def add_property(self, state_name, property_name, shape, dtype):
+        """ 
+        Adds and returns a property to this Simulation.
+
+        I have provided this method because it works from the perspective of
+        adding a property to a Simulation, instead of the perspective of
+        creating a property, and then specifying the Simulation you're
+        relating it too.
+
+        Arguments
+            name            |   type 
+            ----------------------------------
+            state_name      |   String 
+            property_name   |   String
+            shape           |   Tuple of Ints
+            dtype           |   numpy.dtype
+    
+        """
+        return Property.objects.create_property(self, state_name, 
+                                                 property_name, shape, dtype)
 
 
     def get_property(self, state_name, property_name):
-        """ Returns the StatePropertyValue specified """
+        """ 
+        Returns the Property with the specified name.
+
+        Arguments
+            name            |   type
+            ------------------------------------
+            state_name      |   String
+            property_name   |   String
+        """
         s = self.state_set.get(name=state_name)
         return s.property_set.get(name=property_name)
 
@@ -294,7 +344,7 @@ class Simulation(models.Model):
             cls     |   Class
             field   |   django.db.models.ForeignKeyField
             name    |   String
-            value   |   OPTIONAL: String OR Float 
+            value   |   String OR Float OR None
 
         """
         try: 
