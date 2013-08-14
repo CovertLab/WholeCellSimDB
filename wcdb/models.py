@@ -89,7 +89,7 @@ class State(models.Model):
 """ StateProperty """
 class PropertyManager(models.Manager):
     def create_property(self, simulation, state_name, property_name,
-                        dimensions, value_type):
+                        dimensions, dtype):
         """ 
         Creates a new StatePropertyValue and the associated dataset. 
 
@@ -106,10 +106,13 @@ class PropertyManager(models.Manager):
                                             simulation=simulation)[0]
         p_obj = self.create(name=property_name, state=s_obj)
 
+        maxshape = dimensions[:-1] + (None,)
+
         f = simulation.h5file  # Get the simulation h5 file
 
         # Create the datset in the simulation h5 file
-        f.create_dataset(p_obj.path, shape=dimensions, dtype=value_type)
+        f.create_dataset(p_obj.path, shape=dimensions, dtype=dtype,
+                         maxshape=maxshape)
 
         # Make sure it's saved and closed.
         f.flush()
@@ -159,47 +162,31 @@ class Property(models.Model):
         shape as self.dataset.shape, and the last dimension of ts is less than 
         the number indices available in self.dataset.
 
-        That is:
-            len(ts.shape) == len(self.dataset.shape)
+        That is, len(ts.shape) == len(self.dataset.shape)
 
-        and:
-            ts.shape[-1] == (self.dataset.shape[-1] - self.filled)
-
-        An example for the first condition:
+        For example: 
             If self.dataset.shape is (2,3,4), you must pass in a tuple of
             shape (2,3,x). 
 
             If ts == {{0, 1}, {2, 3}, {4, 5}} then it will fail.
 
             Instead, it should be ts == {{[0], [1]}, {[2], [3]}, {[4], [5]}}
-
-        Second condition:
-            Let's say: 
-                self.dataset.shape == (2,3,4)
-                self.filled == 3 
-
-            and that ts == {{[0], [1]}, {[2], [3]}, {[4], [5]}}. This means 
-            that ts.shape == (2,3,2)
-
-            ts.shape[-1] == 2
-            self.dataset.shape - self.filled == 4 - 3 == 1
-
-            therefore the timeslice ts cannot be saved in this array.
-
-                 
         """
         # If all dimensions, except the time dimension, are equal.
         if ts.shape[:-1] == self.dataset.shape[:-1]:
-            try:
-                lts = ts.shape[-1] # Length of the time dimension.
-                self.dataset[...,self._k:self._k+lts] = ts
-                self.state.simulation.h5file.flush()
-                self._k += lts
-            except:
-                pass
-        else: 
-            return False
+            lts = ts.shape[-1] # Length of the time dimension.
 
+            # If there isn't enough room for the time timeslice then
+            # we'll expand the dataset so there is room.
+            if lts > (self.dataset.shape[-1] - self.filled):
+                new_shape = self.dataset.shape[:-1] + (self.filled + lts,)
+                self.dataset.resize(new_shape)
+
+            self.dataset[...,self.filled:self.filled+lts] = ts
+            self.state.simulation.h5file.flush()
+            self.filled += lts
+        else:
+            return False
 
     # Unicode
     def __unicode__(self):
@@ -284,9 +271,9 @@ class Simulation(models.Model):
             return g
 
     # Properties
-    def add_property(self, s, p, dim, val_type):
+    def add_property(self, s, p, dim, dtype):
         """ Adds a property to the wcmodel. """
-        p_obj = Property.objects.create_property(self, s, p, dim, val_type)
+        p_obj = Property.objects.create_property(self, s, p, dim, dtype)
 
 
     def get_property(self, state_name, property_name):
@@ -297,21 +284,45 @@ class Simulation(models.Model):
     ########################################################################
     # General methods for dealing with Options, Parameters, and Processes. #
     def add_opp(self, cls, field, name, value=''):
-        """ If the opp is added to the simulation that object is returned,
-        however, if the opp already exists then nothing is returned.  """
+        """ 
+        If the opp is added to the simulation that object is returned,
+        however, if the opp already exists then nothing is returned.  
+
+        Arguments
+            name    |   type
+            -------------------------------------------------
+            cls     |   Class
+            field   |   django.db.models.ForeignKeyField
+            name    |   String
+            value   |   OPTIONAL: String OR Float 
+
+        """
         try: 
             o = cls.objects.get_or_create(name=name, value=value)[0]
         except:
             o = cls.objects.get_or_create(name=name)[0]
         
-        if o not in field.all():
+        if o not in field.filter(name=name):
             field.add(o)
             return o
 
     def set_opp(self, cls, field, name, value):
-        """ If the opp is set it returns the opp object with that value.
-        However, if the new value is the same as the old one, or if the 
-        opp isn't part of this simulation then nothing is returned. """
+        """ 
+        Updates the value of the OPP with the given name.
+
+        Arguments
+            name    |   type
+            ----------------------------------
+            cls     |   Class
+            field   |   models.ForeignKeyField
+            name    |   String
+            value   |   String OR Float 
+
+
+        NOTE:   This method accomplishes it's task by removing
+                the previous object-relation and adding a new one.
+
+        """
         try:
             new = cls.objects.get_or_create(name=name, value=value)[0]
             current = field.filter(name=name)[0]
@@ -323,55 +334,128 @@ class Simulation(models.Model):
 
     # Methods for dealing with Options 
     def add_option(self, name, value=""):
-        """ Adds an option to the wcmodel. Returns true if it was successfully
-        added to the Simulation. """
+        """ 
+        Adds an Option with the specified name and value to the Simulation.
+
+        Argument
+            name    |   type
+            ----------------------
+            name    |   String
+            value   |   String
+        """
         if type(value) == str:
             self.add_opp(Option, self.options, name, value)
 
     def get_option(self, name):
+        """ 
+        Returns the Option with the specified name.
+
+        Arguments
+            name    |   type
+            ------------------
+            name    |   String
+        """ 
         return self.options.filter(name=name)[0]
 
     def set_option(self, name, value):
-        """ Set the options value. """
+        """ 
+        Set the value of the Option with the specified name to the 
+        specified value. 
+
+        Arguments
+            name    |   type
+            ----------------
+            name    |   String
+            value   |   String
+
+        """
         if type(value) == str:
             self.set_opp(Option, self.options, name, value)
 
     # Methods for dealing with Paramters
     def add_parameter(self, name, value=0):
-        """ Adds a parameter to the Simulation. """
+        """
+        Adds a parameter to the Simulation with the
+        specified name and value.
+
+        Arguments
+            name    |   type
+            ---------------------------
+            name    |   String
+            value   |   Float
+        """
         if type(value) == float:
             self.add_opp(Parameter, self.parameters, name, value)
 
     def get_parameter(self, name):
-        """ Returns the parameter with the submitted name. """
+        """ 
+        Returns the parameter with the specified name. 
+
+        Arguments
+            name    |   type
+            --------------------
+            name    |   String
+
+        """
         return self.parameters.filter(name=name)[0]
 
     def set_parameter(self, name, value):
-        """ Set the parameters value. """
+        """
+        Sets the value of the Parameter with the specified name,
+        to the specified value. 
+
+        Arguments
+            name    |   type
+            ---------------------
+            name    |   String
+            value   |   float
+        """
         if type(value) == float:
             self.set_opp(Parameter, self.parameters, name, value)
 
     # Methods for dealing with Process 
     def add_process(self, name):
-        """ Adds a process to the Simulation. """
+        """
+        Adds a process to this Simulation simulation with
+        the specified name. 
+
+        Arguments
+            name    |   type
+            ----------------
+            name    |   String
+    
+        """
         self.add_opp(Process, self.processes, name)
 
     def get_process(self, name):
+        """
+        Returns the process associated with this Simulation with
+        the specified name.
+
+
+        Arguments
+            name    |   type
+            -----------------
+            name    |   String
+        """
         return self.processes.filter(name=name)[0]
 
     ########################################
     # Methods for dealing with the H5 file.#
     @property
     def file_path(self):
-        """ Returns the path to the HDF5 file for the Simulation """
+        """ The path to the HDF5 file for the Simulation """
         return HDF5_ROOT + "/" + self.name.replace(" ","_") + ".h5"
 
     @property
     def h5file(self):
-        """ Returns the H5Py File object for the Simulation HDF5 file """
+        """ The H5Py File object for the Simulation HDF5 file """
         return h5py.File(self.file_path, self._file_permissions)
 
     def lock_file(self):
+        """
+        Makes the file read only (when accessing through these models)
+        """
         self._file_permissions = "r"
 
     # Other classes/methods
