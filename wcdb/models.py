@@ -10,11 +10,11 @@ HDF5_ROOT = "/home/nolan/hdf5"
 
 __author__ = "Nolan Phillips"
 __credits__ = ["Nolan Phillips", "Yingwei Wang", "Jonathan Karr"]
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __maintainer__ = "Nolan Phillips"
 __email__ = "ncphillips@upei.ca"
 __status__ = "Development"
-__date__ = "Tue Aug 13 17:23:21 ADT 2013"
+__date__ = "Tue Aug 13 22:22:18 ADT 2013"
 
 """ User """
 class UserProfile(models.Model):
