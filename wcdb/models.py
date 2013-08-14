@@ -1,8 +1,20 @@
+#!/usr/bin/env python
+"""
+This is the models module for the Whole Cell DB. 
+"""
 from django.db import models
 from django.contrib.auth.models import User
 import h5py
 
 HDF5_ROOT = "/home/nolan/hdf5"
+
+__author__ = "Nolan Phillips"
+__credits__ = ["Nolan Phillips", "Yingwei Wang", "Jonathan Karr"]
+__version__ = "1.0.0"
+__maintainer__ = "Nolan Phillips"
+__email__ = "ncphillips@upei.ca"
+__status__ = "Development"
+__date__ = "Tue Aug 13 17:23:21 ADT 2013"
 
 """ User """
 class UserProfile(models.Model):
@@ -66,7 +78,7 @@ class State(models.Model):
      
     @property
     def path(self):
-        """ Get the path to the dataset within the simulation h5 file """
+        """ The path to the dataset within the simulation h5 file """
         return "/".join(['/states', self.name]).replace(" ", "_")
 
     # Unicode
@@ -78,7 +90,18 @@ class State(models.Model):
 class PropertyManager(models.Manager):
     def create_property(self, simulation, state_name, property_name,
                         dimensions, value_type):
-        """ Creates a new StatePropertyValue and the associated dataset """
+        """ 
+        Creates a new StatePropertyValue and the associated dataset. 
+
+        Arguments
+            name            type
+            ----------------------------------
+            simulation      | wcdb.Simulation
+            state_name      | String
+            property_name   | String
+            dimensions      | Tuple of Ints
+            dtype           | Numpy.dtype
+        """
         s_obj = State.objects.get_or_create(name=state_name, 
                                             simulation=simulation)[0]
         p_obj = self.create(name=property_name, state=s_obj)
@@ -100,14 +123,14 @@ class Property(models.Model):
     state = models.ForeignKey('State')
 
     # Number of indices filled in in the time dimension.
-    _k = models.IntegerField(default=0) 
+    filled = models.IntegerField(default=0) 
 
     objects = PropertyManager()
                          
     # Generates the path to the dataset in the h5 file.
     @property
     def path(self):
-        """ Get the path to the dataset within the simulation h5 file """
+        """ The path to the dataset within the simulation h5 file """
         return "/".join([self.state.path,
                          self.name]).replace(" ", "_")
 
@@ -118,12 +141,53 @@ class Property(models.Model):
     # Access the H5Py dataset object for this property.
     @property
     def dataset(self):
-        """ Returns the H5Py Dataset object for this property. """
+        """ The H5Py Dataset object for this property. """
         f = self.state.simulation.h5file
         return f[self.path]
 
     def add_data(self, ts):
-        """ Accepts a numpy array and attempts to add it to the dataset. """
+        """ 
+        This method is for adding new time slices to the data.
+
+        Arguments
+            name        type
+            ----------------------
+            ts      | numpy.array
+
+
+        This method requires that ts.shape be the same lengh as the
+        shape as self.dataset.shape, and the last dimension of ts is less than 
+        the number indices available in self.dataset.
+
+        That is:
+            len(ts.shape) == len(self.dataset.shape)
+
+        and:
+            ts.shape[-1] == (self.dataset.shape[-1] - self.filled)
+
+        An example for the first condition:
+            If self.dataset.shape is (2,3,4), you must pass in a tuple of
+            shape (2,3,x). 
+
+            If ts == {{0, 1}, {2, 3}, {4, 5}} then it will fail.
+
+            Instead, it should be ts == {{[0], [1]}, {[2], [3]}, {[4], [5]}}
+
+        Second condition:
+            Let's say: 
+                self.dataset.shape == (2,3,4)
+                self.filled == 3 
+
+            and that ts == {{[0], [1]}, {[2], [3]}, {[4], [5]}}. This means 
+            that ts.shape == (2,3,2)
+
+            ts.shape[-1] == 2
+            self.dataset.shape - self.filled == 4 - 3 == 1
+
+            therefore the timeslice ts cannot be saved in this array.
+
+                 
+        """
         # If all dimensions, except the time dimension, are equal.
         if ts.shape[:-1] == self.dataset.shape[:-1]:
             try:
