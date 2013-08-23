@@ -51,18 +51,6 @@ class SimulationTests(TestCase):
 
         os.remove(sim.file_path)
 
-    def test_get_opp(self):
-        sim = self.sample_simulation(
-            parameters={"Parameter A": 0.0, "Parameter B":1.0},
-            options={"Option A": "value a", "Option B": "value b"},
-            processes=["Process 1", "Process 2"])
-
-        print sim.parameters
-        print sim.options
-        print sim.processes
-
-
- 
     ##############################################################
     # State Properties
     ##############################################################
@@ -98,31 +86,9 @@ class SimulationTests(TestCase):
         os.remove(sim.file_path)
 
     #### Methods ####
-    def test_get_state(self):
-        sim = self.sample_simulation(
-            state_properties={"State A": { "Prop a": ((1,1,100),"=f8"),
-                                           "Prop b": ((1,100),"=f8") },
-                              "State B": { "Prop c": ((4,5,100),"=f8")}})
-        self.assertEqual(
-            sim.get_state("State A"),
-            State.objects.get(name="State A", simulation=sim))
-        os.remove(sim.file_path)
-
     def test_add_state(self):
-        sim = self.sample_simulation()
-        # Finish this later. 
-        os.remove(sim.file_path)
-
-    def test_get_property(self):
-        sim = self.sample_simulation(
-            state_properties={"State A": { "Prop a": ((1,1,100),"=f8"),
-                                           "Prop b": ((1,100),"=f8") },
-                              "State B": { "Prop c": ((4,5,100),"=f8")}})
-        self.assertEqual(
-            sim.get_property("State A", "Prop a"), 
-            Property.objects.get(state__name="State A", 
-                                        name="Prop a"))
-        os.remove(sim.file_path)
+        # Probably just get rid of htis. It should be in here. 
+        pass
 
     
     def test_hdf5_file_created(self):
@@ -138,12 +104,14 @@ class SimulationTests(TestCase):
         self.assertEqual(file_exists, True)
 
    # Adding to Datasets
+     #This shouldn't even be in this module, should be in the Property tests.
     def test_adding_data(self):
         import numpy
         sim = self.sample_simulation(
             state_properties={"State A": { "Prop a": ((2,3), "=f8")}})
-        
-        p = sim.get_property('State A', 'Prop a')
+
+        p = sim.state_set.filter(name='State A')[0].property_set.filter(
+                                                        name='Prop a')[0]
        
         p.add_data(np.array([[[0],[1],[2]],[[3],[4],[5]]]))
         p.add_data(np.array([[[10],[11],[12]],[[13],[14],[15]]]))
@@ -159,7 +127,3 @@ class SimulationTests(TestCase):
 # 
 
         os.remove(sim.file_path)
-
-    def test_add_op(self):
-        sim = self.sample_simulation()
-        sim.add_op(Option, "Option a", "Value a")
