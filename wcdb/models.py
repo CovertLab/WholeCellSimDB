@@ -2,29 +2,28 @@
 from django.db import models
 from django.contrib.auth.models import User
 import h5py
+import sys
 
 HDF5_ROOT = "/home/nolan/hdf5"
 
-
-class UserProfile(models.Model):
+### OPP ###
+class Option(models.Model):
     """ 
-    User 
+    Option 
 
-    This model is currently not being used by anything.
-    """
-    user = models.OneToOneField(User)
-    affiliation = models.CharField(max_length=255, 
-                                   blank=True, default='')
+    Each Whole Cell Model (WCM) will have a set of Options. Because the 
+    number of options may change depending on the WCM, they are stored
+    internally in their own as Django models.
+    """ 
+    name        = models.CharField(max_length=255)
+    value       = models.CharField(max_length=255)
+    simulation  = models.ForeignKey("Simulation")
 
     def __unicode__(self):
-        if (self.affiliation == ""):
-            return self.user.__unicode__()
-        else:
-            return " - ".join([self.user.__unicode__(), self.affiliation])
-    
+        return self.name
+
+
     class Meta:
-        ordering = ['user__last_name', 'user__first_name']
-        get_latest_by = 'user__date_joined'
         app_label='wcdb'
 
 
@@ -36,31 +35,12 @@ class Parameter(models.Model):
     number of parameters may change depending on the WCM, they are stored
     internally in their own as Django models.
     """ 
-    name = models.CharField(max_length=255)
-    value = models.FloatField()
+    name        = models.CharField(max_length=255)
+    value       = models.PositiveIntegerField()
+    simulation  = models.ForeignKey("Simulation")
 
     def __unicode__(self):
-        return " = ".join([self.name, str(self.value)])
-
-
-    class Meta:
-        app_label='wcdb'
-
-
-class Option(models.Model):
-    """ 
-    Option 
-
-    Each Whole Cell Model (WCM) will have a set of Options. Because the 
-    number of options may change depending on the WCM, they are stored
-    internally in their own as Django models.
-    """ 
-
-    name = models.CharField(max_length=255)
-    value = models.TextField()
-
-    def __unicode__(self):
-        return " = ".join([self.name, self.value])
+        return self.name
 
 
     class Meta:
@@ -76,7 +56,8 @@ class Process(models.Model):
     number of processes may change depending on the WCM, they are stored
     internally in their own as Django models.
     """ 
-    name = models.CharField(max_length=255, primary_key=True, unique=True)
+    name       = models.CharField(max_length=255)
+    simulation = models.ForeignKey("Simulation")
 
     class Meta:
         verbose_name_plural = 'Processes'
@@ -85,7 +66,7 @@ class Process(models.Model):
     def __unicode__(self):
         return self.name
 
-
+### States ###
 class State(models.Model):
     """
     State
@@ -105,31 +86,30 @@ class State(models.Model):
         return " - ".join([self.simulation.name, 
                            self.name])
 
+
+### Properties ###
 class PropertyManager(models.Manager):
-    def create_property(self, simulation, state_name, property_name,
-                        dimensions, dtype):
+    def create_property(self, simulation, state, name, shape, dtype):
         """ 
         Creates a new StatePropertyValue and the associated dataset. 
 
         Arguments
-            name            type
+            name            | type
             ----------------------------------
             simulation      | wcdb.Simulation
-            state_name      | String
-            property_name   | String
+            state           | wcdb.State 
+            name            | String
             dimensions      | Tuple of Ints
             dtype           | Numpy.dtype
         """
-        s_obj = State.objects.get_or_create(name=state_name, 
-                                            simulation=simulation)[0]
-        p_obj = self.create(name=property_name, state=s_obj)
+        p_obj = self.create(name=name, state=state)
 
-        maxshape = dimensions[:-1] + (None,)
+        maxshape = shape[:-1] + (None,)
 
         f = simulation.h5file  # Get the simulation h5 file
 
         # Create the datset in the simulation h5 file
-        f.create_dataset(p_obj.path, shape=dimensions, dtype=dtype,
+        f.create_dataset(p_obj.path, shape=shape, dtype=dtype,
                          maxshape=maxshape)
 
         # Make sure it's saved and closed.
@@ -142,7 +122,6 @@ class PropertyManager(models.Manager):
 class Property(models.Model):
     """
     Property
-
     """
     name  = models.CharField(max_length=255)
     state = models.ForeignKey('State')
@@ -152,7 +131,6 @@ class Property(models.Model):
 
     objects = PropertyManager()
                          
-    # Generates the path to the dataset in the h5 file.
     @property
     def path(self):
         """ The path to the dataset within the simulation h5 file """
@@ -164,7 +142,6 @@ class Property(models.Model):
         """ The shape of the property's dataset """
         return self.dataset.shape
 
-    # Access the H5Py dataset object for this property.
     @property
     def dataset(self):
         """ The H5Py Dataset object for this property. """
@@ -202,8 +179,10 @@ class Property(models.Model):
             # If there isn't enough room for the time timeslice then
             # we'll expand the dataset so there is room.
             if lts > (self.dataset.shape[-1] - self.filled):
-                new_shape = self.dataset.shape[:-1] + (self.filled + lts,)
+                new_length = self.filled + lts
+                new_shape = self.dataset.shape[:-1] + (new_length,)
                 self.dataset.resize(new_shape)
+                self.state.simulation.t = new_length
 
             self.dataset[...,self.filled:self.filled+lts] = ts
             self.state.simulation.h5file.flush()
@@ -222,31 +201,50 @@ class Property(models.Model):
 
 
 class SimulationManager(models.Manager):
-    def create_simulation(self, name, organism, model, replicate_index=1, t=1,
-                          description="", ip='0.0.0.0', batch="", length=1.0,
-                          options={},     parameters={}, processes=[], 
+    def create_simulation(self, 
+                          name, 
+                          organism,
+                          batch="", 
+                          description="", 
+                          length=1.0,
+                          replicate_index=1,
+                          ip='0.0.0.0', 
+                          t=1, 
+                          options={},
+                          parameters={},
+                          processes=[], 
                           state_properties={}):
 
-        simulation = self.create(name=name, batch=batch,   model=model, 
-                                 length=length, ip=ip, t=t,
+        simulation = self.create(name=name, 
+                                 organism=organism,
+                                 batch=batch, 
                                  description=description,
-                                 replicate_index=replicate_index)
+                                 length=length, 
+                                 replicate_index=replicate_index,
+                                 ip=ip,
+                                 t=t)
 
         f = simulation.h5file 
 
         for s, pd in state_properties.iteritems():
-            for p, d in pd.iteritems():
-                dim = d[0] + (t,)
-                simulation.add_property(s, p, dim, d[1])
+            state = simulation.add_state(s)
+            for name, d in pd.iteritems():
+                Property.objects.create_property(simulation,
+                                                 state, 
+                                                 name,
+                                                 d[0], # Shape
+                                                 d[1]) # dType
 
         for name, value in options.iteritems():
-            simulation.add_option(name=name, value=value)
+            Option.objects.create(name=name, value=value,
+                                   simulation=simulation)
 
         for name, value in parameters.iteritems():
-            simulation.add_parameter(name=name, value=value)
+            Parameter.objects.create(name=name, value=value,
+                                     simulation=simulation)
 
         for name in processes:
-            simulation.add_process(name=name)
+            Process.objects.create(name=name, simulation=simulation)
 
         f.flush()
         f.close() 
@@ -257,242 +255,69 @@ class Simulation(models.Model):
     """ 
     Simulation 
 
+    Creation Arguments
+        name                | type
+        ----------------------------
+        name                | String
+        organism            | String
+        batch               | String
+        description         | String 
+        length              | Float 
+        replicate_index     | Positive Integer
+        ip                  | IP Address
+        t                   | Integer
+        options             | Dict String:String {"Option name": "Option val",}
+        parameters          | Dict String:Float  {"Parameter name": 0.0,}
+        processes           | Tuple of Strings of Process names.
+        state_properties    | Dict String:Dict {"State name": PropertyDict,}
+
+        State Dict Format:
+            {"State Name": 
+                {"Property name": 
+                    (
+                      (k0, k1, ..., kn, t), 
+                      dtype
+                    )
+                }
+            }
+
+        Where k0, ..., kn are Integers describing the shape of the property,
+        and t is an Integer indicating how many time slices there will be.
     """
     # Metadata
     name            = models.CharField(max_length=255, unique=True)
-    model           = models.CharField(max_length=255, default="")
     organism        = models.CharField(max_length=255, default="")
     batch           = models.CharField(max_length=255, default="")
     description     = models.TextField(default="")
     length          = models.FloatField(default=1.0)
-    #user            = models.ForeignKey('UserProfile')
     replicate_index = models.PositiveIntegerField(default=1)
     ip              = models.IPAddressField(default="0.0.0.0")
     date            = models.DateTimeField(auto_now=True, auto_now_add=True)
     t               = models.PositiveIntegerField()
-
-    # M2M Fields
-    options     = models.ManyToManyField('Option')
-    parameters  = models.ManyToManyField('Parameter')
-    processes   = models.ManyToManyField('Process')
 
     # Internal
     _file_permissions = models.CharField(max_length=3, default="a")
 
     objects = SimulationManager()
 
-    
-    # Methods for dealing with State-Properties
-    # States
-    def get_state(self, state_name):
-        return self.state_set.get(state_name=state_name)
-
     def add_state(self, state_name):
-        """ This stuff should be in a State Manager. """
-        State.objects.create(name=state_name, simulation=self)
+        """ 
+        This method creates a new State object and also the group in the HDF5.
+
+        NOTE: This stuff should be in a State Manager, so this method
+              will eventually be removed.
+        """
         if self._file_permissions == 'a':
+            s = State.objects.create(name=state_name, simulation=self)
             f = self.h5file
             g = f.create_group('/states/' + state_name) 
             f.flush()
-            return g
+            return s
 
-    # Properties
-    def add_property(self, state_name, property_name, shape, dtype):
-        """ 
-        Adds and returns a property to this Simulation.
-
-        I have provided this method because it works from the perspective of
-        adding a property to a Simulation, instead of the perspective of
-        creating a property, and then specifying the Simulation you're
-        relating it too.
-
-        Arguments
-            name            |   type 
-            ----------------------------------
-            state_name      |   String 
-            property_name   |   String
-            shape           |   Tuple of Ints
-            dtype           |   numpy.dtype
-    
-        """
-        return Property.objects.create_property(self, state_name, 
-                                                 property_name, shape, dtype)
-
-
-    def get_property(self, state_name, property_name):
-        """ 
-        Returns the Property with the specified name.
-
-        Arguments
-            name            |   type
-            ------------------------------------
-            state_name      |   String
-            property_name   |   String
-        """
-        s = self.state_set.get(name=state_name)
-        return s.property_set.get(name=property_name)
-
-    ########################################################################
-    # General methods for dealing with Options, Parameters, and Processes. #
-    def add_opp(self, cls, field, name, value=''):
-        """ 
-        If the opp is added to the simulation that object is returned,
-        however, if the opp already exists then nothing is returned.  
-
-        Arguments
-            name    |   type
-            -------------------------------------------------
-            cls     |   Class
-            field   |   django.db.models.ForeignKeyField
-            name    |   String
-            value   |   String OR Float OR None
-
-        """
-        try: 
-            o = cls.objects.get_or_create(name=name, value=value)[0]
-        except:
-            o = cls.objects.get_or_create(name=name)[0]
-        
-        if o not in field.filter(name=name):
-            field.add(o)
-            return o
-
-    def set_opp(self, cls, field, name, value):
-        """ 
-        Updates the value of the OPP with the given name.
-
-        Arguments
-            name    |   type
-            ----------------------------------
-            cls     |   Class
-            field   |   models.ForeignKeyField
-            name    |   String
-            value   |   String OR Float 
-
-
-        NOTE:   This method accomplishes it's task by removing
-                the previous object-relation and adding a new one.
-
-        """
-        try:
-            new = cls.objects.get_or_create(name=name, value=value)[0]
-            current = field.filter(name=name)[0]
-            if new.value != current.value:
-                field.remove(current)
-                field.add(new)
-                return new
-        except: pass
-
-    # Methods for dealing with Options 
-    def add_option(self, name, value=""):
-        """ 
-        Adds an Option with the specified name and value to the Simulation.
-
-        Argument
-            name    |   type
-            ----------------------
-            name    |   String
-            value   |   String
-        """
-        if type(value) == str:
-            self.add_opp(Option, self.options, name, value)
-
-    def get_option(self, name):
-        """ 
-        Returns the Option with the specified name.
-
-        Arguments
-            name    |   type
-            ------------------
-            name    |   String
-        """ 
-        return self.options.filter(name=name)[0]
-
-    def set_option(self, name, value):
-        """ 
-        Set the value of the Option with the specified name to the 
-        specified value. 
-
-        Arguments
-            name    |   type
-            ----------------
-            name    |   String
-            value   |   String
-
-        """
-        if type(value) == str:
-            self.set_opp(Option, self.options, name, value)
-
-    # Methods for dealing with Paramters
-    def add_parameter(self, name, value=0):
-        """
-        Adds a parameter to the Simulation with the
-        specified name and value.
-
-        Arguments
-            name    |   type
-            ---------------------------
-            name    |   String
-            value   |   Float
-        """
-        if type(value) == float:
-            self.add_opp(Parameter, self.parameters, name, value)
-
-    def get_parameter(self, name):
-        """ 
-        Returns the parameter with the specified name. 
-
-        Arguments
-            name    |   type
-            --------------------
-            name    |   String
-
-        """
-        return self.parameters.filter(name=name)[0]
-
-    def set_parameter(self, name, value):
-        """
-        Sets the value of the Parameter with the specified name,
-        to the specified value. 
-
-        Arguments
-            name    |   type
-            ---------------------
-            name    |   String
-            value   |   float
-        """
-        if type(value) == float:
-            self.set_opp(Parameter, self.parameters, name, value)
-
-    # Methods for dealing with Process 
-    def add_process(self, name):
-        """
-        Adds a process to this Simulation simulation with
-        the specified name. 
-
-        Arguments
-            name    |   type
-            ----------------
-            name    |   String
-    
-        """
-        self.add_opp(Process, self.processes, name)
-
-    def get_process(self, name):
-        """
-        Returns the process associated with this Simulation with
-        the specified name.
-
-
-        Arguments
-            name    |   type
-            -----------------
-            name    |   String
-        """
-        return self.processes.filter(name=name)[0]
 
     ########################################
     # Methods for dealing with the H5 file.#
+    ########################################
     @property
     def file_path(self):
         """ The path to the HDF5 file for the Simulation """
