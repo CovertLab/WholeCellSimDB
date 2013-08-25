@@ -10,10 +10,7 @@ HDF5_ROOT = "/home/nolan/hdf5"
 class Option(models.Model):
     """ 
     Option 
-
-    Each Whole Cell Model (WCM) will have a set of Options. Because the 
-    number of options may change depending on the WCM, they are stored
-    internally in their own as Django models.
+        Options.objects.create(name, value, simulation)
     """ 
     name        = models.CharField(max_length=255)
     value       = models.CharField(max_length=255)
@@ -30,10 +27,7 @@ class Option(models.Model):
 class Parameter(models.Model):
     """ 
     Parameter
-
-    Each Whole Cell Model (WCM) will have a set of Parameters. Because the 
-    number of parameters may change depending on the WCM, they are stored
-    internally in their own as Django models.
+        Parameter.objects.create(name, value, simulation)
     """ 
     name        = models.CharField(max_length=255)
     value       = models.PositiveIntegerField()
@@ -51,10 +45,7 @@ class Parameter(models.Model):
 class Process(models.Model):
     """ 
     Process 
-
-    Each Whole Cell Model (WCM) will have a set of Process. Because the 
-    number of processes may change depending on the WCM, they are stored
-    internally in their own as Django models.
+        Process.objects.create(name, simulation)
     """ 
     name       = models.CharField(max_length=255)
     simulation = models.ForeignKey("Simulation")
@@ -69,19 +60,19 @@ class Process(models.Model):
 ### States ###
 class StateManager(models.Manager):
     def create_state(self, name, simulation):
+        name = name.strip()
         state = self.create(name=name, simulation=simulation)
         f = simulation.h5file
         g = f.create_group('/states/' + name)
         f.flush()
+        f.close()
         return state
     
 class State(models.Model):
     """
     State
 
-    States are groups of paramters. 
-
-    Creation Arguments
+    State.objects.create_state(name, simulation)
         name        |   type
         --------------------------------------
         name        |   String
@@ -95,7 +86,7 @@ class State(models.Model):
     @property
     def path(self):
         """ The path to the dataset within the simulation h5 file """
-        return "/".join(['/states', self.name]).replace(" ", "_")
+        return ('/states/' + self.name)
 
     # Unicode
     def __unicode__(self):
@@ -105,15 +96,14 @@ class State(models.Model):
 
 ### Properties ###
 class PropertyManager(models.Manager):
-    def create_property(self, simulation, state, name, shape, dtype):
+    def create_property(self, state, name, shape, dtype):
         """ 
         Creates a new StatePropertyValue and the associated dataset. 
 
         Arguments
             name            | type
             ----------------------------------
-            simulation      | wcdb.Simulation
-            state           | wcdb.State 
+            state           | wcdb.models.State 
             name            | String
             dimensions      | Tuple of Ints
             dtype           | Numpy.dtype
@@ -122,7 +112,7 @@ class PropertyManager(models.Manager):
 
         maxshape = shape[:-1] + (None,)
 
-        f = simulation.h5file  # Get the simulation h5 file
+        f = state.simulation.h5file  # Get the simulation h5 file
 
         # Create the datset in the simulation h5 file
         f.create_dataset(p_obj.path, shape=shape, dtype=dtype,
@@ -245,8 +235,7 @@ class SimulationManager(models.Manager):
         for state_name, pd in state_properties.iteritems():
             state = State.objects.create_state(state_name, simulation)
             for prop_name, d in pd.iteritems():
-                Property.objects.create_property(simulation,
-                                                 state, 
+                Property.objects.create_property(state, 
                                                  prop_name,
                                                  d[0], # Shape
                                                  d[1]) # dType
