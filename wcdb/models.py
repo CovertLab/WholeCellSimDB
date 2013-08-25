@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from django.db import models
 from django.contrib.auth.models import User
+
 import h5py
 import sys
 
@@ -10,6 +11,8 @@ HDF5_ROOT = "/home/nolan/hdf5"
 class Option(models.Model):
     """ 
     Option 
+
+    Creating Options
         Options.objects.create(name, value, simulation)
     """ 
     name        = models.CharField(max_length=255)
@@ -27,6 +30,8 @@ class Option(models.Model):
 class Parameter(models.Model):
     """ 
     Parameter
+
+    Creating Parameter
         Parameter.objects.create(name, value, simulation)
     """ 
     name        = models.CharField(max_length=255)
@@ -45,6 +50,8 @@ class Parameter(models.Model):
 class Process(models.Model):
     """ 
     Process 
+
+    Creating Processes
         Process.objects.create(name, simulation)
     """ 
     name       = models.CharField(max_length=255)
@@ -133,7 +140,7 @@ class Property(models.Model):
     state = models.ForeignKey('State')
 
     # Number of indices filled in in the time dimension.
-    filled = models.IntegerField(default=0) 
+    _filled = models.IntegerField(default=0) 
 
     objects = PropertyManager()
                          
@@ -179,8 +186,10 @@ class Property(models.Model):
             Instead, it should be ts == {{[0], [1]}, {[2], [3]}, {[4], [5]}}
         """
         # If all dimensions, except the time dimension, are equal.
+        """ I'm not sure if I should be doing this if statement, or if I
+            should just let it throw the exception."""
         if ts.shape[:-1] == self.dataset.shape[:-1]:
-            lts = ts.shape[-1] # Length of the time dimension.
+            lts = ts.shape[-1] # Length of the new slice.
 
             # If there isn't enough room for the time timeslice then
             # we'll expand the dataset so there is room.
