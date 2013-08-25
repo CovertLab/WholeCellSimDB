@@ -69,9 +69,9 @@ class Process(models.Model):
 ### States ###
 class StateManager(models.Manager):
     def create_state(self, name, simulation):
-        state = State.objects.create(name, simulation)
+        state = self.create(name=name, simulation=simulation)
         f = simulation.h5file
-        g = f.create_group('/states/' + state_name)
+        g = f.create_group('/states/' + name)
         f.flush()
         return state
     
@@ -242,12 +242,12 @@ class SimulationManager(models.Manager):
 
         f = simulation.h5file 
 
-        for s, pd in state_properties.iteritems():
-            state = simulation.add_state(s)
-            for name, d in pd.iteritems():
+        for state_name, pd in state_properties.iteritems():
+            state = State.objects.create_state(state_name, simulation)
+            for prop_name, d in pd.iteritems():
                 Property.objects.create_property(simulation,
                                                  state, 
-                                                 name,
+                                                 prop_name,
                                                  d[0], # Shape
                                                  d[1]) # dType
 
@@ -315,21 +315,6 @@ class Simulation(models.Model):
     _file_permissions = models.CharField(max_length=3, default="a")
 
     objects = SimulationManager()
-
-    def add_state(self, state_name):
-        """ 
-        This method creates a new State object and also the group in the HDF5.
-
-        NOTE: This stuff should be in a State Manager, so this method
-              will eventually be removed.
-        """
-        if self._file_permissions == 'a':
-            s = State.objects.create(name=state_name, simulation=self)
-            f = self.h5file
-            g = f.create_group('/states/' + state_name) 
-            f.flush()
-            return s
-
 
     ########################################
     # Methods for dealing with the H5 file.#
