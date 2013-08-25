@@ -67,14 +67,30 @@ class Process(models.Model):
         return self.name
 
 ### States ###
+class StateManager(models.Manager):
+    def create_state(self, name, simulation):
+        state = State.objects.create(name, simulation)
+        f = simulation.h5file
+        g = f.create_group('/states/' + state_name)
+        f.flush()
+        return state
+    
 class State(models.Model):
     """
     State
 
     States are groups of paramters. 
+
+    Creation Arguments
+        name        |   type
+        --------------------------------------
+        name        |   String
+        simulation  |   wcdb.models.Simulation
     """
     name = models.CharField(max_length=255)
     simulation = models.ForeignKey('Simulation')
+
+    objects = StateManager()
      
     @property
     def path(self):
