@@ -86,11 +86,6 @@ class SimulationTests(TestCase):
         os.remove(sim.file_path)
 
     #### Methods ####
-    def test_add_state(self):
-        # Probably just get rid of htis. It should be in here. 
-        pass
-
-    
     def test_hdf5_file_created(self):
         sim = self.sample_simulation(
             state_properties={"State A": { "Prop a": ((1,1,100),"=f8"),
@@ -102,28 +97,3 @@ class SimulationTests(TestCase):
         else: 
             file_exists = False
         self.assertEqual(file_exists, True)
-
-   # Adding to Datasets
-     #This shouldn't even be in this module, should be in the Property tests.
-    def test_adding_data(self):
-        import numpy
-        sim = self.sample_simulation(
-            state_properties={"State A": { "Prop a": ((2,3), "=f8")}})
-
-        p = sim.state_set.filter(name='State A')[0].property_set.filter(
-                                                        name='Prop a')[0]
-       
-        p.add_data(np.array([[[0],[1],[2]],[[3],[4],[5]]]))
-        p.add_data(np.array([[[10],[11],[12]],[[13],[14],[15]]]))
-        p.add_data(np.array([[[20],[22],[22]],[[23],[24],[25]]]))
-        p.add_data(np.array([[[10],[11],[12]],[[13],[14],[15]]]))
-        
-#        numpy.testing.assert_array_equal(
-#            p,
-#            [ [[[0],[1],[2]],[[3],[4],[5]]],
-#              [[[10],[11],[12]],[[13],[14],[15]]],
-#              [[[20],[22],[22]],[[23],[24],[25]]],
-#              [[[10],[11],[12]],[[13],[14],[15]]]])
-# 
-
-        os.remove(sim.file_path)

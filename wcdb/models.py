@@ -148,7 +148,7 @@ class Property(models.Model):
     def path(self):
         """ The path to the dataset within the simulation h5 file """
         return "/".join([self.state.path,
-                         self.name]).replace(" ", "_")
+                         self.name])
 
     @property
     def shape(self):
