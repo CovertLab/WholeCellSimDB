@@ -7,7 +7,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir))
 
 setup(
     name='django-wcdb',
-    version='1.0.1',
+    version='1.1.0',
     packages=['wcdb'],
     include_package_data=True,
     license='FreeBSD',
