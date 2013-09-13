@@ -193,15 +193,15 @@ class Property(models.Model):
 
             # If there isn't enough room for the time timeslice then
             # we'll expand the dataset so there is room.
-            if lts > (self.dataset.shape[-1] - self.filled):
-                new_length = self.filled + lts
+            if lts > (self.dataset.shape[-1] - self._filled):
+                new_length = self._filled + lts
                 new_shape = self.dataset.shape[:-1] + (new_length,)
                 self.dataset.resize(new_shape)
                 self.state.simulation.t = new_length
 
-            self.dataset[...,self.filled:self.filled+lts] = ts
+            self.dataset[...,self._filled:self._filled+lts] = ts
             self.state.simulation.h5file.flush()
-            self.filled += lts
+            self._filled += lts
         else:
             return False
 
