@@ -1,4 +1,6 @@
 # WholeCellDB v1.1.0
+
+<a name="table_of_contents"/>
 1. [About](#about)
 2. [Requirements](#requirements)
    1. [Mimimum requirements](#requirements_minimum)
@@ -40,7 +42,7 @@ See [wholecell.stanford.edu](http://wholecell.stanford.edu) for additional infor
 1. Setup your database in the `DATABASES` dict in `WholeCellDB/settings.py`. For more information on how you can do this, see the [django tutorial](https://docs.djangoproject.com/en/1.5/intro/tutorial01/#database-setup).
     * To use SQLite set the `ENGINE` property to `django.db.backends.sqlite3` and set the `NAME` property to the path to the database file
     * To use MySQL (1) create a new user and database and (2) set the `ENGINE` property to `django.db.backends.mysql` and set the `HOST`, `PORT`, `NAME`, `USER`, and `PASSWORD` properties
-2. In the `wcdb/models.py` file, change the value of `HDF5_ROOT` to the location you wish to save the HDF5 data.
+2. Edit the value of `HDF5_ROOT` in `WholeCellDB/settings.py` to indicate the location you wish to save the HDF5 data.
 
         HDF5 = "/path/to/my/hdf5/location"
 3. Run `python manage.py syncdb` to create the models. 
@@ -108,5 +110,12 @@ WholeCellDB was developed by researchers at the University of Prince Edward Isla
 * [Yingwei Wang](http://www.csit.upei.ca/~ywang/), University of Prince Edward Island
 
 <a name="license"/>
-## License
-*Add a license here. We usually use the MIT license.*
+## The MIT License (MIT)
+
+Copyright &copy; 2013 Nolan Philips, Jonathan Karr, Markus Covert, Yingwei Wang
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
