@@ -4,23 +4,56 @@ WholeCellDB is a standalone Django project for storing and retrieving data gener
 
 ## Prerequisites
 
+### Mimimum requirements
 * python 2.7
 * Django 1.5
+* hdf5
+* hdf5-devel
 * python-numpy
 * python-h5py
+
+### Additional requirments for production servers
+* apache
+* mod_wsgi
 
 
 ## Quick Start
 
 1. Setup your database in the `DATABASES` dict in `WholeCellDB/settings.py`. For more information on how you can do this, see the [django tutorial](https://docs.djangoproject.com/en/1.5/intro/tutorial01/#database-setup).
-
+    * To use SQLite set the `ENGINE` property to `django.db.backends.sqlite3` and set the `NAME` property to the path to the database file
+    * To use MySQL (1) create a new user and database and (2) set the `ENGINE` property to `django.db.backends.mysql` and set the `HOST`, `PORT`, `NAME`, `USER`, and `PASSWORD` properties
 2. In the `wcdb/models.py` file, change the value of `HDF5_ROOT` to the location you wish to save the HDF5 data.
 
         HDF5 = "/path/to/my/hdf5/location"
-
 3. Run `python manage.py syncdb` to create the models. 
+4. Configure your web server
+    * Run `python manage.py runserver` to start the development server, or
+    * Add the following to your Apache configuration (`/etc/httpd/conf.d/WholeCellDB.conf and restart
+5. Navigate to the WholeCellDB website using your webserver
+    * Development server: [http://localhost:8000](http://localhost:8000)
+    * Production server:
 
-4. Run `python manage.py runserver` to start the development server.
+            LoadModule wsgi_module modules/mod_wsgi.so
+            
+            WSGIDaemonProcess default processes=2 threads=25
+            WSGIDaemonProcess wholecelldb:1 threads=1
+            WSGIDaemonProcess wholecelldb:2 threads=1
+            WSGIDaemonProcess wholecellkbeco:1 threads=25
+            SetEnv PROCESS_GROUP default
+            WSGIProcessGroup %{ENV:PROCESS_GROUP}
+            WSGISocketPrefix /var/run/wsgi
+            
+            #Alias /projects/WholeCellDB/static /home/projects/WholeCell-Mpn/kb/static
+            Alias /projects/WholeCellDB /home/projects/WholeCellDB/WholeCellDB/wsgi.py
+            <Directory /home/projects/WholeCellDB/WholeCellDB>
+                WSGIApplicationGroup %{RESOURCE}
+                WSGIRestrictProcess wholecelldb:1 wholecelldb:2
+                SetEnv PROCESS_GROUP wholecelldb:1
+                AddHandler wsgi-script .py
+                Options ExecCGI
+                Order allow,deny
+                Allow from all
+            </Directory>
 
 ## Integrating WholeCellDB with your WholeCell Model
 Use the following code to import the WholeCellDB packages into Python:
