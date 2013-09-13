@@ -4,8 +4,7 @@ from django.contrib.auth.models import User
 
 import h5py
 import sys
-
-HDF5_ROOT = "/home/nolan/hdf5"
+from settings import HDF5_ROOT
 
 ### OPP ###
 class Option(models.Model):
@@ -197,7 +196,7 @@ class Property(models.Model):
                 new_length = self._filled + lts
                 new_shape = self.dataset.shape[:-1] + (new_length,)
                 self.dataset.resize(new_shape)
-                self.state.simulation.t = new_length
+                self.state.simulation.length = new_length
 
             self.dataset[...,self._filled:self._filled+lts] = ts
             self.state.simulation.h5file.flush()
@@ -307,7 +306,6 @@ class Simulation(models.Model):
     replicate_index = models.PositiveIntegerField(default=1)
     ip              = models.IPAddressField(default="0.0.0.0")
     date            = models.DateTimeField(auto_now=True, auto_now_add=True)
-    t               = models.PositiveIntegerField()
 
     # Internal
     _file_permissions = models.CharField(max_length=3, default="a")
