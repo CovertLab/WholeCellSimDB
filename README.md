@@ -12,7 +12,7 @@ WholeCellDB is a standalone Django project for storing and retrieving data gener
 
 ## Quick Start
 
-1. Setup your database in the `DATABASE` dict in `WholeCellDB/settings.py`. For more information on how you can do this, see the [django tutorial](https://docs.djangoproject.com/en/1.5/intro/tutorial01/#database-setup).
+1. Setup your database in the `DATABASES` dict in `WholeCellDB/settings.py`. For more information on how you can do this, see the [django tutorial](https://docs.djangoproject.com/en/1.5/intro/tutorial01/#database-setup).
 
 2. In the `wcdb/models.py` file, change the value of `HDF5_ROOT` to the location you wish to save the HDF5 data.
 
