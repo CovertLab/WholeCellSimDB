@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 import h5py
 import sys
-from settings import HDF5_ROOT
+from WholeCellDB.settings import HDF5_ROOT
 
 ### OPP ###
 class Option(models.Model):
