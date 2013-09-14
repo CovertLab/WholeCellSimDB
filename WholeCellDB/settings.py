@@ -1,7 +1,12 @@
 # Django settings for WholeCellDB project.
 
+import os
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+
+ROOT_URL = 'http://covertlab.stanford.edu/projects/WholeCellDB'
+ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -65,13 +70,11 @@ STATIC_ROOT = ''
 
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
-STATIC_URL = '/static/'
+STATIC_URL = ROOT_URL + '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
-    # Put strings here, like "/home/html/static" or "C:/www/django/static".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
+    ROOT_DIR + "/wcdbweb/static",
 )
 
 # List of finder classes that know how to find static files in
@@ -109,10 +112,8 @@ WSGI_APPLICATION = 'WholeCellDB.wsgi.application'
 
 HDF5_ROOT = "/home/nolan/hdf5"
 
-TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
+TEMPLATE_DIRS = (    
+    ROOT_DIR + "/wcdbweb/templates",
 )
 
 INSTALLED_APPS = (
