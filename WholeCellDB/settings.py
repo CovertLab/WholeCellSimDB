@@ -159,3 +159,11 @@ LOGGING = {
         },
     }
 }
+
+AUTH_PROFILE_MODULE = 'wcdb.Investigator'
+LOGIN_URL = ROOT_URL + '/login/'
+LOGIN_REDIRECT_URL = ROOT_URL + '/'
+
+ABSOLUTE_URL_OVERRIDES = {
+    'auth.user': lambda o: ROOT_URL + '/investigator/' +  o.username,
+}
