@@ -1,0 +1,126 @@
+﻿{% comment %}
+Base template
+
+Author: Jonathan Karr, jkarr@stanford.edu
+Affiliation: Covert Lab, Department of Bioengineering, Stanford University
+Created: 2013-09-13
+{% endcomment %}
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="{{ LANGUAGE_CODE|default:"en-us" }}" xml:lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+{% load static %}
+<head>
+	{% block head %}
+	<!-- meta data -->
+	<title>{% block head_title %}WholeCellDB{% endblock %}</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Language" content="en-us" />
+	<meta http-equiv="Cache-Control" content="NO-CACHE" />
+	<meta http-equiv="Pragma" content="NO-CACHE" />
+	<meta name="description" content="Database of whole-cell model predictions." />
+	<meta name="keywords" content="cell, systems, biology, computational, database, modeling" />
+	<meta name="author" content="Nolan Phillips, Jonathan Karr, Markus Covert, and Yingwei Wang" />
+	<meta name="revised" content="2013" />
+	<meta name="copyright" content="&copy; 2008-2012 Nolan Phillips, Jonathan Karr, Markus Covert, and Yingwei Wang" />
+	<!--<meta name="google-site-verification" content="Vdho9XJAyUBzyApnbEsjy8m6CsLjNEI12c8wqVVpsS8" />-->
+	
+	<!-- style -->
+	<link rel="stylesheet" type="text/css" media="all" href="{% get_static_prefix %}css/jquery-ui-1.8.23.custom.css" />
+	<link rel="stylesheet" type="text/css" media="all" href="{% get_static_prefix %}css/PTSans.min.css" />
+	<link rel="stylesheet" type="text/css" media="all" href="{% get_static_prefix %}css/styles.css" />	
+	<link rel="stylesheet" type="text/css" media="print" href="{% get_static_prefix %}css/styles.print.css" />
+	
+	<!-- favicon -->
+	<link rel="icon" type="image/png" href="{% get_static_prefix %}favicon.ico">
+	
+	<!-- javascript -->
+	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/jquery-1.8.0.min.js"></script>
+	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/jquery-ui-1.8.23.custom.min.js"></script>
+	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/flot/jquery.flot.min.js"></script>
+	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/flot/jquery.flot.axislabels.min.js"></script>
+	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/flot/jquery.flot.pie.min.js"></script>
+	<!-[if lte IE 8]>
+	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/flot/excanvas.min.js"></script>
+	<![endif]->
+	
+	<!-- google analytics
+	<script type="text/javascript">
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-34992113-1']);
+	_gaq.push(['_trackPageview']);
+
+	(function() {
+	var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	})();
+	</script>
+    -->
+	{% endblock %}
+</head>
+<body>
+	<!-- header -->
+	<div id="header" class="ui-widget-header">
+		<div class="title">&nbsp;</div>
+		<div class="banner"><a href="{% url wcdbweb.views.index %}"><img src="{% get_static_prefix %}img/banner.png" /></a></div>
+		<div class="search"></div>
+		
+		<ul class="menu">
+			<li><a href="{% url wcdbweb.views.index %}">Home</a></li>
+            <li class="spacer"/>			
+            <li><a href="#">Download</a>
+                <ul>
+                <li>Data</li>
+                <li><a href="http://github.com/CovertLab/WholeCellDB">Source code</a></li>
+                </ul>
+            </li>
+			<li class="spacer"/>
+			<li><a href="#">Help</a>
+				<ul>
+				<li><a href="{% url wcdbweb.views.tutorial %}">Tutorial</a></li>
+				<li><a href="{% url wcdbweb.views.about %}">About</a></li>
+				<li><a href="{% url wcdbweb.views.about %}#contact">Contact</a></li>
+				</ul>
+			</li>
+			<li class="spacer"/>
+            {% if request.user.is_authenticated %}
+            <li>Logout</li>
+            {% else %}
+            <li>Login</li>
+            {% endif %}
+		</ul>
+	</div>
+		
+	<div id="main">
+		<!-- content -->
+		<div id="content">
+		<h1>{% block page_title %}{% endblock %}</h1>
+		{% block content %}{% endblock %}		
+		</div>
+	</div>
+		
+	<!-- footer -->
+	<div id="footer" class="ui-widget-header">
+		<div class="left">
+		</div>
+		
+		<div class="center">			
+			Last updated {{ last_updated_date }}. Contact <a href="mailto:wholecelldb@lists.stanford.edu">wholecelldb@lists.stanford.edu</a>.<br/> 
+			&copy; 2008-2013 <a href="http://ca.linkedin.com/pub/nolan-phillips/68/935/702">Nolan Phillips</a>, <a href="http://www.stanford.edu/~jkarr">Jonathan Karr</a>, <a href="http://covertlab.stanford.edu">Markus Covert</a>, and <a href="http://www.csit.upei.ca/~ywang/">Yingwei Wang</a>.		
+		</div>
+		
+		<div class="right">
+			{% block action_icons %}			
+			<a href="javascript:window.print()"><img src="{% get_static_prefix %}img/printer.png" /></a>
+			{% endblock %}
+		</div>
+	</div>	
+	
+	<!-- modal -->
+	<div id="modal"></div>
+	
+	<!-- tooltip -->
+	<div id="tooltip" class="ui-widget-header ui-corner-all"></div>
+</body>
+</html>

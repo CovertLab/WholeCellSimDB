@@ -63,7 +63,7 @@ See [wholecell.stanford.edu](http://wholecell.stanford.edu) for additional infor
             WSGIProcessGroup %{ENV:PROCESS_GROUP}
             WSGISocketPrefix /var/run/wsgi
             
-            #Alias /projects/WholeCellDB/static /home/projects/WholeCell-Mpn/kb/static
+            Alias /projects/WholeCellDB/static /home/projects/WholeCellDB/wcdbweb/static
             Alias /projects/WholeCellDB /home/projects/WholeCellDB/WholeCellDB/wsgi.py
             <Directory /home/projects/WholeCellDB/WholeCellDB>
                 WSGIApplicationGroup %{RESOURCE}
@@ -94,7 +94,7 @@ Use the following code to import the WholeCellDB packages into Python:
     
 <a name="help"/>
 ## Need help?
-Please contact the development team at [insert@email.address](mailto:insert@email.address).
+Please contact the development team at [wholecelldb@lists.stanford.edu](mailto:wholecelldb@lists.stanford.edu).
 
 <a name="implementation"/>
 ## Implementation
