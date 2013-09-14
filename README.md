@@ -1,10 +1,11 @@
 # WholeCellDB v1.1.0
 
 <a name="table_of_contents"/>
+
 1. [About](#about)
 2. [Requirements](#requirements)
-   1. [Mimimum requirements](#requirements_minimum)
-   2. [Additional requirments for production servers](#requirements_production)
+    1. [Mimimum requirements](#requirements_minimum)
+    2. [Additional requirments for production servers](#requirements_production)
 3. [Getting started](#starting)
 4. [Integrating WholeCellDB with Whole-cell models](#integrating)
 5. [Need help?](#help)
@@ -35,6 +36,7 @@ See [wholecell.stanford.edu](http://wholecell.stanford.edu) for additional infor
 ### Additional requirments for production servers
 * apache
 * mod_wsgi
+* mysql
 
 <a name="starting"/>
 ## Getting started
