@@ -11,13 +11,15 @@ body{
 	margin:0px;
 	padding:0px;
 	padding-top:10px;
-	padding-bottom:10px;
-	font-size:12px;
-	font-family:PT Sans,sans-serif;
+	padding-bottom:10px;	
 }
 table{
 	border-collapse:separate;
 	border-spacing:0px 0px;
+}
+body, table{
+    font-size:12px;
+	font-family:PT Sans,sans-serif;
 }
 
 th{
@@ -291,536 +293,54 @@ select.select{
 #content{
 	width:100%;
 }
-#content h1{
+#content div h1{
 	color: #3d80b3;
-	margin-bottom:12px;
-	margin-top:16px;
+	margin-bottom:6px;
+	margin-top:26px;
 	line-height:100%;
 }
-#content h1 a{
+#content div h1 a{
 	color: #3d80b3;
 }
-#content h2{
-	font-size:16px;
-	line-height:100%;
-	margin-top:16px;
-	margin-bottom:2px;
-}
-#content p{
+#content div p{
 	margin-bottom:6px;
 	margin-top:0px;
 	padding:0px;
 }
-
-#content ul{
-	margin:0px;
-	margin-top:0px;
+#content div ul{
+	margin:0px;	    
 	padding-left:16px;
 }
-#content table{
+#content div ul.inparagraph{
+    margin-top:-6px;
+    margin-bottom:6px;
 }
-#content table th, #content table td{
-	text-align:left;
-	padding-right:10px;
-}
-#content table th:last-child, #content table td:last-child{
-	padding-right:0px;
-}
-
-/* index content */
-#index , #about {
-	text-align:justify;
+#content div ul li p{
+    margin:0px;
+    margin-left:-6px;    
 }
 
-/* list content */
-#list{
-	float:left;
-	width:600px;
+#content div table {
+    width:100%;
 }
-#list a{
-	color:#222;
+#content div table thead tr th, #content div table tbody tr th{
+    text-align: left;
+    padding-right: 10px;
 }
-#list thead th{
-	background:#3d80b3;
-	border-top:1px solid #3d80b3;	
-	border-bottom:1px solid #3d80b3;	
-	color:white;
-	border-right:1px solid white;
+#content div table tbody tr td{
+    text-align: right;
 }
-#list thead tr th:first-child{
-	border-top-left-radius:6px;
+#content div table thead tr th {    
+    border-bottom: 1px solid #3d80b3;
+    background: #d6edff;
 }
-#list thead tr th:last-child{
-	border-top-right-radius:6px;
-	border-right:1px solid #3d80b3;
+#content div table {
+    border-top: 1px solid #3d80b3;
+    border-bottom: 1px solid #3d80b3;
 }
-#list tbody tr:nth-child(even) th, #list tbody tr:nth-child(even) td{
-	background:#CCC;
+#content div table tbody tr:nth-child(even) th, #content div table tbody tr:nth-child(even) td{
+	background:#e3e3e3;
 }
-#list tbody tr:nth-child(odd) th, #list tbody tr:nth-child(odd) td{
-	background:#DDD;
-}
-#list tbody tr:hover th, #list tbody tr:hover td{
-	background:white;
-}
-#list tbody tr:last-child th, #list tbody tr:last-child td{
-	border-bottom:1px solid #3d80b3;
-}
-#list tbody tr:last-child th:first-child{
-	border-bottom-left-radius:6px;
-}
-#list tbody tr:last-child td:last-child{
-	border-bottom-right-radius:6px;
-}
-#list tbody tr td:last-child{
-	border-right:1px solid #3d80b3;
-}
-#list tbody tr:hover{
-	background:white;
-}
-
-#list th, #list td{
-	margin:0px;
-	padding:2px;
-	border-left:1px solid #3d80b3;
-}
-#list tbody th:first-child{
-	max-width:200px;
-	overflow-x:hidden;
-}
-#list thead tr th:nth-child(3), #list tbody tr td:nth-child(3){
-	min-width:32px;
-}
-#list tbody tr td:nth-child(3) a{
-	padding:0px;
-	padding-right:2px;
-}
-#list tbody tr td:nth-child(3) a img{
-	padding:0px;
-	margin:0px;
-	height:12px;
-	width:12px;
-}
-#list tbody tr td:nth-child(3) a:last-child{
-	padding-right:0px;
-}
-#list thead tr th:nth-child(2), #list tbody tr td:nth-child(2){
-	width:100%;	
-	overflow-x:hidden;
-}
-
-#listfilter{
-	width:190px;
-	margin-left:610px;
-	border:1px solid #3d80b3;
-	border-radius:6px;
-	padding-bottom:12px;
-}
-
-#listfilter h1{
-	margin:0px;
-	padding:2px;
-	background:#3d80b3;
-	color:white;
-	font-weight:bold;
-	text-align:center;
-	font-size:12px;
-	border-top-left-radius:6px;
-	border-top-right-radius:6px;	
-}
-
-#listfilter .block{
-	padding-left:4px;
-	padding-right:6px;	
-	margin-top:4px;
-}
-#listfilter .block h2{
-	margin:0px;	
-	padding:0px;	
-	margin-left:12px;
-	font-weight:bold;
-	font-size:12px;
-	color:#3d80b3;
-}
-#listfilter .block ul{
-	margin:0px;
-	margin-bottom:10px;
-	padding-right:0px;
-	padding-top:0px;
-	padding-bottom:0px;
-	overflow:hidden;
-	white-space:nowrap;
-}
-#listfilter .block:last-child ul{
-	margin-bottom:-10px;
-}
-#listfilter .block ul li{
-	 white-space: nowrap;
-	 list-style-position: outside;	
-	 list-style-type: none;	 
-	 color:#3d80b3;
-	 font-size:18px;
-	 line-height:12px;
-}
-#listfilter .block ul li.selected{
-	list-style-type: square;
-}
-#listfilter .block ul li a{
-	position:relative;
-	top:-1px;
-	color:#222;
-	margin-left:-2px;
-	font-size:12px;
-}
-
-/* details content */
-#detail{
-	width:100%;
-}
-#detail tbody tr th, #detail tbody tr td{
-	padding-left:2px;
-	padding-right:2px;
-	vertical-align:top;
-}
-#detail tbody.data tr:nth-child(even) th, #detail tbody.data tr:nth-child(even) td{
-	background:#DDD;
-}
-#detail tbody.data tr:nth-child(odd) th, #detail tbody.data tr:nth-child(odd) td{
-	background:#CCC;
-}
-#detail tbody.data tr:last-child th:first-child, #detail tbody.data tr:last-child td:first-child{
-	border-bottom-left-radius:6px;
-}
-#detail tbody.data tr:last-child th:last-child, #detail tbody.data tr:last-child td:last-child{
-	border-bottom-right-radius:6px;
-}
-#detail tbody.data tr:first-child th{
-	background:#3d80b3;
-	border-radius:0px;
-	border-top-left-radius:6px;
-	border-top-right-radius:6px;
-	color:white;
-	border:1px solid #3d80b3;
-	padding:2px;	
-}
-#detail tbody.data tr:last-child th, #detail tbody.data tr:last-child td{
-	border-bottom:1px solid #3d80b3;
-}
-#detail tbody.data tr th{
-	border-left:1px solid #3d80b3;
-}
-#detail tbody.data tr td:nth-child(2){
-	border-left:1px solid #3d80b3;
-	border-right:1px solid #3d80b3;
-	width:100%;
-}
-#detail tbody.data tr td:last-child{
-	border-right:1px solid #3d80b3;
-	text-align:center;
-	min-width:20px;
-}
-#detail tbody.spacing tr td{
-	border:none;
-	background-color:transparent;
-	border-radius:0px;
-}
-
-#detail tbody tr td ul, #detail tbody tr td ol{
-	margin:0px;
-	padding:0px;
-	padding-left:20px;
-}
-#detail tbody tr td ul li p, #detail tbody tr td ol li p{
-	margin:0px;
-	padding:0px;
-	margin-left:-4px;
-}
-
-#detail tbody tr td ol li{
-	margin-bottom:6px;
-}
-#detail tbody tr td ol li:last-child{
-	margin-bottom:0px;
-}
-
-#detail tbody tr td ul.vertical_spacing li{
-	margin-bottom:6px;
-}
-#detail tbody tr td ul.vertical_spacing li:last-child{
-	margin-bottom:0px;
-}
-#detail tbody tr td:last-child img{
-	position:relative;
-	top:1px;
-}
-
-/* viewPropertyInSimulation */
-#viewPropertyInSimulation .simProp{
-	border-radius:6px;
-	border: 1px solid #3d80b3;
-	margin-top:20px;
-}
-#viewPropertyInSimulation .simProp .simPropHeader{
-	border-top-left-radius:6px;
-	border-top-right-radius:6px;
-	background:#3d80b3;
-	border:1px solid #3d80b3;
-	color:white;
-	padding:2px;
-	font-weight:bold;	
-}
-#viewPropertyInSimulation .simProp .simPropContent{
-	border-bottom-left-radius:6px;
-	border-bottom-right-radius:6px;
-	padding:10px;
-	padding-top:0px;
-	max-height:400px;
-	overflow-y:auto;
-}
-#viewPropertyInSimulation .simProp .simPropContent .linenodiv{
-	color:#999;
-	max-width:10px;
-}
-
-
-/* import/export content */
-#form{
-	width:100%;
-	text-align:right;
-	margin:0px;
-	padding:0px;
-}
-#form .block{	
-	width:100%;
-	padding:0px;
-	margin-bottom:20px;
-	border: 1px solid #3d80b3;
-	border-radius:6px;
-	text-align:left;
-}
-#form .block h1{
-	border: 1px solid #3d80b3;
-	border-top-left-radius:6px;
-	border-top-right-radius:6px;
-	background:#3d80b3;
-	color:white;
-	font-size:12px;
-	padding:2px;
-	margin:0px;
-}
-#form .block .content{
-	margin:0px;
-	padding:4px;
-	padding-left:3px;
-	padding-right:3px;
-}
-#form .block .content .col{
-	float:left;
-	width:50%;
-}
-#form .block .content input{
-	margin-left:0px;
-}
-#form .button{
-	margin:0px;
-}
-#form .block .content #checkall{
-	margin-top:20px;
-}
-
-/* edit */
-#edit table{
-	width:100%;
-	margin-top:20px;
-}
-#edit table tbody tr th, #edit table tbody tr td{
-	padding-right:2px;
-	padding-left:2px;
-}
-#edit table tbody tr:first-child th{
-	border-top-left-radius:6px;
-	border-top:solid #3d80b3 thin;
-}
-#edit table tbody tr:first-child td{
-	border-top-right-radius:6px;
-	border-top:solid #3d80b3 thin;
-}
-#edit table tbody tr:last-child th{
-	border-bottom-left-radius:6px;
-	border-bottom:solid #3d80b3 thin;
-}
-#edit table tbody tr:last-child td{
-	border-bottom-right-radius:6px;
-	border-bottom:solid #3d80b3 thin;
-}
-#edit table tbody tr th{
-	border-left:solid #3d80b3 thin;
-}
-#edit table tbody tr td{
-	border-left:solid #3d80b3 thin;
-	border-right:solid #3d80b3 thin;
-}
-#edit table tbody tr:nth-child(even) th, #edit table tbody tr:nth-child(even) td{
-	background:#DDD;
-}
-#edit table tbody tr:nth-child(odd) th, #edit table tbody tr:nth-child(odd) td{
-	background:#CCC;
-}
-#edit table tbody tr:hover th, #edit table tbody tr:hover td{
-	background:white;
-}
-
-#edit table tbody tr td input.text{
-	width:99%;
-	border:solid thin #222;
-	border-radius:0px;
-}
-#edit table tbody tr td select{
-	width:100%;
-	border:solid thin #222;
-}
-#edit table tbody tr td select.multiple{
-	height:100px;
-}
-#edit table tbody tr td textarea{
-	width:99%;
-	height:100px;
-	border:solid thin #222;
-}
-
-#edit table table.ForeignKey, #edit table table.ManyToManyField{
-	margin-top:0px;
-	width:100%;
-}
-#edit table table.ForeignKey tbody th, #edit table table.ForeignKey tbody td, #edit table table.ManyToManyField thead th, #edit table table.ManyToManyField tbody td{
-	border:none;
-	border-radius:0px;
-	background:transparent;
-	padding-left:2px;
-	padding-right:2px;
-}
-#edit table table.ForeignKey tbody th{
-	width:auto;
-}
-#edit table table.ForeignKey tbody td{
-	width:100%;
-}
-#edit table table.ManyToManyField thead tr th, #edit table table.ManyToManyField tbody tr td{
-	width:auto;
-}
-#edit table table.ManyToManyField thead tr th:first-child, #edit table table.ManyToManyField tbody tr td:first-child{
-	padding-left:0px;
-}
-#edit table table.ManyToManyField thead tr th:last-child, #edit table table.ManyToManyField tbody tr td:last-child{
-	width:18px;
-	padding-right:0px;
-}
-
-#edit table table.ForeignKey tbody td table.evidence{
-	width:100%;
-	margin:0px;
-	padding:0px;
-}
-#edit table table.ForeignKey tbody td table.evidence thead tr th, #edit table table.ForeignKey tbody td table.evidence tbody tr td{ width: auto; }
-#edit table table.ForeignKey tbody td table.evidence tbody tr td:nth-child(1){ width: 60px; }
-#edit table table.ForeignKey tbody td table.evidence tbody tr td:nth-child(2){ width: 60px; }
-#edit table table.ForeignKey tbody td table.evidence tbody tr td:nth-child(3){ width: 60px; }
-#edit table table.ForeignKey tbody td table.evidence tbody tr td:nth-child(4){ width: 60px; }
-#edit table table.ForeignKey tbody td table.evidence tbody tr td:nth-child(5){ width: 60px; }
-#edit table table.ForeignKey tbody td table.evidence tbody tr td:nth-child(6){ width: 60px; }
-#edit table table.ForeignKey tbody td table.evidence tbody tr td:nth-child(7){ width: 60px; }
-#edit table table.ForeignKey tbody td table.evidence tbody tr td:nth-child(8){ width: 200px; }
-#edit table table.ForeignKey tbody td table.evidence tbody tr td:nth-child(9){ width: 120px; }
-#edit table table.ForeignKey tbody td table.evidence tbody tr td:nth-child(10){ width: 22px; }
-
-#edit table table.ForeignKey tbody td table.evidence tbody tr td input.text, #edit table table.ForeignKey tbody td table.evidence tbody tr td select{
-	width: 100%;
-}
-#edit table table.ForeignKey tbody td table.evidence tbody tr td select.multiple{
-	height:20px;
-}
-#edit table table.ForeignKey tbody td table.evidence{
-	width:100%;
-	margin:0px;
-	padding:0px;
-	border:none;
-}
-
-
-#edit table tbody tr td .error{
-	color:red;
-	font-style:italic;
-}
-
-#edit .save{
-	width:100%; text-align:right; margin:0px; padding:0px; padding-top:10px;
-}
-
-/* modal */
-#modal{
-	font-size:12px;
-	font-family:PT Sans,sans-serif;
-}
-
-#modal table.evidence{
-	width:100%;
-	margin:0px;
-	padding:0px;
-	height:autp;
-}
-
-#modal table.evidence tbody tr th, #modal table.evidence tbody tr td{
-	padding-right:2px;
-	padding-left:2px;
-	text-align:left;
-}
-
-#modal table.evidence input.text{
-	width:99%;
-	border:solid thin #222;
-	border-radius:0px;
-}
-#modal table.evidence select{
-	width:100%;
-	border:solid thin #222;
-}
-#modal table.evidence select.multiple{
-	height:100px;
-}
-#modal table.evidence textarea{
-	width:99%;
-	height:100px;
-	border:solid thin #222;
-}
-
-#modal table.evidence thead tr th, #modal table.evidence tbody tr td{ width: auto; }
-#modal table.evidence tbody tr td:nth-child(1){ width: 60px; }
-#modal table.evidence tbody tr td:nth-child(2){ width: 60px; }
-#modal table.evidence tbody tr td:nth-child(3){ width: 60px; }
-#modal table.evidence tbody tr td:nth-child(4){ width: 60px; }
-#modal table.evidence tbody tr td:nth-child(5){ width: 60px; }
-#modal table.evidence tbody tr td:nth-child(6){ width: 60px; }
-#modal table.evidence tbody tr td:nth-child(7){ width: 60px; }
-#modal table.evidence tbody tr td:nth-child(8){ width: 200px; }
-#modal table.evidence tbody tr td:nth-child(9){ width: 120px; }
-#modal table.evidence tbody tr td:nth-child(10){ width: 22px; }
-
-#modal table.evidence tbody tr td input.text, #modal table.evidence tbody tr td select{
-	width: 100%;
-}
-#modal table.evidence tbody tr td select.multiple{
-	height:20px;
-}
-
-/* delete */
-#delete{
-	width:100%;
-}
-
-#delete div{
-	width:100%;
-	text-align:center;
-}
-#delete div:last-child{
-	margin-top:10px;
+#content div table tbody tr:nth-child(odd) th, #content div table tbody tr:nth-child(odd) td{
+	background:#efefef;
 }

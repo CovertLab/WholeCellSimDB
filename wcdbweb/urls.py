@@ -18,6 +18,9 @@ urlpatterns += patterns('wcdbweb.views',
     #home page
     url(r'^$', 'index'),
     
+    #browse
+    url(r'^list_batches$', 'list_batches'),
+    
     #documentation
     url(r'^tutorial$', 'tutorial'),
     url(r'^about$', 'about'),
