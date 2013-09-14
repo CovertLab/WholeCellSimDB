@@ -6,7 +6,7 @@ import h5py
 import sys
 from WholeCellDB.settings import HDF5_ROOT
 
-### OPP ###
+""" OPP """
 class Option(models.Model):
     """ 
     Option 
@@ -63,7 +63,7 @@ class Process(models.Model):
     def __unicode__(self):
         return self.name
 
-### States ###
+""" States """
 class StateManager(models.Manager):
     def create_state(self, name, simulation):
         name = name.strip()
@@ -100,7 +100,7 @@ class State(models.Model):
                            self.name])
 
 
-### Properties ###
+""" Properties """
 class PropertyManager(models.Manager):
     def create_property(self, state, name, shape, dtype):
         """ 
@@ -211,6 +211,7 @@ class Property(models.Model):
                            self.name])
 
     class Meta:
+		verbose_name_plural = 'Properties'
         app_label='wcdb'
 
 
@@ -278,7 +279,6 @@ class Simulation(models.Model):
         length              | Float 
         replicate_index     | Positive Integer
         ip                  | IP Address
-        t                   | Integer
         options             | Dict String:String {"Option name": "Option val",}
         parameters          | Dict String:Float  {"Parameter name": 0.0,}
         processes           | Tuple of Strings of Process names.
@@ -298,23 +298,18 @@ class Simulation(models.Model):
         and t is an Integer indicating how many time slices there will be.
     """
     # Metadata
-    name            = models.CharField(max_length=255, unique=True)
-    organism        = models.CharField(max_length=255, default="")
-    batch           = models.CharField(max_length=255, default="")
-    description     = models.TextField(default="")
-    length          = models.FloatField(default=1.0)
-    replicate_index = models.PositiveIntegerField(default=1)
-    ip              = models.IPAddressField(default="0.0.0.0")
-    date            = models.DateTimeField(auto_now=True, auto_now_add=True)
+    batch           = models.ForeignKey('SimulationBatch')  
+	replicate_index = models.PositiveIntegerField(default=1)
+    length          = models.FloatField(default=1.0)    
 
     # Internal
     _file_permissions = models.CharField(max_length=3, default="a")
 
     objects = SimulationManager()
 
-    ########################################
+    """""""""""""""""""""""""""""""""""""""#
     # Methods for dealing with the H5 file.#
-    ########################################
+    """""""""""""""""""""""""""""""""""""""#
     @property
     def file_path(self):
         """ The path to the HDF5 file for the Simulation """
@@ -339,3 +334,32 @@ class Simulation(models.Model):
     class Meta:
         get_latest_by = 'date'
         app_label='wcdb'
+		
+class SimulationBatch(models.Model):
+	name             = models.CharField(max_length=255, default="")
+	description      = models.TextField(default="")
+	organism         = models.ForeignKey('Organism')
+	organism_version = models.CharField(max_length=255, default="")
+	investigator     = models.ForeignKey('Investigator')
+	ip               = models.IPAddressField(default="0.0.0.0")
+    date             = models.DateTimeField(auto_now=True, auto_now_add=True)
+	
+	class Meta:
+		verbose_name = 'Simulation batch'
+		verbose_name_plural = 'Simulation batches'
+		app_label = 'wcdb'
+		
+class Organism(models.Model):
+	name        = models.CharField(max_length=255, default="")
+	description = models.TextField(default="")
+	
+	class Meta:
+		app_label = 'wcdb'
+
+class Investigator(models.Model):
+	user        = OneToOneField(User)
+	affiliation = CharField(max_length=255, default="")
+	
+	class Meta:
+		ordering = ['user__last_name', 'user__first_name']
+		get_latest_by = 'user__date_joined'
