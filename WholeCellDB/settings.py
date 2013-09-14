@@ -74,7 +74,7 @@ STATIC_URL = ROOT_URL + '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
-    ROOT_DIR + "/wcdbweb/static",
+    ROOT_DIR + "/../wcdbweb/static",
 )
 
 # List of finder classes that know how to find static files in
@@ -113,7 +113,7 @@ WSGI_APPLICATION = 'WholeCellDB.wsgi.application'
 HDF5_ROOT = "/home/nolan/hdf5"
 
 TEMPLATE_DIRS = (    
-    ROOT_DIR + "/wcdbweb/templates",
+    ROOT_DIR + "/../wcdbweb/templates",
 )
 
 INSTALLED_APPS = (
