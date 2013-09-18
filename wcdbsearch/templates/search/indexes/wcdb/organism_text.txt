@@ -1,0 +1,5 @@
+{{ object.name }}
+{% for batch in object.simulation_batches.all %}
+    {{ batch.name }}
+    {{ batch.description }}
+{% endfor %}

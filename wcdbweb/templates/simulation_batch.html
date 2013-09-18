@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% comment %}
+List simulation batches page
+
+Author: Jonathan Karr, jkarr@stanford.edu
+Affiliation: Covert Lab, Department of Bioengineering, Stanford University
+Created: 2013-09-16
+{% endcomment %}
+
+{% load static %}
+{% load template_extras %}
+
+{% block head_title %}{{ block.super }} :: Batch :: {{ batch.organism.name }} &ndash; {{ batch.name }}{% endblock %}
+
+{% block content %}
+
+<div>
+<h1>Simulation batch :: {{ batch.name }}</h1>
+
+<h2>Meta info</h2>
+<ul class="inparagraph">
+<li><p>Organism: <a href="{% url wcdbweb.views.organism id=batch.organism.id %}">{{ batch.organism.name }}</a> ({{ batch.organism_version }})</p></li>
+<li><p>Investigator: <a href="{% url wcdbweb.views.investigator id=batch.investigator.id %}">{{ batch.investigator.user.get_full_name }}</a>, {{ batch.investigator.affiliation }}</p></li>
+<li><p>IP address: {{ batch.ip }}</p>
+<li><p>Date: {{ batch.date|date:"M j, Y" }}</p>
+</ul>
+
+<h2>Processes ({{ processes|length }})</h2>
+<script>
+var processes = [
+    {% for process in processes %}    
+    {label: '{{process.name}}'},
+    {% endfor %}
+];
+$(function() {
+    $('#processes-tree').tree({
+        data: processes
+    });
+});
+</script>
+<div id="processes-tree" style="margin-top:-6px"></div>
+
+<h2>States ({{ states|length }})</h2>
+<script>
+var states = [
+    {% for state in states %}    
+    {label: '{{state.name}}', children: [
+        {% for prop in state.properties.all %}
+        {label: '{{prop.name}}'},
+        {% endfor %}
+        ]},
+    {% endfor %}
+];
+$(function() {
+    $('#states-tree').tree({
+        data: states
+    });
+});
+</script>
+<div id="states-tree" style="margin-top:-6px"></div>
+
+<h2>Options ({{ batch.options.all.count }})</h2>
+<script>
+var options = [
+    {% for name, value in options.iteritems %}
+    {% if value|is_dict %}
+        {label:'{{name|capfirst}}', children: [
+        {% for subname, subvalue in value.iteritems %}
+            {label:'{{subname}}', children: [
+            {% for subsubname, subsubvalue in subvalue.iteritems %}
+                {% if subsubvalue|is_list %}
+                {label:'{{subsubname }}: {{ subsubvalue|join:', ' }}'},
+                {% else %}
+                {label:'{{subsubname }}: {{ subsubvalue }}'},
+                {% endif %}
+            {% endfor %}
+                ]},
+        {% endfor %}
+            ]},
+    {% else %}
+        {label: '{{name}}: {{value}}'},
+    {% endif %}
+    {% endfor %}
+    ];
+$(function() {
+    $('#options-tree').tree({
+        data: options
+    });
+});
+</script>
+<div id="options-tree" style="margin-top:-6px"></div>
+
+<h2>Parameters ({{ batch.parameters.all.count }})</h2>
+<script>
+var parameters = [
+    {% for name, value in parameters.iteritems %}
+    {% if value|is_dict %}
+        {label:'{{name|capfirst}}', children: [
+        {% for subname, subvalue in value.iteritems %}
+            {label:'{{subname}}', children: [
+            {% for subsubname, subsubvalue in subvalue.iteritems %}
+                {% if subsubvalue|is_list %}
+                {label:'{{subsubname }}: [{{ subsubvalue|join:', ' }}]'},
+                {% else %}
+                {label:'{{subsubname }}: {{ subsubvalue }}'},
+                {% endif %}
+            {% endfor %}
+                ]},
+        {% endfor %}
+            ]},
+    {% else %}
+        {label: '{{name}}: {{value}}'},
+    {% endif %}
+    {% endfor %}
+    ];
+$(function() {
+    $('#parameters-tree').tree({
+        data: parameters
+    });
+});
+</script>
+<div id="parameters-tree" style="margin-top:-6px"></div>
+
+<h2>Simulations</h2>
+<table class="table list_simulations" class="inparagraph">
+    <thead>
+        <tr>
+            <th>Index</th>
+            <th>Length</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for sim in batch.simulations|order_by:'batch_index' %}
+        <tr>
+            <td>{{ sim.batch_index }}</td>
+            <td>{{ sim.length }}</td>            
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+{% endblock %}

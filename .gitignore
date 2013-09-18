@@ -30,6 +30,7 @@
 *.hdf4
 *.db
 *.h5
+**/indexes/
 
 # OS generated files #
 ######################

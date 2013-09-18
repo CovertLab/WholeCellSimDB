@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% comment %}
+List simulation batches page
+
+Author: Jonathan Karr, jkarr@stanford.edu
+Affiliation: Covert Lab, Department of Bioengineering, Stanford University
+Created: 2013-09-16
+{% endcomment %}
+
+{% load static %}
+
+{% block head_title %}{{ block.super }} :: Organism :: {{ organism.name }}{% endblock %}
+
+{% block content %}
+
+<div>
+<h1>Organism :: {{ organism.name }}</h1>
+
+<h2>Simulation batches</h2>
+<table class="table list_batches_organism" class="inparagraph">
+    <thead>
+        <tr>
+            <th colspan="1"></th>
+            <th colspan="4">Simulation batch</th>
+        </tr>
+        <tr>
+            <th>Version</th>
+            <th>Name</th>
+            <th>No. simulations</th>
+            <th>Investigator</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for batch in organism.simulation_batches.all %}
+        <tr>
+            <td>{{ batch.organism_version }}</td>
+            <td><a href="{% url wcdbweb.views.simulation_batch id=batch.id %}">{{ batch.name }}</a></td>
+            <td>{{ batch.simulations.all|length }}</td>
+            <td><a href="{% url wcdbweb.views.investigator id=batch.investigator.id %}">{{ batch.investigator.user.get_full_name }}</a></td>
+            <td>{{ batch.date|date:"M j, Y" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h2>Investigators</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Affiliation</th>
+            <th>Batches</th>
+            <th>Simulations</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for id, investigator in investigators.iteritems %}
+        <tr>
+            <td><a href="{% url wcdbweb.views.investigator id=id %}">{{ investigator.full_name }}</a></td>
+            <td>{{ investigator.affiliation }}</td>
+            <td>{{ investigator.n_simulation_batch }}</td>
+            <td>{{ investigator.n_simulation }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</div>
+
+{% endblock %}
