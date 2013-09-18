@@ -1,10 +1,9 @@
 from django.contrib import admin
-from wcdb.models import *
+from wcdb.models import SimulationBatch
 
-class SimulationAdmin(admin.ModelAdmin):
+class SimulationBatchAdmin(admin.ModelAdmin):
     date_hierarchy = 'date'
-    list_display = ('name', 'organism', 'length', 'date')
-    list_filter = ('date', 'organism')
+    list_display = ('organism', 'organism_version', 'name', 'description', 'investigator', 'date')
+    list_filter = ('organism', 'organism_version', 'investigator', 'date')
 
-
-admin.site.register(Simulation, SimulationAdmin)
+admin.site.register(SimulationBatch, SimulationBatchAdmin)

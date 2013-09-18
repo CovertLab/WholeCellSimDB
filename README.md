@@ -44,14 +44,19 @@ See [wholecell.stanford.edu](http://wholecell.stanford.edu) for additional infor
 1. Setup your database in the `DATABASES` dict in `WholeCellDB/settings.py`. For more information on how you can do this, see the [django tutorial](https://docs.djangoproject.com/en/1.5/intro/tutorial01/#database-setup).
     * To use SQLite set the `ENGINE` property to `django.db.backends.sqlite3` and set the `NAME` property to the path to the database file
     * To use MySQL (1) create a new user and database and (2) set the `ENGINE` property to `django.db.backends.mysql` and set the `HOST`, `PORT`, `NAME`, `USER`, and `PASSWORD` properties
-2. Edit the value of `HDF5_ROOT` in `WholeCellDB/settings.py` to indicate the location you wish to save the HDF5 data.
+2. Create a directory to save the HDF5 data, e.g. `/path/to/my/hdf5/location`
+3. Edit the value of `HDF5_ROOT` in `WholeCellDB/settings.py` to indicate the location you wish to save the HDF5 data.
 
         HDF5 = "/path/to/my/hdf5/location"
-3. Run `python manage.py syncdb` to create the models. 
-4. Configure your web server
+4. Run `python manage.py syncdb` to create the models. 
+5. run `python manage.py rebuild_index` to create the haystack indices. 
+6. Set permissions for haystack search indices
+        sudo chown -R apache: wcdbsearch/indexes
+        sudo chmod ug+rw wcdbsearch/indexes
+6. Configure your web server
     * Run `python manage.py runserver` to start the development server, or
     * Add the following to your Apache configuration (`/etc/httpd/conf.d/WholeCellDB.conf and restart
-5. Navigate to the WholeCellDB website using your webserver
+7. Navigate to the WholeCellDB website using your webserver
     * Development server: [http://localhost:8000](http://localhost:8000)
     * Production server:
 

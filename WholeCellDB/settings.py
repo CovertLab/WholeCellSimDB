@@ -5,7 +5,7 @@ import os
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-ROOT_URL = 'http://covertlab.stanford.edu/projects/WholeCellDB'
+ROOT_URL = 'http://wholecelldb.stanford.edu'
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 ADMINS = (
@@ -16,11 +16,12 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '/home/nolan/GitRepos/WholeCellDB/database.db',                      # Or path to database file if using sqlite3.
+        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'wholecelldb',
+        #'NAME': '/home/nolan/GitRepos/WholeCellDB/database.db',                      # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
-        'USER': '',
-        'PASSWORD': '',
+        'USER': 'wholecelldb',
+        'PASSWORD': '9KNYdUnQaSFSUDCa',
         'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
         'PORT': '',                      # Set to empty string for default.
     }
@@ -110,11 +111,17 @@ ROOT_URLCONF = 'WholeCellDB.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'WholeCellDB.wsgi.application'
 
-HDF5_ROOT = "/home/nolan/hdf5"
+HDF5_ROOT = "/home/projects/WholeCellDB/wcdb/data"
 
 TEMPLATE_DIRS = (    
     ROOT_DIR + "/../wcdbweb/templates",
+    ROOT_DIR + "/../wcdbsearch/templates",
 )
+
+import os
+HAYSTACK_SITECONF = 'wcdbsearch.indexes'
+HAYSTACK_SEARCH_ENGINE  = 'xapian'
+HAYSTACK_XAPIAN_PATH = ROOT_DIR + "/../wcdbsearch/indexes"
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -127,8 +134,15 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
+    
+    #WholeCellDB
     'wcdb',
-	'wcdbweb',
+	'wcdbweb',    
+    'wcdbcli',
+    'wcdbsearch',
+    
+    #search
+    'haystack',
 )
 
 # A sample logging configuration. The only tangible logging

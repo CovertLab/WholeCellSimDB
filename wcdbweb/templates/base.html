@@ -23,10 +23,11 @@ Created: 2013-09-13
 	<meta name="author" content="Nolan Phillips, Jonathan Karr, Markus Covert, and Yingwei Wang" />
 	<meta name="revised" content="2013" />
 	<meta name="copyright" content="&copy; 2008-2012 Nolan Phillips, Jonathan Karr, Markus Covert, and Yingwei Wang" />
-	<!--<meta name="google-site-verification" content="Vdho9XJAyUBzyApnbEsjy8m6CsLjNEI12c8wqVVpsS8" />-->
+	<meta name="google-site-verification" content="Vdho9XJAyUBzyApnbEsjy8m6CsLjNEI12c8wqVVpsS8" />
 	
 	<!-- style -->
 	<link rel="stylesheet" type="text/css" media="all" href="{% get_static_prefix %}css/jquery-ui-1.8.23.custom.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="{% get_static_prefix %}css/jqtree.css" />
 	<link rel="stylesheet" type="text/css" media="all" href="{% get_static_prefix %}css/PTSans.min.css" />
 	<link rel="stylesheet" type="text/css" media="all" href="{% get_static_prefix %}css/styles.css" />	
 	<link rel="stylesheet" type="text/css" media="print" href="{% get_static_prefix %}css/styles.print.css" />
@@ -37,6 +38,7 @@ Created: 2013-09-13
 	<!-- javascript -->
 	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/jquery-1.8.0.min.js"></script>
 	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/jquery-ui-1.8.23.custom.min.js"></script>
+    <script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/tree.jquery.js"></script>
 	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/flot/jquery.flot.min.js"></script>
 	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/flot/jquery.flot.axislabels.min.js"></script>
 	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/flot/jquery.flot.pie.min.js"></script>
@@ -44,19 +46,15 @@ Created: 2013-09-13
 	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/flot/excanvas.min.js"></script>
 	<![endif]->
 	
-	<!-- google analytics
-	<script type="text/javascript">
-	var _gaq = _gaq || [];
-	_gaq.push(['_setAccount', 'UA-34992113-1']);
-	_gaq.push(['_trackPageview']);
-
-	(function() {
-	var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-	ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-	var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-	})();
-	</script>
-    -->
+	<!-- google analytics -->
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-44127714-1', 'stanford.edu');
+        ga('send', 'pageview');
+    </script>
 	{% endblock %}
 </head>
 <body>
@@ -64,40 +62,64 @@ Created: 2013-09-13
 	<div id="header" class="ui-widget-header">
 		<div class="title">&nbsp;</div>
 		<div class="banner"><a href="{% url wcdbweb.views.index %}"><img src="{% get_static_prefix %}img/banner.png" /></a></div>
-		<div class="search"></div>
+		<div class="search">
+			<form name="search" action="{% url wcdbweb.views.search_basic %}" method="get">
+				<table cellpadding="0" cellspacing="0">
+				<tr>
+					<td><input id="searchq" name="q" type="text" class="text text-default" value="Enter search term(s)" onclick="
+                    if ($(this).hasClass('text-default')) {
+                        this.value = '';
+                    }
+                    $(this).removeClass('text-default');
+                    $(this).removeClass('highlight');
+                    "/></td>
+					<td><a href="javascript:document.search.submit()"><img src="{% get_static_prefix %}img/magnifier.png" /></a></td>
+				</tr>
+                <tr>
+					<td class="engine">
+                        <input type="radio" name="engine" value="haystack" {% if not engine or engine == 'haystack' %} checked="true" {% endif %}/><span>WholeCellDB</span>
+						<input type="radio" name="engine" value="google" {% if engine == 'google' %} checked="true" {% endif %}/><span>Google</span>
+					</td>
+                    <td></td>
+                </tr>
+				</table>
+			</form>
+        </div>
 		
 		<ul class="menu">
 			<li><a href="{% url wcdbweb.views.index %}">Home</a></li>
             <li class="spacer"/>
-            <li><a href="{% url wcdbweb.views.list_batches %}">Browse</a>
+            <li><a href="#">Browse</a>
+                <ul>
+                <li><a href="{% url wcdbweb.views.list_organisms %}">Organisms</a></li>
+                <li><a href="{% url wcdbweb.views.list_simulation_batches %}">Simulation batches</a></li>
+                <li><a href="{% url wcdbweb.views.list_investigators %}">Investigators</a></li>
+                </ul></li>
+            <li class="spacer"/>
+            <li><a href="#">Search</a>
+                <ul>
+                <li><a href="javascript: $('#searchq').addClass('highlight');">Basic</a></li>
+                <li><a href="{% url wcdbweb.views.search_advanced %}">Advanced</a></li>
+                </ul></li>
             <li class="spacer"/>
             <li><a href="#">Download</a>
                 <ul>
                 <li>Data</li>
                 <li><a href="http://github.com/CovertLab/WholeCellDB">Source code</a></li>
-                </ul>
-            </li>
+                </ul></li>
 			<li class="spacer"/>
 			<li><a href="#">Help</a>
 				<ul>
 				<li><a href="{% url wcdbweb.views.tutorial %}">Tutorial</a></li>
 				<li><a href="{% url wcdbweb.views.about %}">About</a></li>
 				<li><a href="{% url wcdbweb.views.about %}#contact">Contact</a></li>
-				</ul>
-			</li>
-			<li class="spacer"/>
-            {% if request.user.is_authenticated %}
-            <li>Logout</li>
-            {% else %}
-            <li>Login</li>
-            {% endif %}
+				</ul></li>
 		</ul>
 	</div>
 		
 	<div id="main">
 		<!-- content -->
 		<div id="content">
-		<h1>{% block page_title %}{% endblock %}</h1>
 		{% block content %}{% endblock %}		
 		</div>
 	</div>
@@ -117,12 +139,6 @@ Created: 2013-09-13
 			<a href="javascript:window.print()"><img src="{% get_static_prefix %}img/printer.png" /></a>
 			{% endblock %}
 		</div>
-	</div>	
-	
-	<!-- modal -->
-	<div id="modal"></div>
-	
-	<!-- tooltip -->
-	<div id="tooltip" class="ui-widget-header ui-corner-all"></div>
+	</div>
 </body>
 </html>

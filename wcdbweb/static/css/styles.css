@@ -11,19 +11,20 @@ body{
 	margin:0px;
 	padding:0px;
 	padding-top:10px;
-	padding-bottom:10px;	
+	padding-bottom:10px;
 }
 table{
 	border-collapse:separate;
 	border-spacing:0px 0px;
 }
-body, table{
+body, table, input{
     font-size:12px;
 	font-family:PT Sans,sans-serif;
 }
 
-th{
+th, td{
 	vertical-align:top;
+    text-align:left;
 }
 
 a, a:hover, a:active, a:visited, a:link{
@@ -33,65 +34,6 @@ a, a:hover, a:active, a:visited, a:link{
 
 a img{
 	border:none;
-}
-
-input.text{
-	border:1px solid #3d80b3;
-	border-radius:6px;
-}
-input.button{
-	border:1px solid #3d80b3;
-	border-radius:6px;
-	background:#DDD;
-}
-select.select{
-	border:1px solid #3d80b3;
-	border-radius:6px;
-}
-
-.errors{
-	font-style:italic;
-	color:red;
-	margin-bottom:10px;
-}
-
-.sequence div{
-	float:left;	
-}
-.sequence div:nth-child(1){
-	text-align:right;
-}
-.sequence div:nth-child(2){
-	font-family:Courier New;
-	margin-right:10px;
-	margin-left:10px;
-}
-
-.tickLabel{
-	font-size:9px;
-	color:#222;
-}
-.axisLabels{
-	font-size:12px;
-	color:#222;
-}
-
-#tooltip {	
-	position:absolute;
-    padding: 5px 5px;
-    font-size: 10px;
-	font-weight:normal;
-	width:auto;
-	height:auto;
-	max-width:150px;
-	vertical-align:middle;
-	display:none;
-}
-#tooltip h1{
-	padding:0px;
-	margin:0px;
-	margin-bottom:2px;
-	font-size:12px;
 }
 
 /* header */
@@ -215,7 +157,7 @@ select.select{
 }
 #header .search img{
 	position:relative;
-	top:3px;
+	top:5px;
 	padding-left:2px;
 }
 #header .search input.text{
@@ -226,6 +168,9 @@ select.select{
 #header .search input.text-default{	
 	font-style:italic;
 	color:#aaa;
+}
+#header .search input.highlight{	
+	background-color:#ffff99;
 }
 
 #header .search table tr td.engine span{
@@ -302,18 +247,26 @@ select.select{
 #content div h1 a{
 	color: #3d80b3;
 }
+#content div h2{
+    margin-bottom:6px;
+}
+
 #content div p{
 	margin-bottom:6px;
 	margin-top:0px;
 	padding:0px;
 }
-#content div ul{
+#content div ul, #content div ol{
 	margin:0px;	    
 	padding-left:16px;
 }
-#content div ul.inparagraph{
+#content div ol ul, #content div ul.inparagraph{
     margin-top:-6px;
     margin-bottom:6px;
+}
+#content div ul ul {
+    margin-top:0px;
+    margin-bottom:0px;
 }
 #content div ul li p{
     margin:0px;
@@ -323,24 +276,156 @@ select.select{
 #content div table {
     width:100%;
 }
-#content div table thead tr th, #content div table tbody tr th{
-    text-align: left;
-    padding-right: 10px;
-}
-#content div table tbody tr td{
-    text-align: right;
-}
-#content div table thead tr th {    
-    border-bottom: 1px solid #3d80b3;
+#content div table.table thead tr th {        
     background: #d6edff;
 }
-#content div table {
+#content div table.table thead tr:first-child th{
+    text-align:center;
+}
+#content div table.table thead tr:last-child th {    
+    text-align:left;
+    border-bottom: 1px solid #3d80b3;    
+}
+#content div table.table {
     border-top: 1px solid #3d80b3;
     border-bottom: 1px solid #3d80b3;
 }
-#content div table tbody tr:nth-child(even) th, #content div table tbody tr:nth-child(even) td{
+#content div table.table tbody tr:nth-child(even) th, #content div table.table tbody tr:nth-child(even) td{
 	background:#e3e3e3;
 }
-#content div table tbody tr:nth-child(odd) th, #content div table tbody tr:nth-child(odd) td{
+#content div table.table tbody tr:nth-child(odd) th, #content div table.table tbody tr:nth-child(odd) td{
 	background:#efefef;
+}
+#content div table.table tr th, #content div table.table tr td{
+    padding-right: 3px;
+    padding-left: 3px;
+}
+
+#content div tt{
+    background-color: #dedede;
+    border:1px solid #999;
+    padding-left:2px;
+    padding-right:2px;
+    padding-bottom:2px;   
+}
+#content div pre{
+    width:100%;
+    background-color: #dedede;
+    border:1px solid #999;
+    padding:6px;
+}
+
+#content div table.summary thead tr th, #content div table.summary tbody tr th{
+    text-align: left;
+}
+#content div table.summary thead tr th:last-child, #content div table.summary tbody tr td{
+    text-align: right;
+}
+
+#content div table.list_batches thead tr:nth-child(1) th:nth-child(1), 
+#content div table.list_batches thead tr:nth-child(2) th:nth-child(2), 
+#content div table.list_batches tbody tr td:nth-child(2){
+    border-right: 1px solid #3d80b3;
+}
+
+#content div table.list_batches_investigator thead tr:nth-child(1) th:nth-child(1), 
+#content div table.list_batches_investigator thead tr:nth-child(2) th:nth-child(2), 
+#content div table.list_batches_investigator tbody tr td:nth-child(2){
+    border-right: 1px solid #3d80b3;
+}
+
+#content div table.list_batches_organism thead tr:nth-child(1) th:nth-child(1), 
+#content div table.list_batches_organism thead tr:nth-child(2) th:nth-child(1), 
+#content div table.list_batches_organism tbody tr td:nth-child(1){
+    border-right: 1px solid #3d80b3;
+}
+
+#content div table.list_simulations thead tr th:last-child,
+#content div table.list_simulations tbody tr td:last-child {
+    text-align:right;
+}
+
+#content div table.twocol td{
+    width:50%;
+}
+#content div table.threecol td{
+    width:33%;
+}
+#content div table.fourcol td{
+    width:25%;
+}
+
+#content div table.search_advanced tbody tr:first-child th {
+    padding-top:20px;
+}
+#content div table.search_advanced tbody:first-child tr:first-child th {
+    padding-top:0px;
+}
+#content div table.search_advanced tbody tr td:first-child{
+    min-width:98px;
+}
+#content div table.search_advanced tbody tr td:last-child{
+    width:100%;
+    padding-left:10px;
+}
+#content div table.search_advanced tbody tr td input[type="text"], #content div table.search_advanced tbody tr td textarea{
+    width:685px;
+    margin:0px;
+    padding:0px;
+}
+#content div table.search_advanced tbody tr td input[type="text"]{
+    height:12px;
+}
+#content div table.search_advanced tbody tr td textarea{
+    height:80px;
+    padding-right:2px;
+}
+#content div table.search_advanced tbody:last-child tr th{
+    text-align:right;
+}
+#content div table.search_advanced tbody:last-child tr th input{
+    position:relative;
+    right:-2px;
+}
+
+/* tutorial */
+#content #tutorial{
+    position:absolute;
+    margin:auto auto;
+    top:66px;
+    bottom:33px;
+    left:0px;
+    right:0px;
+    width:600px;
+    height:340px;
+    border:2px solid #ccc;    
+    border-radius:12px;
+    background:#DEDEDE;    
+    padding:10px;
+    box-shadow: 10px 10px 20px #aaa;
+}
+#content #tutorial h1{
+    padding-top:0px;
+    margin-top:0px;
+}
+
+#content #tutorial h2{
+    margin-bottom:0px;
+    margin-left:-6px;
+}
+
+#content #tutorial ul li img{
+    display:none;
+    position:fixed;
+    z-index:10;
+}
+
+#content #tutorial ul li:hover{
+    color:#3d80b3;
+}
+#content #tutorial ul li:hover a{
+    color:black;
+}
+#content #tutorial ul li:hover img{
+    display:block;
 }
