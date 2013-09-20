@@ -47,17 +47,17 @@ class Parameter(models.Model):
     Creating Parameter
         Parameter.objects.create(name, value, simulation)
     """     
-    process          = models.ForeignKey('Process', null=True, blank=True, related_name='parameters')
-    state            = models.ForeignKey('State', null=True, blank=True, related_name='parameters')
-    name             = models.CharField(max_length=255)
-    value            = models.CharField(max_length=255, null=True, blank=True)
-    index            = models.IntegerField(default=0)
-    simulation_batch = models.ForeignKey("SimulationBatch", related_name='parameters')
+    process    = models.ForeignKey('Process', null=True, blank=True, related_name='parameters')
+    state      = models.ForeignKey('State', null=True, blank=True, related_name='parameters')
+    name       = models.CharField(max_length=255)
+    value      = models.CharField(max_length=255, null=True, blank=True)
+    index      = models.IntegerField(default=0)
+    simulation = models.ForeignKey("Simulation", related_name='parameters')
 
     def __unicode__(self):
         names = [
-            simulation_batch.organism.name,
-            simulation_batch.name,
+            simulation.organism.name,
+            simulation.name,
             ]
         if self.state is not None:
             names.append(self.state.name)
@@ -78,8 +78,8 @@ class Process(models.Model):
     Creating Processes
         Process.objects.create(name, simulation_batch)
     """ 
-    name             = models.CharField(max_length=255)
-    simulation_batch = models.ForeignKey("SimulationBatch", related_name = 'processes')
+    name       = models.CharField(max_length=255)
+    simulation = models.ForeignKey("Simulation", related_name='processes')
 
     class Meta:
         verbose_name_plural = 'Processes'
@@ -103,32 +103,32 @@ class State(models.Model):
         name        |   String
         simulation  |   wcdb.models.Simulation
     """
-    name             = models.CharField(max_length=255)
-    simulation_batch = models.ForeignKey('SimulationBatch', related_name='states')   
+    name       = models.CharField(max_length=255)
+    simulation = models.ForeignKey('Simulation', related_name='states')   
      
     # Unicode
     def __unicode__(self):
         return ' - '.join([
-            self.simulation_batch.organism.name,
-            self.simulation_batch.name,
+            self.simulation.organism.name,
+            self.simulation.name,
             self.name
             ])
     
-""" Properties """
-class Property(models.Model):
-    state = models.ForeignKey('State', related_name='properties')   
-    name  = models.CharField(max_length=255)   
+#""" Properties """
+#class Property(models.Model):
+#    state = models.ForeignKey('State', related_name='properties')   
+#    name  = models.CharField(max_length=255)   
     
-    def __unicode__(self):
-        return ' - '.join([
-            self.state.simulation_batch.organism.name,
-            self.state.simulation_batch.name,
-            self.state.name,
-            self.name
-            ])
+#    def __unicode__(self):
+#        return ' - '.join([
+#            self.state.simulation_batch.organism.name,
+#            self.state.simulation_batch.name,
+#            self.state.name,
+#            self.name
+#            ])
 
 """ Properties """
-class PropertyValueManager(models.Manager):
+class PropertyManager(models.Manager):
     def create_property_value(self, simulation, property, shape, dtype):
         """ 
         Creates a new StatePropertyValue and the associated dataset. 
@@ -160,17 +160,19 @@ class PropertyValueManager(models.Manager):
         return p_obj
 
 
-class PropertyValue(models.Model):
+class Property(models.Model):
     """
-    Property value
+    Property
     """
-    simulation = models.ForeignKey('Simulation', related_name='property_values')
-    property   = models.ForeignKey('Property', related_name = 'values')
+    name  = models.CharField(max_length='255', default='')    
+    state = models.ForeignKey('State', related_name='properties')
+    #simulation = models.ForeignKey('Simulation', related_name='property_values')
+    #property   = models.ForeignKey('Property', related_name = 'values')
 
     # Number of indices filled in in the time dimension.
     _filled = models.IntegerField(default=0) 
 
-    objects = PropertyValueManager()
+    objects = PropertyManager()
     
     @property_tag
     def path(self):
@@ -476,11 +478,10 @@ class SimulationBatchManager(models.Manager):
         return batch
         
 class SimulationBatch(models.Model):
-    organism         = models.ForeignKey('Organism', related_name = 'simulation_batches')
-    organism_version = models.CharField(max_length=255, default="")
-    name             = models.CharField(max_length=255, default="")
+    name             = models.CharField(max_length=255, default='')
     description      = models.TextField(default="")    
-    investigator     = models.ForeignKey('Investigator', related_name = 'simulation_batches')
+    organism_version = models.ForeignKey('OrganismVersion', related_name='Simulation batches')
+    investigator     = models.ForeignKey('Investigator', related_name='Simulation batches')
     ip               = models.IPAddressField(default="0.0.0.0")
     date             = models.DateTimeField(auto_now=True, auto_now_add=True)
     
@@ -496,7 +497,7 @@ class SimulationBatch(models.Model):
 
 class LabelSet(models.Model):
     name = models.CharField(max_length=255)
-    organism_version = models.ForeignKey('OrganismVersion')
+    organism_version = models.ForeignKey('OrganismVersion', related_name='label_sets')
     dimensions = models.IntegerField()
 
     def __unicode__(self):
@@ -510,7 +511,7 @@ class LabelSet(models.Model):
 class Label(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
-    label_set = models.ForeignKey('LabelSet')
+    label_set = models.ForeignKey('LabelSet', related_name='labels')
 
     index = models.IntegerField()
 
@@ -544,7 +545,7 @@ class OrganismVersion(models.Model):
     organisms.
     """
     version_number = models.CharField(max_length=255)
-    organism = models.ForeignKey('Organism')
+    organism = models.ForeignKey('Organism', related_name='versions')
 
     def __unicode__(self):
         return ('%s %s' % (self.organism.name, self.version_number)).strip()
