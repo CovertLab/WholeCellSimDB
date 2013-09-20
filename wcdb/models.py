@@ -494,6 +494,34 @@ class SimulationBatch(models.Model):
         unique_together = (('organism', 'name'), )
          
 
+class LabelSet(models.Model):
+    name = models.CharField(max_length=255)
+    organism_version = models.ForeignKey('OrganismVersion')
+    dimensions = models.IntegerField()
+
+    def __unicode__(self):
+        return name
+
+
+    class Meta:
+        app_label = 'wcdb'
+
+
+class Label(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    label_set = models.ForeignKey('LabelSet')
+
+    index = models.IntegerField()
+
+    def __unicode__(self):
+        return ("%i. %s" % (self.index, self.name)).strip()
+
+
+    class Meta:
+        app_label = 'wcdb'
+
+
 class Organism(models.Model):
     """ This table represents an in-silico organism. """
     name = models.CharField(max_length=255, default="", unique=True)
@@ -511,6 +539,10 @@ class Organism(models.Model):
 
 
 class OrganismVersion(models.Model):
+    """ 
+    This table represents a specific code version of an in-silico version of an
+    organisms.
+    """
     version_number = models.CharField(max_length=255)
     organism = models.ForeignKey('Organism')
 
