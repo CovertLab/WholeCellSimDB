@@ -492,23 +492,42 @@ class SimulationBatch(models.Model):
         get_latest_by = 'date'
         app_label = 'wcdb'
         unique_together = (('organism', 'name'), )
-        
+         
+
 class Organism(models.Model):
+    """ This table represents an in-silico organism. """
     name = models.CharField(max_length=255, default="", unique=True)
+    ## Possible Fields ##
+    # programming language used
+    # programming language version
+    # domain, kingdom, phylum, class, order, family, genus, species
 
     def __unicode__(self):
         return self.name
     
+
     class Meta:
         app_label = 'wcdb'
 
-class Investigator(models.Model):
-    user        = models.OneToOneField(User)
+
+class OrganismVersion(models.Model):
+    version_number = models.CharField(max_length=255)
+    organism = models.ForeignKey('Organism')
+
+    def __unicode__(self):
+        return ('%s %s' % (self.organism.name, self.version_number)).strip()
+
+
+    class Meta:
+        app_label = 'wcdb'
+
+
+class Investigator(User):
     affiliation = models.CharField(max_length=255, default="")
     
     def __unicode__(self):
         return ('%s %s' % (self.first_name, self.last_name)).strip()       
     
     class Meta:
-        ordering = ['user__last_name', 'user__first_name']
-        get_latest_by = 'user__date_joined'
+        ordering = ['last_name', 'first_name']
+        get_latest_by = 'date_joined'
