@@ -25,7 +25,7 @@ Created: 2013-09-13
 
 <div>
 <h1>Content</h1>
-<table>
+<table class="table summary">
     <thead>
         <tr>
             <th>Quantity</th>
@@ -34,8 +34,12 @@ Created: 2013-09-13
     </thead>
     <tbody>
         <tr>
-            <th>In silico organisms</th>
-            <td>{{ summary.n_in_silico_organism }}</td>
+            <th><a href="{% url wcdbweb.views.list_organisms %}">In silico organisms</a></th>
+            <td><a href="{% url wcdbweb.views.list_organisms %}">{{ summary.n_in_silico_organism }}</a></td>
+        </tr>
+        <tr>
+            <th><a href="{% url wcdbweb.views.list_simulation_batches %}">Simulation batches</a></th>
+            <td><a href="{% url wcdbweb.views.list_simulation_batches %}">{{ summary.n_simulation_batch }}</a></td>
         </tr>
         <tr>
             <th>Simulations</th>
@@ -62,8 +66,8 @@ Created: 2013-09-13
             <td>{{ summary.n_option }}</td>
         </tr>
         <tr>
-            <th>Investigators</th>
-            <td>{{ summary.n_investigator }}</td>
+            <th><a href="{% url wcdbweb.views.list_investigators %}">Investigators</a></th>
+            <td><a href="{% url wcdbweb.views.list_investigators %}">{{ summary.n_investigator }}</a></td>
         </tr>
     </tbody>
 </table>

@@ -51,9 +51,9 @@ class SimulationTests(TestCase):
 
         os.remove(sim.file_path)
 
-    ##############################################################
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
     # State Properties
-    ##############################################################
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
     # Autocreated?
     def test_1_state_1_property_autocreated(self):
         sim = self.sample_simulation(
@@ -85,7 +85,7 @@ class SimulationTests(TestCase):
             '<Property: Sim - State B - Prop c>'])
         os.remove(sim.file_path)
 
-    #### Methods ####
+    """ Methods """
     def test_hdf5_file_created(self):
         sim = self.sample_simulation(
             state_properties={"State A": { "Prop a": ((1,1,100),"=f8"),

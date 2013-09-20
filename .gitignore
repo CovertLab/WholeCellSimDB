@@ -29,6 +29,8 @@
 *.hdf5
 *.hdf4
 *.db
+*.h5
+**/indexes/
 
 # OS generated files #
 ######################
@@ -47,3 +49,4 @@ Thumbs.db
 
 wcdb_loadmat.py
 SampleData/
+.htaccess
