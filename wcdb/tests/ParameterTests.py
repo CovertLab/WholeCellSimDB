@@ -1,25 +1,27 @@
 from django.test import TestCase
-from wcdb.models import Parameter
+from wcdb.models import Parameter, OPTarget, State, Process
 
 
 class ParameterModelTests(TestCase):
-    def test_create_parameter(self):
-        Parameter.objects.create(name="Test Parameter")
+   
+    def test_create_option_with_OPTarget(self):
+        target = OPTarget.objects.create(name="Test Target")
+        Parameter.objects.create(name="Test 1", value="Value 1", index=1, target=target)
         self.assertQuerysetEqual(
                 Parameter.objects.all(),
-                ['<Parameter: Test Parameter>'])
+                ['<Parameter: Test Target - Test 1 = Value 1>'])
 
-    def test_create_two_different_parameters(self):
-        Parameter.objects.create(name="Test Parameter")
-        Parameter.objects.create(name="Test Parameter")
+    def test_create_option_with_State(self):
+        target = State.objects.create(name="Test Target")
+        Parameter.objects.create(name="Test 1", value="Value 1", index=1, target=target)
         self.assertQuerysetEqual(
                 Parameter.objects.all(),
-                ['<Parameter: Test Parameter>',
-                 '<Parameter: Test Parameter>'])
+                ['<Parameter: Test 1 - Value 1>'])
 
-    def test_create_two_identical_parameters(self):
-        Parameter.objects.create(name="Test 1.0")
-        Parameter.objects.get_or_create(name="Test 1.0")
+    def test_create_option_with_Process(self):
+        target = Process.objects.create(name="Test Target")
+        Parameter.objects.create(name="Test 1", value="Value 1", index=1, target=target)
         self.assertQuerysetEqual(
                 Parameter.objects.all(),
-                ['<Parameter: Test 1.0>'])
+                ['<Parameter: Test 1 - Value 1>'])
+

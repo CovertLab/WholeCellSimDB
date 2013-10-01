@@ -11,25 +11,24 @@ property_tag = property
 
 # This serves as the base class for the Option and Parameter tables.
 class OPBase(models.Model):
-    target  = models.ForeignKey('OPTarget', related_name='%(class)s')
+    """
+    {"name": {"target": (value, index)}}
+    """
     name    = models.CharField(max_length=255)
     value   = models.CharField(max_length=255, null=True, blank=True)
     index   = models.IntegerField(default=0) # This will probably have to be stored in HDF5 file.
 
-    def __unicode__(self):
-        return ' - '.join([
-                self.target.__unicode__(),
-                self.name,
-                self.value
-            ])
-
-
     class Meta:
-        abstract = True # Need to do something about the indexes. Store in HDF5?
+        abstract = True 
 
 
 class Option(OPBase):  
     target = models.ForeignKey('OPTarget', related_name='options')
+
+    def __unicode__(self):
+        return '%s - %s = %s' % (self.target.__unicode__(),
+                                 self.name,
+                                 self.value) 
 
 
     class Meta:
@@ -38,6 +37,11 @@ class Option(OPBase):
 
 class Parameter(OPBase):
     target = models.ForeignKey('OPTarget', related_name='parameters')
+
+    def __unicode__(self):
+        return '%s - %s = %s' % (self.target.__unicode__(),
+                                 self.name,
+                                 self.value)
 
 
     class Meta:
@@ -48,21 +52,25 @@ class Parameter(OPBase):
 # mostly the same relations, just in a different context.
 class OPTarget(models.Model):
     name = models.CharField(max_length=255)
-    simulation = models.ForeignKey('Simulation', related_name='OPParent')
 
     def __unicode__(self):
-        return ' - '.join([
-            self.simulation.__unicode__(),
-            self.name
-            ])
+        return self.name
 
 
     class Meta:
-        abstract = True
+        app_label='wcdb'
+
 
 
 class Process(OPTarget):
+    """
+    ["name",]
+    """
+    # name = models.CharField(max_length=255)
     simulation = models.ForeignKey("Simulation", related_name='processes')
+
+    def __unicode__(self):
+        return "%s - %s" % (simulation.__unicode__(), self.name)
 
 
     class Meta:
@@ -71,8 +79,20 @@ class Process(OPTarget):
 
  
 class State(OPTarget):
+    """
+    {"name": ("units", property_description)}
+    """
+    # name = models.CharField(max_length=255)
     simulation = models.ForeignKey('Simulation', related_name='states')   
-     
+    units = models.CharField(max_length=10)
+ 
+    def __unicode__(self):
+        return " - ".join([simulation.__unicode__(), self.name])
+
+    @property_tag
+    def path(self):
+        return "/states/%s" % self.name
+
 
     class Meta:
         app_label = 'wcdb'
@@ -112,9 +132,12 @@ class PropertyManager(models.Manager):
 
 
 class Property(models.Model):
+    """
+    {"name": (dtype, dimensions, names_of_labelsets)
+    """
     name   = models.CharField(max_length='255', default='')    
     state  = models.ForeignKey('State', related_name='properties')
-    labels = models.ManyToManyField('LabelSet', through='PropertyLabel')
+    labels = models.ManyToManyField('LabelSet', through='PropertyLabelSets')
 
     # Number of indices filled in in the time dimension.
     _filled = models.IntegerField(default=0) 
@@ -203,44 +226,51 @@ class Property(models.Model):
         app_label = 'wcdb'
 
 
-class PropertyLabel(models.Model):
-    property  = models.ForeignKey('Property', related_name='label_sets')
-    label_set = models.ForeignKey('LabelSet', related_name='properties')
-    dimension = models.PositiveIntegerField()
-
-
-    class Meta:
-        app_label = 'wcdb'
-
-
 class SimulationManager(models.Manager):
     def create_simulation(self, 
-                          batch,    
-                          batch_index = 1,
-                          state_properties = {},
-                          length = 0.0):
-        
-        # Associated the Simulation with the batch. 
-        simulation = batch.simulations.create(                                 
-                                 batch_index = batch_index,
-                                 length = length,
-                                 )
+                          name, 
+                          organism_version,
+                          investigator,
+                          batch, 
+                          description="", 
+                          length=1.0,
+                          replicate_index=1,
+                          ip='0.0.0.0', 
+                          t=1, 
+                          options={},
+                          parameters={},
+                          processes=[], 
+                          state_properties={}):
+
+        simulation = self.create(name=name, 
+                                 organism_version=organism_version,
+                                 batch=batch, 
+                                 description=description,
+                                 length=length, 
+                                 replicate_index=replicate_index,
+                                 ip=ip,
+                                 t=t)
 
         f = simulation.h5file 
 
         for state_name, pd in state_properties.iteritems():
-            state = batch.states.get(name = state_name)
-            
-            g = f.create_group('/states/' + state_name) # This should maybe happen in a StateManager?
-            f.flush()
-            
+            state = State.objects.create_state(state_name, simulation)
             for prop_name, d in pd.iteritems():
-                property = state.properties.get(name=prop_name)
-                PropertyValue.objects.create_property_value(
-                                                simulation, 
-                                                property,
-                                                d[0], # Shape
-                                                d[1]) # dType
+                Property.objects.create_property(state, 
+                                                 prop_name,
+                                                 d[0], # Shape
+                                                 d[1]) # dType
+
+        for name, value in options.iteritems():
+            Option.objects.create(name=name, value=value,
+                                   simulation=simulation)
+
+        for name, value in parameters.iteritems():
+            Parameter.objects.create(name=name, value=value,
+                                     simulation=simulation)
+
+        for name in processes:
+            Process.objects.create(name=name, simulation=simulation)
 
         f.flush()
         f.close() 
@@ -309,15 +339,20 @@ class SimulationBatchManager(models.Manager):
                           options = {},
                           parameters = {}):
 
-        organism = OrganismVersion.objects.get_or_create(name=organism_version, organism__name=organism)[0]
-        organism.save()
-        
+        # Find or create the Organism with the supplied na.e
+        organism = Organism.objects.get_or_create(name=organism_name)[0]
+
+        organism_version = OrganismVersion.objects.get_or_create(
+                                              organism=org_version,
+                                              version_number=organism_version)[0]
+
         investigator = Investigator.objects.get_or_create(
             first_name=investigator_first,
             last_name=investigator_last,
             email=investigator_email,
             affiliation=investigator_affiliation)[0]
         
+        # Create a batch for this version of the organism. 
         batch = organism.simulation_batches.create(
             name = name,
             description = description,
@@ -344,6 +379,9 @@ class SimulationBatchManager(models.Manager):
                 property.save()
         
         #options
+        # options is now a dict of dicts. the keys of the outer dict are process and state and maybe something else
+        # options = {"processes":{"process_name_1":()}, "states":{"state_name":()}}
+        # iterate through all the options
         for prop_name, value in options.iteritems():
             if re.match(r"^__.+?__$", prop_name) or prop_name == 'processes' or prop_name == 'states':
                 continue
@@ -354,7 +392,9 @@ class SimulationBatchManager(models.Manager):
                 option = batch.options.create(name = prop_name, value = value)
             option.save()
         
+        # Each Process has a 
         for process_name, props in options['processes'].iteritems():
+            # get the process for this simulation with the same name as the key
             process = batch.processes.get(name = process_name)
             
             for prop_name, value in props.iteritems():
@@ -423,53 +463,14 @@ class SimulationBatch(models.Model):
     objects = SimulationBatchManager()
     
     def __unicode__(self):
-        return " - ".join([
-                self.organism_version.__unicode__(),
-                self.name
-            ])
+        return "%s - %s" % (self.organism_version.__unicode__(), self.name)
 
 
     class Meta:
         verbose_name = 'Simulation batch'
-        verbose_name_plural = 'Simulation batches'
+        vbatch erbose_name_plural = 'Simulation batches'
         get_latest_by = 'date'
         app_label = 'wcdb'
- 
-
-class LabelSet(models.Model):
-    name = models.CharField(max_length=255)
-    organism_version = models.ForeignKey('OrganismVersion', related_name='label_sets')
-    dimensions = models.IntegerField()
-
-    def __unicode__(self):
-        return name
-
-
-    class Meta:
-        app_label = 'wcdb'
-
-
-class LabelSetLabel(models.Model):
-    """This crazily named table just stores extra names for the m2m relation between Labels and their Sets."""
-    label = models.ForeignKey('Label')
-    label_set = models.ForeignKey('LabelSet')
-    index = models.PositiveIntegerField()
-
-    class Meta:
-       app_label = 'wcdb'
-
-
-class Label(models.Model):
-    name = models.CharField(max_length=255)
-    description = models.TextField()
-
-    def __unicode__(self):
-        return ("%i. %s" % (self.index, self.name)).strip()
-
-
-    class Meta:
-        app_label = 'wcdb'
-
 
 class Organism(models.Model):
     """ This table represents an in-silico organism. """
@@ -497,25 +498,84 @@ class OrganismVersion(models.Model):
     organism = models.ForeignKey('Organism', related_name='versions')
 
     def __unicode__(self):
-        return " - ".join([
-                self.organism.__unicode__(),
-                self.version_number
-            ])
+        return "%s %s" % (self.organism.__unicode__(), self.version_number)
 
 
     class Meta:
         ordering = ['version_number']
         app_label = 'wcdb'
-        unique_together = ('version_number', 'organism__name')
 
 
 class Investigator(User):
     affiliation = models.CharField(max_length=255, default="")
     
     def __unicode__(self):
-        return ('%s %s' % (self.first_name, self.last_name)).strip()       
+        return '%s %s' % (self.first_name, self.last_name)
     
 
     class Meta:
         ordering = ['last_name', 'first_name']
         get_latest_by = 'date_joined'
+
+
+
+
+####         ###############
+####         ###############
+####         ####       ####
+####         ####       ####
+####         ###############
+####         ###############
+####         ####       ####
+############ ####       ####
+############ ####       ####
+
+class PropertyLabelSets(models.Model):
+    property = models.ForeignKey('Property')
+    label_set = models.ForeignKey('LabelSet')
+    dimension = models.PositiveIntegerField()
+
+
+    class Meta:
+        app_label = 'wcdb'
+
+
+class LabelSet(models.Model):
+    """
+    Example Names:
+        'Compartments'
+        'Gene'
+        'ProteinComplex-Mature
+    """
+    name = models.CharField(max_length=255)
+    labels = models.ManyToManyField('Label', through='LabelSet2Label')
+    organism_version = models.ForeignKey('OrganismVersion', related_name='labelsets')
+
+    def __unicode__(self):
+        return name
+
+
+    class Meta:
+        app_label = 'wcdb'
+
+
+class LabelSet2Label(models.Model):
+    label_set = models.ForeignKey('LabelSet')
+    label = models.ForeignKey('Label')
+    index = models.PositiveIntegerField()
+
+
+    class Meta:
+       app_label = 'wcdb'
+
+
+class Label(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+
+    def __unicode__(self):
+        return "%i. %s" % (self.index, self.name)
+
+
+    class Meta:
+        app_label = 'wcdb'

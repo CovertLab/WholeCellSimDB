@@ -16,12 +16,12 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'wholecelldb',
-        #'NAME': '/home/nolan/GitRepos/WholeCellDB/database.db',                      # Or path to database file if using sqlite3.
+        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        #'NAME': '',
+        'NAME': '/home/nolan/GitRepos/WholeCellDB/database.db',                      # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
-        'USER': 'wholecelldb',
-        'PASSWORD': '9KNYdUnQaSFSUDCa',
+        'USER': '',
+        'PASSWORD': '',
         'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
         'PORT': '',                      # Set to empty string for default.
     }
@@ -71,11 +71,10 @@ STATIC_ROOT = ''
 
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
-STATIC_URL = ROOT_URL + '/static/'
+STATIC_URL = '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
-    ROOT_DIR + "/../wcdbweb/static",
 )
 
 # List of finder classes that know how to find static files in
@@ -114,14 +113,16 @@ WSGI_APPLICATION = 'WholeCellDB.wsgi.application'
 HDF5_ROOT = "/home/projects/WholeCellDB/wcdb/data"
 
 TEMPLATE_DIRS = (    
-    ROOT_DIR + "/../wcdbweb/templates",
-    ROOT_DIR + "/../wcdbsearch/templates",
+    'wcdb/templates',
 )
 
 import os
-HAYSTACK_SITECONF = 'wcdbsearch.indexes'
-HAYSTACK_SEARCH_ENGINE  = 'xapian'
-HAYSTACK_XAPIAN_PATH = ROOT_DIR + "/../wcdbsearch/indexes"
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+        'URL': 'http://127.0.0.1:8080/solr'
+    },
+}
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -137,10 +138,6 @@ INSTALLED_APPS = (
     
     #WholeCellDB
     'wcdb',
-	'wcdbweb',    
-    'wcdbcli',
-    'wcdbsearch',
-    
     #search
     'haystack',
 )

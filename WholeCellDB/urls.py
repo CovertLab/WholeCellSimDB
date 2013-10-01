@@ -6,5 +6,5 @@ admin.autodiscover()
 
 urlpatterns = patterns('',   
     # WholeCellDB web application
-    url(r'', include('wcdbweb.urls')),
+    url(r'', include('wcdb.urls')),
 )

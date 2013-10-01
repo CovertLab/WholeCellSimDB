@@ -1,24 +1,30 @@
 from django.test import TestCase
-from wcdb.models import Process
+from wcdb.models import *
+
+import os
+import h5py
 
 
-class ProcessModelTests(TestCase):
-    def test_create_process(self):
-        Process.objects.create(name="Test 1")
+class StateModelTests(TestCase):
+    def sample_simulation(self, name="Sim", options={}, parameters={},
+                          processes=[], state_properties={}):
+        return Simulation.objects.create_simulation(
+                    name=name,
+                    organism = "E. coli",
+                    batch = "First batch.",
+                    description = "Description of the Simulation.",
+                    replicate_index=1000,
+                    ip="127.0.0.1",
+                    length=10000.00,
+                    options=options,
+                    parameters=parameters,
+                    processes=processes,
+                    state_properties=state_properties)
+
+    def test_objects_createstate(self):
+        simulation = self.sample_simulation()
+        state = State.objects.create_state("Test State", simulation)
         self.assertQuerysetEqual(
-                Process.objects.all(),
-                ['<Process: Test 1>'])
-
-    def test_create_two_different_processs(self):
-        Process.objects.create(name="Test 1")
-        Process.objects.create(name="Test 2")
-        self.assertQuerysetEqual(
-                Process.objects.all(),
-                ['<Process: Test 1>', '<Process: Test 2>'])
-
-    def test_create_two_identical_processs(self):
-        Process.objects.create(name="Test 1")
-        Process.objects.get_or_create(name="Test 1")
-        self.assertQuerysetEqual(
-                Process.objects.all(),
-                ['<Process: Test 1>'])
+            State.objects.all(),
+            ['<State: Sim - Test State>'])
+        os.remove(simulation.file_path)
