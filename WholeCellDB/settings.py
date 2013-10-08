@@ -60,8 +60,7 @@ MEDIA_ROOT = ''
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
-# Examples: "http://example.com/media/", "http://media.example.com/"
-MEDIA_URL = ''
+# Examples: "http://example.com/media/", "http://media.example.com/" MEDIA_URL = ''
 
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
@@ -110,7 +109,7 @@ ROOT_URLCONF = 'WholeCellDB.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'WholeCellDB.wsgi.application'
 
-HDF5_ROOT = "/home/projects/WholeCellDB/wcdb/data"
+HDF5_ROOT = "/home/nolan/hdf5"
 
 TEMPLATE_DIRS = (    
     'wcdb/templates',

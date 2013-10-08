@@ -11,18 +11,36 @@ property_tag = property
 
 # This serves as the base class for the Option and Parameter tables.
 class OPBase(models.Model):
-    """
-    {"name": {"target": (value, index)}}
-    """
     name    = models.CharField(max_length=255)
     value   = models.CharField(max_length=255, null=True, blank=True)
-    index   = models.IntegerField(default=0) # This will probably have to be stored in HDF5 file.
+    index   = models.IntegerField(default=0) 
 
     class Meta:
         abstract = True 
 
+    """
+    These are going to have to be stored in the HDF5 files of the 
+    Simulations that they are a part of. This will be redundant data.
+
+    Might need a listener to see update the HDF5 file if any values
+    are changed in an instance. This would happen after the instance
+    is saved.
+    """
+
 
 class Option(OPBase):  
+    """
+    option_descriptions = {
+        "name": {
+            "target": [value, ... ],
+            ...
+        },
+        ...
+    }
+   
+    If target is an empty string, it will set the target as the 
+    Simulation itself. 
+    """
     target = models.ForeignKey('OPTarget', related_name='options')
 
     def __unicode__(self):
@@ -36,6 +54,18 @@ class Option(OPBase):
 
 
 class Parameter(OPBase):
+    """
+    parameter_descriptions = {
+        "name": {
+            "target": [value, ...],
+            ...
+        },
+        ...
+    }
+   
+    If target is an empty string, it will set the target as the 
+    Simulation itself. 
+    """
     target = models.ForeignKey('OPTarget', related_name='parameters')
 
     def __unicode__(self):
@@ -48,59 +78,9 @@ class Parameter(OPBase):
         app_label='wcdb'
 
 
-# This is the base class for the State and Process tables, which contain
-# mostly the same relations, just in a different context.
-class OPTarget(models.Model):
-    name = models.CharField(max_length=255)
-
-    def __unicode__(self):
-        return self.name
-
-
-    class Meta:
-        app_label='wcdb'
-
-
-
-class Process(OPTarget):
-    """
-    ["name",]
-    """
-    # name = models.CharField(max_length=255)
-    simulation = models.ForeignKey("Simulation", related_name='processes')
-
-    def __unicode__(self):
-        return "%s - %s" % (simulation.__unicode__(), self.name)
-
-
-    class Meta:
-        verbose_name_plural = 'Processes'
-        app_label = 'wcdb'
-
- 
-class State(OPTarget):
-    """
-    {"name": ("units", property_description)}
-    """
-    # name = models.CharField(max_length=255)
-    simulation = models.ForeignKey('Simulation', related_name='states')   
-    units = models.CharField(max_length=10)
- 
-    def __unicode__(self):
-        return " - ".join([simulation.__unicode__(), self.name])
-
-    @property_tag
-    def path(self):
-        return "/states/%s" % self.name
-
-
-    class Meta:
-        app_label = 'wcdb'
-    
-
 """ Properties """
 class PropertyManager(models.Manager):
-    def create_property_value(self, state, name, shape, dtype):
+    def create_property(self, state, name, dtype, shape):
         """ 
         Creates a new StatePropertyValue and the associated dataset. 
 
@@ -116,7 +96,7 @@ class PropertyManager(models.Manager):
 
         maxshape = shape[:-1] + (None,)
 
-        f = simulation.h5file  # Get the simulation h5 file
+        f = state.simulation.h5file  # Get the simulation h5 file
 
         # Create the datset in the simulation h5 file
         f.create_dataset(p_obj.path, 
@@ -133,7 +113,14 @@ class PropertyManager(models.Manager):
 
 class Property(models.Model):
     """
-    {"name": (dtype, dimensions, names_of_labelsets)
+    property_description = { 
+        "name": ["dtype", dimensions, labelset],
+        ...
+    }
+
+    dtype = string, must be a numpy dtype
+    dimensions = [int, int, ...]
+    labelsets = [string, string, ...]
     """
     name   = models.CharField(max_length='255', default='')    
     state  = models.ForeignKey('State', related_name='properties')
@@ -145,7 +132,7 @@ class Property(models.Model):
     objects = PropertyManager()
     
     @property_tag
-    def path_to_dataset(self):
+    def path(self):
         """ The path to the dataset within the simulation h5 file """
         return "/".join([self.state.name,
                          self.name])
@@ -166,7 +153,7 @@ class Property(models.Model):
     @property_tag
     def dataset(self):
         """ The H5Py Dataset object for this property. """
-        f = self.simulation.h5file
+        f = self.state.simulation.h5file
         return f[self.path]
 
     def add_data(self, ts):
@@ -208,7 +195,7 @@ class Property(models.Model):
                 self.simulation.length = new_length
 
             self.dataset[...,self._filled:self._filled+lts] = ts
-            self.simulation.h5file.flush()
+            self.state.simulation.h5file.flush()
             self._filled += lts
         else:
             return False # Can this be made pretty?
@@ -217,7 +204,7 @@ class Property(models.Model):
     def __unicode__(self):
         return " - ".join([
             self.state.__unicode__(),
-            self.property.name
+            self.name
             ])
 
     class Meta:
@@ -226,59 +213,213 @@ class Property(models.Model):
         app_label = 'wcdb'
 
 
+
+# This is the base class for the State and Process tables, which contain
+# mostly the same relations, just in a different context.
+class OPTarget(models.Model):
+    name = models.CharField(max_length=255, default="")
+
+    def __unicode__(self):
+        print self.name
+
+
+    class Meta:
+        app_label='wcdb'
+
+
+class Process(OPTarget):
+    """
+    process_descriptions = ["name", ...]
+    """
+    simulation = models.ForeignKey("Simulation", related_name='processes')
+
+    def __unicode__(self):
+        return "%s - %s" % (simulation.__unicode__(), self.name)
+
+
+    class Meta:
+        verbose_name_plural = 'Processes'
+        app_label = 'wcdb'
+
+    """
+    I need to create a process manager so that I can store 
+    this information in the HDF5 file as well.  
+    """
+
+ 
+class State(OPTarget):
+    """
+    state_descriptions = {
+        "name": ["units", property_descriptions],
+        ...
+    }
+    """
+    simulation = models.ForeignKey('Simulation', related_name='states')   
+    units = models.CharField(max_length=10)
+ 
+    def __unicode__(self):
+        return " - ".join([self.simulation.__unicode__(), self.name])
+
+    @property_tag
+    def path(self):
+        return "/states/%s" % self.name
+
+
+    class Meta:
+        app_label = 'wcdb'
+    
+
 class SimulationManager(models.Manager):
     def create_simulation(self, 
-                          name, 
-                          organism_version,
-                          investigator,
                           batch, 
-                          description="", 
-                          length=1.0,
-                          replicate_index=1,
-                          ip='0.0.0.0', 
-                          t=1, 
+                          batch_index,
                           options={},
                           parameters={},
                           processes=[], 
-                          state_properties={}):
+                          state_properties={},
+                          length=1.0):
 
-        simulation = self.create(name=name, 
-                                 organism_version=organism_version,
-                                 batch=batch, 
-                                 description=description,
-                                 length=length, 
-                                 replicate_index=replicate_index,
-                                 ip=ip,
-                                 t=t)
+        simulation = self.create(batch=batch, 
+                                 batch_index=batch_index,
+                                 length=length)
 
         f = simulation.h5file 
 
         for state_name, pd in state_properties.iteritems():
-            state = State.objects.create_state(state_name, simulation)
+            state = State.objects.create(name=state_name,
+                                         simulation=simulation,
+                                         units="") 
             for prop_name, d in pd.iteritems():
-                Property.objects.create_property(state, 
+                p = Property.objects.create_property(state, 
                                                  prop_name,
                                                  d[0], # Shape
                                                  d[1]) # dType
-
-        for name, value in options.iteritems():
-            Option.objects.create(name=name, value=value,
-                                   simulation=simulation)
-
-        for name, value in parameters.iteritems():
-            Parameter.objects.create(name=name, value=value,
-                                     simulation=simulation)
-
+               # Have to create the relationships with the LabelSets 
+                                            
         for name in processes:
             Process.objects.create(name=name, simulation=simulation)
 
+        #options
+        # options is now a dict of dicts. the keys of the outer dict are process and state and maybe something else
+        """ 
+        Inside the options.mat file there is a dict with the following keys:
+            geneticKnockouts
+            processes
+            stimulus
+            media
+            verbosity
+            macromoleculeStateInitialization
+            __header__
+            __globals__
+            states
+            lengthSec
+            seed
+            __version__
+            stepSizeSec
+
+        we only want to do deal with the [processes, states, __headers__, __globals__, __version__]
+
+        options = {
+            "processes":{
+                "process_name_1":[],
+                ...
+            }, 
+            "states": {
+                "state_name":[],
+                ...
+            },
+            "__other__": [val, val,...]
+        }
+        """
+        # options
+        for prop_name, value in options.iteritems():
+            if re.match(r"^__.+?__$", prop_name) or prop_name == 'processes' or prop_name == 'states':
+                continue
+            if isinstance(value, list):
+                for index in range(len(value)):
+                    option = simulation.options.create(target=simulation, name=prop_name, value=value[index], index=index)
+            else: 
+                option = simulation.options.create(target=simulation, name=prop_name, value=value)
+            option.save()
+        
+        for process_name, props in options['processes'].iteritems():
+            # options['processes'] must be a dictionary
+            process = simulation.processes.get_or_create(name=process_name)
+            
+            for prop_name, value in props.iteritems():
+                if isinstance(value, list):
+                    for index in range(len(value)):
+                        option = simulation.options.create(target=process, name=prop_name, value=value[index], index=index)
+                else:
+                    option = simulation.options.create(target=process, name=prop_name, value=value)
+                option.save()
+        
+        for state_name, props in options['states'].iteritems():
+            state = simulation.states.get_or_create(name=state_name)
+            
+            for prop_name, value in props.iteritems():
+                if isinstance(value, list):
+                    for index in range(len(value)):
+                        option = simulation.options.create(target=state, name=prop_name, value=value[index], index=index)
+                else:
+                    option = simulation.options.create(target=state, name=prop_name, value=value)
+                option.save()
+ 
+        # parameters
+        for prop_name, value in parameters.iteritems():
+            if re.match(r"^__.+?__$", prop_name) or prop_name == 'processes' or prop_name == 'states':
+                continue
+            if isinstance(value, list):
+                for index in range(len(value)):
+                    parameter = simulation.options.create(target=simulation, name=prop_name, value=value[index], index=index)
+            else: 
+                parameter = simulation.options.create(target=simulation, name=prop_name, value=value)
+            parameter.save()
+        
+        for process_name, props in parameters['processes'].iteritems():
+            # parameters['processes'] must be a dictionary
+            process = simulation.processes.get_or_create(name=process_name)
+            
+            for prop_name, value in props.iteritems():
+                if isinstance(value, list):
+                    for index in range(len(value)):
+                        parameter = simulation.options.create(target=process, name=prop_name, value=value[index], index=index)
+                else:
+                    parameter = simulation.options.create(target=process, name=prop_name, value=value)
+                parameter.save()
+        
+        for state_name, props in parameters['states'].iteritems():
+            state = simulation.states.get_or_create(name=state_name)
+            
+            for prop_name, value in props.iteritems():
+                if isinstance(value, list):
+                    for index in range(len(value)):
+                        parameter = simulation.options.create(target=state, name=prop_name, value=value[index], index=index)
+                else:
+                    parameter = simulation.options.create(target=state, name=prop_name, value=value)
+                parameter.save()
+ 
+        #parameter
         f.flush()
         f.close() 
 
         return simulation
 
 
-class Simulation(models.Model):
+class Simulation(OPTarget):
+    """
+    simulation_description = { 
+        "organism_version": string,
+        "batch": string,
+        "length": int,
+        "options": option_descriptions
+        "parameters": parameter_descriptions
+        "process": process_descriptions
+        "states": state_descriptions,
+        "labelsets": labelset_descriptions
+    }
+        
+    """ 
     # Metadata
     batch       = models.ForeignKey('SimulationBatch', related_name='simulations')  
     batch_index = models.PositiveIntegerField(default=1)
@@ -343,7 +484,7 @@ class SimulationBatchManager(models.Manager):
         organism = Organism.objects.get_or_create(name=organism_name)[0]
 
         organism_version = OrganismVersion.objects.get_or_create(
-                                              organism=org_version,
+                                              organism=organism,
                                               version_number=organism_version)[0]
 
         investigator = Investigator.objects.get_or_create(
@@ -353,7 +494,7 @@ class SimulationBatchManager(models.Manager):
             affiliation=investigator_affiliation)[0]
         
         # Create a batch for this version of the organism. 
-        batch = organism.simulation_batches.create(
+        batch = organism_version.simulation_batches.create(
             name = name,
             description = description,
             organism_version = organism_version,
@@ -361,102 +502,33 @@ class SimulationBatchManager(models.Manager):
             ip = ip)
         batch.save()
         
-        #processes
-        for name in processes:
-            process = batch.processes.create(name=name)
-            process.save()
-        
-        #states
-        for name in states:
-            state = batch.states.create(name=name)
-            state.save()
-            
-        #state properties
-        for state_name, props in state_properties.iteritems():
-            state = batch.states.get(name=state_name)
-            for prop_name in props:
-                property = state.properties.create(name=prop_name)
-                property.save()
-        
-        #options
-        # options is now a dict of dicts. the keys of the outer dict are process and state and maybe something else
-        # options = {"processes":{"process_name_1":()}, "states":{"state_name":()}}
-        # iterate through all the options
-        for prop_name, value in options.iteritems():
-            if re.match(r"^__.+?__$", prop_name) or prop_name == 'processes' or prop_name == 'states':
-                continue
-            if isinstance(value, list):
-                for index in range(len(value)):
-                    option = batch.options.create(name = prop_name, value = value[index], index = index)
-            else:
-                option = batch.options.create(name = prop_name, value = value)
-            option.save()
-        
-        # Each Process has a 
-        for process_name, props in options['processes'].iteritems():
-            # get the process for this simulation with the same name as the key
-            process = batch.processes.get(name = process_name)
-            
-            for prop_name, value in props.iteritems():
-                if isinstance(value, list):
-                    for index in range(len(value)):
-                        option = batch.options.create(process = process, name = prop_name, value = value[index], index = index)
-                else:
-                    option = batch.options.create(process = process, name = prop_name, value = value)
-                option.save()
-        
-        for state_name, props in options['states'].iteritems():
-            state = batch.states.get(name = state_name)
-            
-            for prop_name, value in props.iteritems():
-                if isinstance(value, list):
-                    for index in range(len(value)):
-                        option = batch.options.create(state = state, name = prop_name, value = value[index], index = index)
-                else:
-                    option = batch.options.create(state = state, name = prop_name, value = value)
-                option.save()
-        
-        #parameters
-        for prop_name, value in parameters.iteritems():
-            if re.match(r"^__.+?__$", prop_name) or prop_name == 'processes' or prop_name == 'states':
-                continue
-            if isinstance(value, list):
-                for index in range(len(value)):
-                    parameter = batch.parameters.create(name = prop_name, value = value[index], index = index)
-            else:
-                parameter = batch.parameters.create(name = prop_name, value = value)
-            parameter.save()
-        
-        for process_name, props in parameters['processes'].iteritems():
-            process = batch.processes.get(name = process_name)
-            
-            for prop_name, value in props.iteritems():
-                if isinstance(value, list):
-                    for index in range(len(value)):
-                        parameter = batch.parameters.create(process = process, name = prop_name, value = value[index], index = index)
-                else:
-                    parameter = batch.parameters.create(process = process, name = prop_name, value = value)
-                parameter.save()
-        
-        for state_name, props in parameters['states'].iteritems():
-            state = batch.states.get(name = state_name)
-            
-            for prop_name, value in props.iteritems():
-                if isinstance(value, list):
-                    for index in range(len(value)):
-                        parameter = batch.parameters.create(state = state, name = prop_name, value = value[index], index = index)
-                else:
-                    parameter = batch.parameters.create(state = state, name = prop_name, value = value)
-                parameter.save()
-        
+              
         return batch # Do some cleanup
 
         
 class SimulationBatch(models.Model):
+    """
+    batch_description = {
+        "name": string,
+        "description": string,
+        "organism_version": string,
+        "ip":"string",
+        "investigator": {
+            "first name": string,
+            "last name": string,
+            "affiliation: string,
+            "email": string
+        },
+
+    }
+        
+    """
     name             = models.CharField(max_length=255, default='')
     description      = models.TextField(default="")    
-    organism_version = models.ForeignKey('OrganismVersion', related_name='simulation_batches')
-    investigator     = models.ForeignKey('Investigator', related_name='simulation_batches')
+    organism_version = models.ForeignKey('OrganismVersion',
+                                          related_name='simulation_batches')
+    investigator     = models.ForeignKey('Investigator',
+                                          related_name='simulation_batches')
     ip               = models.IPAddressField(default="0.0.0.0")
     date             = models.DateTimeField(auto_now=True, auto_now_add=True)
     
@@ -468,12 +540,19 @@ class SimulationBatch(models.Model):
 
     class Meta:
         verbose_name = 'Simulation batch'
-        vbatch erbose_name_plural = 'Simulation batches'
+        verbose_name_plural = 'Simulation batches'
         get_latest_by = 'date'
         app_label = 'wcdb'
 
 class Organism(models.Model):
-    """ This table represents an in-silico organism. """
+    """
+    This table represents an in-silico organism.
+
+    organism_description = {
+        "name": string,
+    }
+
+    """
     name = models.CharField(max_length=255, default="", unique=True)
     ## Possible Fields ##
     # programming language used
@@ -493,6 +572,11 @@ class OrganismVersion(models.Model):
     """ 
     This table represents a specific code version of an in-silico version of an
     organisms.
+
+    organism_version_name = {
+        "organism name": string,
+        "version": string
+    }
     """
     version_number = models.CharField(max_length=255)
     organism = models.ForeignKey('Organism', related_name='versions')
@@ -546,6 +630,10 @@ class LabelSet(models.Model):
         'Compartments'
         'Gene'
         'ProteinComplex-Mature
+
+    labelset_description = {
+        "name": ["label 1", "label 2", ... , "label n"],
+    }
     """
     name = models.CharField(max_length=255)
     labels = models.ManyToManyField('Label', through='LabelSet2Label')
