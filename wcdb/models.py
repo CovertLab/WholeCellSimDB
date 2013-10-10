@@ -234,7 +234,7 @@ class Process(OPTarget):
     simulation = models.ForeignKey("Simulation", related_name='processes')
 
     def __unicode__(self):
-        return "%s - %s" % (simulation.__unicode__(), self.name)
+        return "%s - %s" % (self.simulation.__unicode__(), self.name)
 
 
     class Meta:
@@ -321,7 +321,13 @@ class SimulationManager(models.Manager):
 
         options = {
             "processes":{
-                "process_name_1":[],
+                "process_name_1": {
+                    "option 1": val,
+                    "option 2": {
+                        "sub_option a": val1,
+                        "sub_option b": val2
+                    },
+                },
                 ...
             }, 
             "states": {
@@ -333,7 +339,7 @@ class SimulationManager(models.Manager):
         """
         # options
         for prop_name, value in options.iteritems():
-            if re.match(r"^__.+?__$", prop_name) or prop_name == 'processes' or prop_name == 'states':
+            if re.match(r"^__.+?__$", prop_name):
                 continue
             if isinstance(value, list):
                 for index in range(len(value)):
@@ -367,7 +373,7 @@ class SimulationManager(models.Manager):
  
         # parameters
         for prop_name, value in parameters.iteritems():
-            if re.match(r"^__.+?__$", prop_name) or prop_name == 'processes' or prop_name == 'states':
+            if re.match(r"^__.+?__$", prop_name):
                 continue
             if isinstance(value, list):
                 for index in range(len(value)):
