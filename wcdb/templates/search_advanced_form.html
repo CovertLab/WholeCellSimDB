@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% comment %}
+List simulation batches page
+
+Author: Jonathan Karr, jkarr@stanford.edu
+Affiliation: Covert Lab, Department of Bioengineering, Stanford University
+Created: 2013-09-13
+{% endcomment %}
+
+{% load static %}
+
+{% block head_title %}{{ block.super }} :: Advanced search{% endblock %}
+
+{% block content %}
+
+<div>
+<h1>Advanced search</h1>
+
+<form action="{% url wcdb.views.search_advanced %}" method="post">
+    <table class="search_advanced">
+        <!-- investigator -->
+        <tbody>
+            <tr>
+                <th colspan="2">Investigator</th>
+            </tr>
+            <tr>
+                <td>First name</td>
+                <td><input type="text" name="{{form.investigator_name_first.html_name}}" /></td>
+            </tr>
+            <tr>
+                <td>Last name</td>
+                <td><input type="text" name="{{form.investigator_name_last.html_name}}" /></td>
+            </tr>
+            <tr>
+                <td>Affiliation</td>
+                <td><input type="text" name="{{form.investigator_affiliation.html_name}}" /></td>
+            </tr>
+        </tbody>
+        
+        <!-- organism -->
+        <tbody>
+            <tr>
+                <th colspan="2">Investigator</th>
+            </tr>
+            <tr>
+                <td>Name</td>
+                <td><input type="text" name="{{form.organism_name.html_name}}" /></td>
+            </tr>
+            <tr>
+                <td>Version</td>
+                <td><input type="text" name="{{form.organism_version.html_name}}" /></td>
+            </tr>
+        </tbody>
+
+        <!-- meta data -->
+        <tbody>
+            <tr>
+                <th colspan="2">Simulation meta data</th>
+            </tr>
+            <tr>
+                <td>Name</td>
+                <td><input type="text" name="{{form.simulation_batch_name.html_name}}" /></td>
+            </tr>
+            <tr>
+                <td>IP address</td>
+                <td><input type="text" name="{{form.simulation_batch_ip.html_name}}" /></td>
+            </tr>
+            <tr>
+                <td>Date (mm/dd/yyyy)</td>
+                <td><input type="text" name="{{form.simulation_batch_date.html_name}}" /></td>
+            </tr>
+            <!-- TODO
+            <tr>
+                <td>Options</td>
+                <td><textarea name="{{form.simulation_batch_options.html_name}}"></textarea></td>
+            </tr>
+            <tr>
+                <td>Parameters</td>
+                <td><textarea name="{{form.simulation_batch_parameters.html_name}}"></textarea></td>
+            </tr> 
+            -->
+        </tbody>
+
+        <!-- values -->
+        <!-- TODO
+        <tbody>
+            <tr>
+                <th colspan="2">Simulation </th>
+            </tr>
+            <tr>
+                <td>States</td>
+                <td><input type="text" name="{{form.simulation_states.html_name}}" /></td>
+            </tr>
+        </tbody>
+        -->
+        
+        <tbody>
+            <tr>
+                <th colspan="2">
+                    <input type="Submit" name="Search" />
+                </th>
+            </tr>
+        </tbody>
+    </table>
+    
+    
+</form>
+
+</div>
+
+{% endblock %}

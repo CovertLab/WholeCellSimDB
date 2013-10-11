@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% comment %}
+List simulation batches page
+
+Author: Jonathan Karr, jkarr@stanford.edu
+Affiliation: Covert Lab, Department of Bioengineering, Stanford University
+Created: 2013-09-16
+{% endcomment %}
+
+{% load static %}
+
+{% block head_title %}{{ block.super }} :: Investigator :: {{ investigator.user.get_full_name }}{% endblock %}
+
+{% block content %}
+
+<div>
+<h1>Investigator :: {{ investigator.user.get_full_name }}</h1>
+
+<h2>Bio</h2>
+<ul class="inparagraph">
+<li><p>Name: {{ investigator.user.get_full_name }}</p>
+<li><p>Affiliation: {{ investigator.affiliation }}</p>
+<li><p>Contact: <a href="mailto:{{ investigator.user.email}} ">{{ investigator.user.email }}</a></p>
+<li><p>Joined: {{ investigator.user.date_joined|date:"M j, Y" }}</p>
+</ul>
+
+<h2>Simulation batches</h2>
+<table class="table list_batches_investigator" class="inparagraph">
+    <thead>
+        <tr>
+            <th colspan="2">Organism</th>
+            <th colspan="4">Simulation batch</th>
+        </tr>
+        <tr>
+            <th>Name</th>
+            <th>Version</th>
+            <th>Name</th>
+            <th>No. simulations</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for batch in investigator.simulation_batches.all %}
+        <tr>
+            <td><a href="{% url wcdb.views.organism id=batch.organism.id %}">{{ batch.organism.name }}</a></td>
+            <td>{{ batch.organism_version }}</td>
+            <td><a href="{% url wcdb.views.simulation_batch id=batch.id %}">{{ batch.name }}</a></td>
+            <td>{{ batch.simulations.all|length }}</td>
+            <td>{{ batch.date|date:"M j, Y" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+{% endblock %}

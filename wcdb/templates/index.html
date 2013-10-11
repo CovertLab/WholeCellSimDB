@@ -1,0 +1,91 @@
+﻿{% extends "base.html" %}
+
+{% comment %}
+Index page template
+
+Author: Jonathan Karr, jkarr@stanford.edu
+Affiliation: Covert Lab, Department of Bioengineering, Stanford University
+Created: 2013-09-13
+{% endcomment %}
+
+{% block content %}
+<div>
+<h1>Welcome to WholeCellDB!</h1>
+<p>WholeCellDB is a database of whole-cell model simulations designed to make it easy for researchers to explore and analyze whole-cell model predictions including predicted:</p>
+<ul class="inparagraph">
+<li><p>Metabolite concentrations,</p></li>
+<li><p>DNA, RNA and protein expression,</p></li>
+<li><p>DNA-bound protein positions,</p></li>
+<li><p>DNA modification positions, and</p></li>
+<li><p>Ribome positions.</p></li>
+</ul>
+
+<p>WholeCellDB currently contains data from a single whole-cell model of the Gram-positive bacterium and human pathogen <i>Mycoplasma genitalium</i>.</p>
+</div>
+
+<div>
+<h1>Content</h1>
+<table class="table summary">
+    <thead>
+        <tr>
+            <th>Quantity</th>
+            <th>Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th><a href="{% url wcdb.views.list_organisms %}">In silico organisms</a></th>
+            <td><a href="{% url wcdb.views.list_organisms %}">{{ summary.n_in_silico_organism }}</a></td>
+        </tr>
+        <tr>
+            <th><a href="{% url wcdb.views.list_simulation_batches %}">Simulation batches</a></th>
+            <td><a href="{% url wcdb.views.list_simulation_batches %}">{{ summary.n_simulation_batch }}</a></td>
+        </tr>
+        <tr>
+            <th>Simulations</th>
+            <td>{{ summary.n_simulation }}</td>
+        </tr>
+        <tr>
+            <th>Processes</th>
+            <td>{{ summary.n_process }}</td>
+        </tr>
+        <tr>
+            <th>States</th>
+            <td>{{ summary.n_state}}</td>
+        </tr>
+        <tr>
+            <th>Properties</th>
+            <td>{{ summary.n_property }}</td>
+        </tr>
+        <tr>
+            <th>Parameters</th>
+            <td>{{ summary.n_parameter }}</td>
+        </tr>
+        <tr>
+            <th>Options</th>
+            <td>{{ summary.n_option }}</td>
+        </tr>
+        <tr>
+            <th><a href="{% url wcdb.views.list_investigators %}">Investigators</a></th>
+            <td><a href="{% url wcdb.views.list_investigators %}">{{ summary.n_investigator }}</a></td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<div>
+<h1>Getting started?</h1>
+<p>Please view the <a href="{% url wcdb.views.tutorial %}">tutorial</a> and <a href="{% url wcdb.views.about %}">about</a> pages for help getting started.</p>
+</div>
+
+<div>
+<h1>More information</h1>	
+<p>Please see the following for more information or to cite WholeCellDB:</p>
+<p>Karr JR, Sanghvi JC, Macklin DN, Gutschow MV, Jacobs JM, Bolival B, Assad-Garcia N, Glass JI, Covert MW. A Whole-Cell Computational Model Predicts Phenotype from Genotype. <i>Cell</i> <b>150</b>, 389-401 (2012). <a href="http://www.cell.com/abstract/S0092-8674(12)00776-3">Cell</a> | <a href="http://www.ncbi.nlm.nih.gov/pubmed/22817898">PubMed</a></p>
+</div>
+
+<div>
+<h1>Need help?</h1>
+<p>Please contact us at <a href="mailto:wholecell[at]lists.stanford.edu">wholecell@lists.stanford.edu</a>.</p>
+</div>
+{% endblock %}

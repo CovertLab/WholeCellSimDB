@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% comment %}
+Tutorial page
+
+Author: Jonathan Karr, jkarr@stanford.edu
+Affiliation: Covert Lab, Department of Bioengineering, Stanford University
+Created: 2013-09-13
+{% endcomment %}
+
+{% load static %}
+
+{% block head_title %}{{ block.super }} :: Tutorial{% endblock %}
+
+{% block content %}
+<div id="tutorial">
+<h1>Tutorial</h1>
+
+<ul>
+
+<li><h2>Browsing WholeCellDB</h2>
+    <p>Use the "browse" menu at the top-left to explore WholeCellDB including the available in silico organisms and simulation batches.</p>
+    <img style="top:70px; left:-13px;" src="{% get_static_prefix %}img/tutorial/browse.png"/>
+    </li>
+
+<li><h2>Exporting data</h2>
+    <p>Click the icons at the bottom-right to export simulation data.</p>
+    <img style="bottom:21px; right:-10px;" src="{% get_static_prefix %}img/tutorial/export.png"/>
+    </li>
+
+<li><h2>Storing simulations in WholeCellDB</h2>
+    <p>See the <a href="{% url wcdb.views.about %}#getting_started_developers">developer instructions</a> for information about how to install WholeCellDB on your own machine, and save simulations to your own instance of WholeCellDB.</p>
+    <img style="top:70px; left:205px;" src="{% get_static_prefix %}img/tutorial/help.png"/>
+    </li>
+    
+<li><h2>Installing WholeCellDB</h2>
+    <p>See the <a href="{% url wcdb.views.about %}#getting_started_developers">developer instructions</a> for information about how to install WholeCellDB on your own machine, and save simulations to your own instance of WholeCellDB.</p>
+    <img style="top:70px; left:205px;" src="{% get_static_prefix %}img/tutorial/help.png"/>
+    </li>
+
+<li><h2>Need more help?</h2>
+    <p>Please contact the development team at <a href="wholecelldb@lists.stanford.edu">wholecelldb@lists.stanford.edu</a>.</p>
+    <img style="top:70px; left:205px;" src="{% get_static_prefix %}img/tutorial/help.png"/>
+    </li>
+    
+</div>
+{% endblock %}
