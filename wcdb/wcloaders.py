@@ -1,5 +1,7 @@
 from wcdb.models import *
-
+import glob
+import scipy.io
+import numpy
 
 class WCMatLoader:
     @staticmethod
@@ -11,7 +13,8 @@ class WCMatLoader:
         loads their data into the database. It is intended to be used to
         load simulation data that is complete.
         """
-        property_files = glob.glob(simulation_dir + "/state-[a-zA-Z]*-[a-zA-Z]*.mat")
+        property_files = glob.glob(simulation_dir + \
+                                   "/state-[a-zA-Z]*-[a-zA-Z]*.mat")
 
         #save property values data
         for prop_file in property_files:
@@ -23,7 +26,8 @@ class WCMatLoader:
 
                 if "data" in mat_dict.keys():
                     # Get the property.
-                    s_obj = simulation.organism_version.states.get(name=state_name)
+                    s_obj = simulation.organism_version.states.get(
+                                                        name=state_name)
                     try:
                         # Try to find that property.
                         p_obj = s_obj.properties.get(name=prop_name)
@@ -46,7 +50,8 @@ class WCMatLoader:
 
     @staticmethod
     def state_properties(sample_dir):
-        property_files = glob.glob(sample_dir + "/state-[a-zA-Z]*-[a-zA-Z]*.mat")
+        property_files = glob.glob(sample_dir + \
+                                   "/state-[a-zA-Z]*-[a-zA-Z]*.mat")
 
         state_properties = {}
 
@@ -60,7 +65,8 @@ class WCMatLoader:
                     label_sets = [""]
                     d_list = [data.dtype, data.shape, label_sets]
                     # Weird syntax. Just constructing the state_property dict.
-                    state_properties.setdefault(state, {}).setdefault(prop, d_list)
+                    state_properties.setdefault(state, {}).setdefault(prop,
+                                                                      d_list)
 
             except SystemError: #TODO: handle errors
                 pass
@@ -90,7 +96,7 @@ class WCMatLoader:
         """
         Returns a list of processes names.
         """
-        return WCMatLoader.options(sample_dir)['[rocesses'].keys()
+        return WCMatLoader.options(sample_dir)['processes'].keys()
 
     @staticmethod
     def _load_dict(filename, throw_error_on_unknown_data_format=True):
@@ -105,7 +111,7 @@ class WCMatLoader:
                 and isinstance(data[key][0][0],
                                scipy.io.matlab.mio5_params.mat_struct):
                     # Normalize the matlab struct.
-                    dict[key] = _normalize(data[key][0][0],
+                    dict[key] = WCMatLoader._normalize(data[key][0][0],
                                            throw_error_on_unknown_data_format)
                 # Else if it's one dimension and the value is a unicode.
                 elif data[key].ndim == 1 \
@@ -131,7 +137,7 @@ class WCMatLoader:
             if isinstance(elem, numpy.ndarray) and len(elem) == 1 and \
                isinstance(elem[0], numpy.ndarray) and len(elem[0]) == 1 and \
                isinstance(elem[0][0], scipy.io.matlab.mio5_params.mat_struct):
-                dict[strg] = _normalize(elem[0][0], throw_error_on_unknown_data_format)
+                dict[strg] = WCMatLoader._normalize(elem[0][0], throw_error_on_unknown_data_format)
             else:
                 if elem.ndim == 1 and isinstance(elem[0], numpy.unicode_):
                     dict[strg] = elem.tolist()[0]

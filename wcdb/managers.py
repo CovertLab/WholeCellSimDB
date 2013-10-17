@@ -160,6 +160,7 @@ class OrganismVersionManager(models.Manager):
     def create_organism_version(self, organism_name, version, options,
                                 parameters, processes, state_properties):
         # Organism
+        from wcdb.models import Organism
         o = Organism.objects.get_or_create(name=organism_name)
 
         # Organism Version

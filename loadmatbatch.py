@@ -1,6 +1,14 @@
-import sys
-from wcdb.models import Investigator, SimulationBatch, OrganismVersion, Organism
+"""
+> python loadmatbatch.py "M. genitalium" "r1" "Batch 1" "First batch in wcdb" "Jon" "Karr" "Stanford" "jrkarr@stanford.com" "128.41.235.12" "/home/nolan/Documents"
+"""
 
+import sys
+from WholeCellDB import settings
+from django.core.management import setup_environ
+
+setup_environ(settings)
+
+from wcdb.models import Investigator, SimulationBatch, OrganismVersion, Organism
 
 def main():
     organism_name = sys.argv[1]
@@ -18,11 +26,11 @@ def main():
                                            last_name=investigator_last,
                                            email=investigator_email,
                                            affiliation=investigator_affiliation)
-    o = Organism.objects.get_or_create(name=organism_name)
+    o = Organism.objects.get_or_create(name=organism_name)[0]
     ovqs = OrganismVersion.objects.filter(version=organism_version,
                                           organism=o)
     if len(ovqs) == 0:
-        OrganismVersion.objects.create_organism_version_from_mat(batch_dir + "/1")
+        OrganismVersion.objects.create_organism_version_from_mat(organism_name, organism_version, batch_dir + "/1")
     ov = ovqs[0]
     SimulationBatch.objects.create_simulation_batch_from_mat(name=name,
                                                              description=description,

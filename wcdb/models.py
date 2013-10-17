@@ -457,7 +457,7 @@ class OrganismVersion(OptionTarget, ParameterTarget):
         }
     }
     """
-    version_number = models.CharField(max_length=255)
+    version = models.CharField(max_length=255)
     organism = models.ForeignKey('Organism', related_name='versions')
 
     objects = OrganismVersionManager()
@@ -478,7 +478,7 @@ class OrganismVersion(OptionTarget, ParameterTarget):
         return "%s %s" % (self.organism.__unicode__(), self.version_number)
 
     class Meta:
-        ordering = ['version_number']
+        ordering = ['version']
         app_label = 'wcdb'
 
 
