@@ -30,7 +30,7 @@ See [wholecell.stanford.edu](http://wholecell.stanford.edu) for additional infor
 * hdf5
 * hdf5-devel
 * python-numpy
-* python-h5py
+* python-h5py 2.2.0
 
 <a name="requirements_production"/>
 ### Additional requirments for production servers

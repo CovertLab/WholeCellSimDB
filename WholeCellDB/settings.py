@@ -8,8 +8,11 @@ TEMPLATE_DEBUG = DEBUG
 ROOT_URL = 'http://wholecelldb.stanford.edu'
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 
+HDF5_ROOT = "/home/nolan/hdf5"
+
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
+    ('Nolan Phillips', 'ncphillips@upei.ca')
 )
 
 MANAGERS = ADMINS
@@ -17,13 +20,12 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        #'NAME': '',
-        'NAME': '/home/nolan/GitRepos/WholeCellDB/database.db',                      # Or path to database file if using sqlite3.
+        'NAME': '/home/nolan/Dropbox/WholeCellDB/database.db', # Or path to database file if sqlite3.
         # The following settings are not used with sqlite3:
         'USER': '',
         'PASSWORD': '',
-        'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        'PORT': '',                      # Set to empty string for default.
+        'HOST': '', # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+        'PORT': '', # Set to empty string for default.
     }
 }
 
@@ -108,8 +110,6 @@ ROOT_URLCONF = 'WholeCellDB.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'WholeCellDB.wsgi.application'
-
-HDF5_ROOT = "/home/nolan/hdf5"
 
 TEMPLATE_DIRS = (    
     'wcdb/templates',
