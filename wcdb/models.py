@@ -12,12 +12,6 @@ property_tag = property
 # Option Related Classes
 # Option, Target, Group, SimulationsOptions
 class OptionTarget(models.Model):
-    name = models.CharField(max_length=255, null=False, default="")
-
-    def __unicode__(self):
-        print self.name
-
-
     class Meta:
         app_label='wcdb'
 
@@ -42,6 +36,7 @@ class Option(models.Model):
 
 
 class OptionGroup(OptionTarget):
+    name = models.CharField(max_length=255, null=False, default="")
     target = models.ForeignKey('OptionTarget', related_name='option_groups')
 
     def __unicode__(self):
@@ -54,7 +49,8 @@ class OptionGroup(OptionTarget):
 class SimulationsOptions(models.Model):
     simulation = models.ForeignKey('Simulation')
     option = models.ForeignKey('Option')
-    value = models.CharField(max_length=255, default="", null=False)
+    value = models.CharField(max_length=255, default="", null=True)
+    index = models.IntegerField(default=1)
 
     class Meta:
         app_label = 'wcdb'
@@ -63,11 +59,6 @@ class SimulationsOptions(models.Model):
 # Parameter Related Classes
 # Parameter, Target, Group, Simulation Options
 class ParameterTarget(models.Model):
-    name = models.CharField(max_length=255, null=False, default="")
-
-    def __unicode__(self):
-        print self.name
-
     class Meta:
         app_label = 'wcdb'
 
@@ -91,6 +82,7 @@ class Parameter(models.Model):
 
 
 class ParameterGroup(ParameterTarget):
+    name = models.CharField(max_length=255, null=False, default="")
     target = models.ForeignKey('ParameterTarget', related_name='parameter_groups')
 
     def __unicode__(self):
@@ -103,7 +95,8 @@ class ParameterGroup(ParameterTarget):
 class SimulationsParameters(models.Model):
     simulation = models.ForeignKey('Simulation')
     parameter = models.ForeignKey('Parameter')
-    value = models.CharField(max_length=255, default="", null=False)
+    value = models.CharField(max_length=255, default="", null=True)
+    index = models.IntegerField(default=1)
 
     class Meta:
         app_label = 'wcdb'
@@ -127,10 +120,11 @@ class Property(models.Model):
     @property_tag
     def path(self):
         """The path to the dataset within the simulation h5 file """
-        return "/states/%s/%s" % (self.state.name, self.name)
+        return "%s/%s" % (self.state.path, self.name)
 
     class Meta:
         verbose_name_plural = 'Properties'
+        unique_together = ['name', 'state']
         ordering = ['state', 'name']
         app_label = 'wcdb'
 
@@ -143,6 +137,9 @@ class PropertyValue(models.Model):
     _filled = models.IntegerField(default=0)
 
     objects = PropertyValuesManager()
+
+    def __unicode__(self):
+        return self.path
 
     @property_tag
     def path(self):
@@ -208,12 +205,14 @@ class PropertyValue(models.Model):
 
 # Processes
 class Process(OptionTarget, ParameterTarget):
-    simulation = models.ForeignKey("OrganismVersion", related_name='processes')
+    name = models.CharField(max_length=255, null=False, default="")
+    organism_version= models.ForeignKey("OrganismVersion", related_name='processes')
 
     def __unicode__(self):
-        return "%s - %s" % (self.simulation.__unicode__(), self.name)
+        return "%s - %s" % (self.organism_version.__unicode__(), self.name)
 
     class Meta:
+        unique_together = ['name', 'organism_version']
         verbose_name_plural = 'Processes'
         app_label = 'wcdb'
 
@@ -225,16 +224,16 @@ class Process(OptionTarget, ParameterTarget):
 
 # States
 class State(OptionTarget, ParameterTarget):
+    name = models.CharField(max_length=255, null=False, default="")
     organism_version = models.ForeignKey('OrganismVersion', related_name='states')
     units = models.CharField(max_length=10)
  
     def __unicode__(self):
-        return " - ".join([self.simulation.__unicode__(), self.name])
+        return " - ".join([self.organism_version.__unicode__(), self.name])
 
     @property_tag
     def path(self):
         return "/states/%s" % self.name
-
 
     class Meta:
         app_label = 'wcdb'
@@ -354,7 +353,7 @@ class SimulationBatch(models.Model):
         return '%s/%s.h5' % (HDF5_ROOT, self.name)
 
     def h5file(self):
-        return h5py.File(file_path)
+        return h5py.File(self.file_path)
 
     def __unicode__(self):
         return "%s - %s" % (self.organism_version.__unicode__(), self.name)
@@ -475,7 +474,7 @@ class OrganismVersion(OptionTarget, ParameterTarget):
         pass
 
     def __unicode__(self):
-        return "%s %s" % (self.organism.__unicode__(), self.version_number)
+        return "%s %s" % (self.organism.__unicode__(), self.version)
 
     class Meta:
         ordering = ['version']

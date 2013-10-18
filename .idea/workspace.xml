@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="475e7ce7-a7c7-4687-b090-7b6fb4eb902a" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/wccli/loadmatbatch.py" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/wcdb/managers.py" afterPath="$PROJECT_DIR$/wcdb/managers.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/wcdb/models.py" afterPath="$PROJECT_DIR$/wcdb/models.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/wcdb/wcloaders.py" afterPath="$PROJECT_DIR$/wcdb/wcloaders.py" />
-    </list>
+    <list default="true" id="475e7ce7-a7c7-4687-b090-7b6fb4eb902a" name="Default" comment="WUb" />
     <ignored path="WholeCellDB.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -33,10 +28,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="wcloaders.py" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="wcloaders.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/wcdb/wcloaders.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="66" column="12" selection-start="2438" selection-end="2438" vertical-scroll-proportion="0.62234044" vertical-offset="900" max-vertical-offset="3114">
+            <state line="66" column="12" selection-start="2438" selection-end="2438" vertical-scroll-proportion="0.0" vertical-offset="900" max-vertical-offset="3114">
               <folding />
             </state>
           </provider>
@@ -76,10 +71,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="managers.py" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="managers.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/wcdb/managers.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="158" column="45" selection-start="7200" selection-end="7200" vertical-scroll-proportion="0.0" vertical-offset="2723" max-vertical-offset="5112">
+            <state line="157" column="0" selection-start="7154" selection-end="7154" vertical-scroll-proportion="0.44729346" vertical-offset="2669" max-vertical-offset="5112">
               <folding>
                 <element signature="e#0#25#0" expanded="true" />
               </folding>
@@ -548,12 +543,12 @@
     <frame x="7" y="30" width="1368" height="745" extended-state="6" />
     <editor active="false" />
     <layout>
-      <window_info id="Changes" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3283582" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3482587" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3283582" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3482587" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3283582" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32954547" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.31363636" sideWeight="0.67164177" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.18030304" sideWeight="0.67164177" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.31363636" sideWeight="0.65174127" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.18030304" sideWeight="0.65174127" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
@@ -575,6 +570,8 @@
     <option name="myTodoPanelSettings">
       <TodoPanelSettings />
     </option>
+    <MESSAGE value="WUb" />
+    <option name="LAST_COMMIT_MESSAGE" value="WUb" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -670,15 +667,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/wcdb/managers.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="158" column="45" selection-start="7200" selection-end="7200" vertical-scroll-proportion="0.0" vertical-offset="2723" max-vertical-offset="5112">
-          <folding>
-            <element signature="e#0#25#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/wcdb/models.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="5" column="40" selection-start="148" selection-end="148" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="5166">
@@ -704,8 +692,17 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/wcdb/wcloaders.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="66" column="12" selection-start="2438" selection-end="2438" vertical-scroll-proportion="0.62234044" vertical-offset="900" max-vertical-offset="3114">
+        <state line="66" column="12" selection-start="2438" selection-end="2438" vertical-scroll-proportion="0.0" vertical-offset="900" max-vertical-offset="3114">
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/wcdb/managers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="157" column="0" selection-start="7154" selection-end="7154" vertical-scroll-proportion="0.44729346" vertical-offset="2669" max-vertical-offset="5112">
+          <folding>
+            <element signature="e#0#25#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

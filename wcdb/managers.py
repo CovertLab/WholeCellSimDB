@@ -1,5 +1,7 @@
-from wcdb.models import *
 from wcdb.wcloaders import WCMatLoader
+from wcdb.models import *
+import re
+import numpy
 
 
 class PropertyValuesManager(models.Manager):
@@ -9,31 +11,32 @@ class PropertyValuesManager(models.Manager):
         and a Property. It also creates the HDF5 dataset
         in the simulations file.
         """
-
         sps = self.create(simulation=simulation, property=property)
-        maxshape = property.shape[:-1] + (None,)
+        print "%s shape %s" % (sps.property.name, property.shape)
+        shape_l = tuple(int(v) for v in re.findall("[0-9]+", property.shape))
+        maxshape = shape_l[:-1] + (None,)
+        print maxshape
 
-        f = sps.h5file  # Get the simulation h5 file
+        f = sps.h5file()  # Get the simulation h5 file
 
-        # Create the dataset in the simulation h5 file
         f.create_dataset(sps.path,
-                         shape=property.shape,
-                         dtype=property.dtype,
+                         shape=shape_l,
                          maxshape=maxshape)
 
         # Make sure it's saved and closed.
         f.flush()
         f.close()
 
-        return p_obj
+        return sps 
 
 
 class SimulationManager(models.Manager):
     def create_simulation_from_mat(self, sim_dir, batch, index, length=30000):
-        sim = self.create(batch=batch, index=index, length=length,
+        from wcdb.models import Property, PropertyValue, Process, State
+        sim = self.create(batch=batch, batch_index=index, length=length,
                           organism_version=batch.organism_version)
         ov = sim.organism_version
-        properties = Property.objects.filter(organism_version=ov)
+        properties = Property.objects.filter(state__organism_version=ov)
         options_dict = WCMatLoader.options(sim_dir)
         parameters_dict = WCMatLoader.parameters(sim_dir)
 
@@ -44,11 +47,11 @@ class SimulationManager(models.Manager):
         # Option Relations
         for tn, to in options_dict.iteritems():
             if tn == "processes":
-                for pn, po in to:
+                for pn, po in to.iteritems():
                     p = Process.objects.get(name=pn, organism_version=ov)
                     self.create_simulation_options_relations(sim, p, po)
             elif tn == "state":
-                for pn, po in to:
+                for pn, po in to.iteritems():
                     s = State.objects.get(name=pn, organism_version=ov)
                     self.create_simulation_options_relations(sim, s, po)
             elif re.match(r"^__.+?__$", tn):
@@ -59,11 +62,11 @@ class SimulationManager(models.Manager):
         #Parameter Relations
         for tn, to in parameters_dict.iteritems():
             if tn == "processes":
-                for pn, po in to:
+                for pn, po in to.iteritems():
                     p = Process.objects.get(name=pn, organism_version=ov)
                     self.create_simulation_parameters_relations(sim, p, po)
             elif tn == "state":
-                for pn, po in to:
+                for pn, po in to.iteritems():
                     s = State.objects.get(name=pn, organism_version=ov)
                     self.create_simulation_parameters_relations(sim, s, po)
             elif re.match(r"^__.+?__$", tn):
@@ -78,6 +81,7 @@ class SimulationManager(models.Manager):
 
     @staticmethod
     def create_simulation_options_relations(sim, target, d):
+        from wcdb.models import Option, OptionGroup, SimulationsOptions
         for k, v in d.iteritems():
             # If the targets value is a dict then the target must be
             # an option group (see OrganismVersionManager)
@@ -93,7 +97,7 @@ class SimulationManager(models.Manager):
                 for index in range(len(v)):
                     SimulationsOptions.objects.create(option=o,
                                                       simulation=sim,
-                                                      index=index,
+                                                      index=index+1,
                                                       value=v[index])
             # If the targets value is not a dict, list, or tuple,
             # the target is an option with a single value
@@ -101,11 +105,11 @@ class SimulationManager(models.Manager):
                 o = Option.objects.get(name=k, target=target)
                 SimulationsOptions.objects.create(option=o,
                                                   simulation=sim,
-                                                  index=0,
                                                   value=v)
 
     @staticmethod
     def create_simulation_parameters_relations(sim, target, d):
+        from wcdb.models import Parameter, ParameterGroup, SimulationsParameters
         for k, v in d.iteritems():
             # If the targets value is a dict then the target must be
             # an option group (see OrganismVersionManager)
@@ -121,15 +125,15 @@ class SimulationManager(models.Manager):
                 for index in range(len(v)):
                     SimulationsParameters.objects.create(parameter=p,
                                                          simulation=sim,
-                                                         index=index,
+                                                         index=index+1,
                                                          value=v[index])
             # If the targets value is not a dict, list, or tuple,
             # the target is an option with a single value
             else:
+                print "VALUE = %s" % v
                 p = Parameter.objects.get(name=k, target=target)
                 SimulationsParameters.objects.create(parameter=p,
                                                      simulation=sim,
-                                                     index=0,
                                                      value=v)
 
 
@@ -137,12 +141,13 @@ class SimulationBatchManager(models.Manager):
     def create_simulation_batch_from_mat(self, name, description,
                                          organism_version, investigator,
                                          ip, batch_dir):
-        self.create(name=name, description=description,
-                    organism_version=organism_version,
-                    investigator=investigator,
-                    ip=ip)
+        b = self.create(name=name, description=description,
+                        organism_version=organism_version,
+                        investigator=investigator,
+                        ip=ip)
 
         first_sim_dir = batch_dir + '/1'
+        from wcdb.models import Simulation
         Simulation.objects.create_simulation_from_mat(first_sim_dir, b, 1)
 
         #    sim_dirs = glob.glob(batch_dir + "/[0-9]*")
@@ -160,26 +165,32 @@ class OrganismVersionManager(models.Manager):
     def create_organism_version(self, organism_name, version, options,
                                 parameters, processes, state_properties):
         # Organism
-        from wcdb.models import Organism
-        o = Organism.objects.get_or_create(name=organism_name)
+        print "Class: OrganismVersionManager\tMethod: create_organism_version"
+        from wcdb.models import Organism, OrganismVersion, State, Process
+        print "\tGetting organism"
+        o = Organism.objects.get_or_create(name=organism_name)[0]
 
         # Organism Version
-        ov = self.create(o, version=version)
+        print "\tCreating OrganismVersion"
+        ov = OrganismVersion.objects.create(organism=o, version=version)
 
         # State Properties
+        print "\tTransfering control...\n\n"
         OrganismVersionManager.create_state_properties_from_dict(ov, state_properties)
+        print "Class: OrganismVersionManager\tMethod: create_organism_version"
 
         # Processes
-        OrganismVersionManager.create_processes_from_dict(ov, processes)
+        OrganismVersionManager.create_processes_from_list(ov, processes)
 
         # Options
         for tn, to in options.iteritems():
             if tn == "processes":
-                for pn, po in to:
-                    p = Process.objects.get(name=pn, organism_version=ov)
-                    self.create_options_from_dict(p, po)
+                for pn, po in to.iteritems():
+                    if pn in processes:
+                        p = Process.objects.get(name=pn, organism_version=ov)
+                        self.create_options_from_dict(p, po)
             elif tn == "state":
-                for pn, po in to:
+                for pn, po in to.iteritems():
                     state = State.objects.get(name=pn, organism_version=ov)
                     self.create_options_from_dict(state, po)
             elif re.match(r"^__.+?__$", tn):
@@ -188,11 +199,12 @@ class OrganismVersionManager(models.Manager):
 
         for tn, to in parameters.iteritems():
             if tn == "processes":
-                for pn, po in to:
-                    p = Process.objects.get(name=pn, organism_version=ov)
-                    self.create_parameters_from_dict(p, po)
+                for pn, po in to.iteritems():
+                    if pn in processes:
+                        p = Process.objects.get(name=pn, organism_version=ov)
+                        self.create_parameters_from_dict(p, po)
             elif tn == "state":
-                for pn, po in to:
+                for pn, po in to.iteritems():
                     state = State.objects.get(name=pn, organism_version=ov)
                     self.create_parameters_from_dict(state, po)
             elif re.match(r"^__.+?__$", tn):
@@ -201,17 +213,23 @@ class OrganismVersionManager(models.Manager):
 
     def create_organism_version_from_mat(self, organism_name,
                                          organism_version, dir):
+        print "Class OrganismVersionManager\tMethod: create_organism_version_from_mat"
+        print "\tloading options dict"
         options = WCMatLoader.options(dir)
+        print "\tloading parameters dict"
         parameters = WCMatLoader.parameters(dir)
+        print "\tloading processes list"
         processes = WCMatLoader.processes(dir)
+        print "\tloading state property dict"
         state_properties = WCMatLoader.state_properties(dir)
+        print "\tRelinquishing control to create_organism_version"
         self.create_organism_version(organism_name, organism_version, options, parameters, processes, state_properties)
 
     def create_organism_version_from_json(self, json_description):
         pass
 
     @staticmethod
-    def create_state_properties_from_dict(self, ov, state_properties):
+    def create_state_properties_from_dict(ov, state_properties):
         """
         "states_properties": {
             "state_name": {
@@ -232,31 +250,50 @@ class OrganismVersionManager(models.Manager):
 
         # First keys are state names, with the values
         # being the state descriptions.
+        from wcdb.models import State, Property, LabelSet, PropertyLabelSets
+        print "Class: OrganismVersionManager\tMethod: create_state_properties_from_dict" 
         for state_name, state_description in state_properties.iteritems():
-            state = State.objects.create(name=state_name,
-                                         units=state_description['units'],
-                                         organism_version=ov)
+#           THE WAY IT SHOULD BE
+#            state = State.objects.create(name=state_name,
+#                                         units=state_description['units'],
+#                                         organism_version=ov)
+#            print "\tCreated state: %s" % state
+#
+#            for p_name, p_description in sate_description['properties']:
 
-            for p_name, p_description in sate_description['properties']:
-                shape = p_description['shape']
-                dtype = p_description['dtype']
-                labelsets = p_description['labelsets']
-
-                prop = Property.objects.create(state=state,
-                                               name=p_name,
-                                               shape=shape,
-                                               dtype=dtype)
-
-                for name in labelsets:
-                    ls = LabelSet.objects.get(name=name, organism_version=ov)
-                    PropertyLabelSets.objects.create(labelset=ls, property=prop)
+            # This is just because the mat files don't work have the units.
+            state = State.objects.get_or_create(name=state_name,
+                                                units="",
+                                                organism_version=ov)[0]
+            print "\tState: %s Obj: %s" % (state_name, state)
+            for p_name, p_description in state_description.iteritems():
+                print "\t\tProeprty:%s" % p_name
+                #shape = p_description['shape']
+                shape = p_description[1]
+                #dtype = p_description['dtype']
+                dtype = p_description[0]
+                #labelsets = p_description['labelsets']
+                labelsets = ['']
+                prop = Property.objects.get_or_create(state=state,
+                                                      name=p_name,
+                                                      shape=shape,
+                                                      dtype=dtype)[0]
+#                for dim in range(len(labelsets)):
+#                    name = labelsets[dim]
+#                    ls = LabelSet.objects.get(name=name, organism_version=ov)
+#                    PropertyLabelSets.objects.create(label_set=ls, property=prop, dimension=dim)
+#                    print "\tProperty %s has labelset %s at index %i" % (prop, ls, dim)
 
     @staticmethod
-    def create_processes_from_dict(self, organism, dict):
-        pass
+    def create_processes_from_list(organism_version, process_list):
+        for process_name in process_list:
+            from wcdb.models import Process
+            Process.objects.create(name=process_name, organism_version=organism_version)
+        
 
     @staticmethod
     def create_options_from_dict(target, d):
+        from wcdb.models import OptionGroup, Option
         for k, v in d.iteritems():
             if type(v) == dict:
                 og = OptionGroup.objects.create(name=k, target=target)
@@ -266,6 +303,7 @@ class OrganismVersionManager(models.Manager):
 
     @staticmethod
     def create_parameters_from_dict(target, d):
+        from wcdb.models import ParameterGroup, Parameter
         for k, v in d.iteritems():
             if type(v) == dict:
                 og = ParameterGroup.objects.create(name=k, target=target)

@@ -50,16 +50,21 @@ class WCMatLoader:
 
     @staticmethod
     def state_properties(sample_dir):
+        print "Class: WCMatLoader\tMethod: state_properties"
         property_files = glob.glob(sample_dir + \
                                    "/state-[a-zA-Z]*-[a-zA-Z]*.mat")
 
         state_properties = {}
-
+        print "\tBegin..."
         for prop_file in property_files:
             state = prop_file.split("-")[1]  # State name
+            print "\tState: %s" % state
             prop = prop_file.replace(".", "-").split("-")[2]  # Property name
+            print "\tState: %s" % prop
             try:
+                print "\t\tLoading mat..."
                 mat_dict = scipy.io.loadmat(prop_file)
+                print "\t\tdone."
                 if "data" in mat_dict.keys():
                     data = mat_dict['data']
                     label_sets = [""]
