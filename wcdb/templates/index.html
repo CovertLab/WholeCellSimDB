@@ -34,12 +34,12 @@ Created: 2013-09-13
     </thead>
     <tbody>
         <tr>
-            <th><a href="{% url wcdb.views.list_organisms %}">In silico organisms</a></th>
-            <td><a href="{% url wcdb.views.list_organisms %}">{{ summary.n_in_silico_organism }}</a></td>
+            <th><a href="{% url "wcdb.views.list_organisms" %}">In silico organisms</a></th>
+            <td><a href="{% url "wcdb.views.list_organisms" %}">{{ summary.n_organism }}</a></td>
         </tr>
         <tr>
-            <th><a href="{% url wcdb.views.list_simulation_batches %}">Simulation batches</a></th>
-            <td><a href="{% url wcdb.views.list_simulation_batches %}">{{ summary.n_simulation_batch }}</a></td>
+            <th><a href="{% url "wcdb.views.list_simulation_batches" %}">Simulation batches</a></th>
+            <td><a href="{% url "wcdb.views.list_simulation_batches" %}">{{ summary.n_simulation_batch }}</a></td>
         </tr>
         <tr>
             <th>Simulations</th>
@@ -66,8 +66,8 @@ Created: 2013-09-13
             <td>{{ summary.n_option }}</td>
         </tr>
         <tr>
-            <th><a href="{% url wcdb.views.list_investigators %}">Investigators</a></th>
-            <td><a href="{% url wcdb.views.list_investigators %}">{{ summary.n_investigator }}</a></td>
+            <th><a href="{% url "wcdb.views.list_investigators" %}">Investigators</a></th>
+            <td><a href="{% url "wcdb.views.list_investigators" %}">{{ summary.n_investigator }}</a></td>
         </tr>
     </tbody>
 </table>
@@ -75,7 +75,7 @@ Created: 2013-09-13
 
 <div>
 <h1>Getting started?</h1>
-<p>Please view the <a href="{% url wcdb.views.tutorial %}">tutorial</a> and <a href="{% url wcdb.views.about %}">about</a> pages for help getting started.</p>
+<p>Please view the <a href="{% url "wcdb.views.tutorial" %}">tutorial</a> and <a href="{% url "wcdb.views.about" %}">about</a> pages for help getting started.</p>
 </div>
 
 <div>

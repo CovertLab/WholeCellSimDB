@@ -13,46 +13,46 @@ Created: 2013-09-17
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	<!-- top-level pages -->
 	<url>
-		<loc>{{ ROOT_URL }}{% url wcdbweb.views.index %}</loc>
+		<loc>{{ ROOT_URL }}{% url "wcdbweb.views.index" %}</loc>
 		<lastmod>{{ "index.html"|get_template_last_updated|date:"c" }}</lastmod>
 	</url>
     
     <url>
-		<loc>{{ ROOT_URL }}{% url wcdbweb.views.list_investigators %}</loc>
+		<loc>{{ ROOT_URL }}{% url "wcdbweb.views.list_investigators" %}</loc>
 		<lastmod>{{ "list_investigators.html"|get_template_last_updated|date:"c" }}</lastmod>
 	</url>
     <url>
-		<loc>{{ ROOT_URL }}{% url wcdbweb.views.list_organisms %}</loc>
+		<loc>{{ ROOT_URL }}{% url "wcdbweb.views.list_organisms" %}</loc>
 		<lastmod>{{ "list_organisms.html"|get_template_last_updated|date:"c" }}</lastmod>
 	</url>
     <url>
-		<loc>{{ ROOT_URL }}{% url wcdbweb.views.list_simulation_batches %}</loc>
+		<loc>{{ ROOT_URL }}{% url "wcdbweb.views.list_simulation_batches" %}</loc>
 		<lastmod>{{ "list_simulation_batches.html"|get_template_last_updated|date:"c" }}</lastmod>
 	</url>
     
     <url>
-		<loc>{{ ROOT_URL }}{% url wcdbweb.views.search_advanced %}</loc>
+		<loc>{{ ROOT_URL }}{% url "wcdbweb.views.search_advanced" %}</loc>
 		<lastmod>{{ "search_advanced_form.html"|get_template_last_updated|date:"c" }}</lastmod>
 	</url>
     
 	<url>
-		<loc>{{ ROOT_URL }}{% url wcdbweb.views.tutorial %}</loc>
+		<loc>{{ ROOT_URL }}{% url "wcdbweb.views.tutorial" %}</loc>
 		<lastmod>{{ "tutorial.html"|get_template_last_updated|date:"c" }}</lastmod>
 	</url>
 	<url>
-		<loc>{{ ROOT_URL }}{% url wcdbweb.views.about %}</loc>
+		<loc>{{ ROOT_URL }}{% url "wcdbweb.views.about" %}</loc>
 		<lastmod>{{ "about.html"|get_template_last_updated|date:"c" }}</lastmod>
 	</url>
 	
 	<!-- organisms -->
 	{% for organism in organisms %}
 	<url>
-		<loc>{{ ROOT_URL }}{% url wcdbweb.views.organism id=organism.id %}</loc> 
+		<loc>{{ ROOT_URL }}{% url "wcdbweb.views.organism" id=organism.id %}</loc> 
 		<lastmod>{{ "organism.html"|get_template_last_updated|date:"c" }}</lastmod>
 	</url>
         {% for batch in organism.simulation_batches.all %}
     <url>
-		<loc>{{ ROOT_URL }}{% url wcdbweb.views.simulation_batch id=batch.id %}</loc> 
+		<loc>{{ ROOT_URL }}{% url "wcdbweb.views.simulation_batch" id=batch.id %}</loc> 
 		<lastmod>{{ batch.date|set_time_zone|date:"c" }}</lastmod>
 	</url>
         {% endfor %}
@@ -61,7 +61,7 @@ Created: 2013-09-17
     <!-- investigators -->
 	{% for investigator in investigators %}
 	<url>
-		<loc>{{ ROOT_URL }}{% url wcdbweb.views.investigator id=investigator.id %}</loc> 
+		<loc>{{ ROOT_URL }}{% url "wcdbweb.views.investigator" id=investigator.id %}</loc> 
 		<lastmod>{{ investigator.user.date_joined|set_time_zone|date:"c" }}</lastmod>
 	</url>
 	{% endfor %}

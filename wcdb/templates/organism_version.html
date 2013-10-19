@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% comment %}
+List simulation batches page
+
+Author: Nolan Phillips, ncphillips@upei.ca
+Affiliation: Department of Computer Science, University of Prince Edward Island
+
+Author: Jonathan Karr, jkarr@stanford.edu
+Affiliation: Covert Lab, Department of Bioengineering, Stanford University
+
+
+Created: 2013-010-18
+{% endcomment %}
+
+{% load static %}
+
+{% block head_title %}{{ block.super }} :: Organism Version :: {{ organism_version }}{% endblock %}
+
+{% block content %}
+
+
+<div>
+<h1><i>{{ organism_version.organism }} {{ organism_version}}</i></h1>
+
+<h2>Simulations</h2>
+    <table class="table state_properties inparagraph">
+    <thead>
+        <tr>
+            <th>Batch</th>
+            <th>Simulation</th>
+            <th>Investigator</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for simulation in organism_version.simulations.all %}
+        <tr>
+            <td><a href={% url "wcdb.views.simulation_batch" simulation.batch.id %}>{{ simulation.batch }}</td>
+            <td><a href={% url "wcdb.views.simulation" simulation.id %}>{{ simulation }}</td>
+            <td><a href={% url "wcdb.views.investigator" simulation.batch.investigator.id %}>{{ simulation.batch.investigator }}</a></td>
+            <td>{{ simulation.batch.date|date:"M j, Y" }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+
+<h2>State Properties</h2>
+{% for state in organism_version.states.all %}
+<h3>{{ state }}</h3>
+<table class="table state_properties" class="inparagraph">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Property</th>
+            <th>Shape</th>
+            <th>Data Type</th>
+        </tr>
+    </thead>
+    <tbody>
+         {% for property in state.properties.all %}
+         <tr>
+            <td></td>
+            <td>{{ property }}</td>
+            <td>{{ property.shape }}</td>
+            <td>{{ property.dtype }}</td>
+         </tr>
+         {% endfor %}
+
+    </tbody>
+</table>
+{% endfor %}
+
+<h2>Processes</h2>
+<table class="table state_properties" class="inparagraph">
+<thead>
+    <tr>
+        <th>Process</th>
+    </tr>
+</thead>
+<tbody>
+{% for process in organism_version.processes.all %}
+    <tr><td>{{ process }}<td></tr>
+{% endfor %}
+</tbody>
+</table>
+
+
+
+{% endblock %}

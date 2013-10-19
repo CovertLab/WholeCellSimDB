@@ -21,7 +21,6 @@ Created: 2013-09-13
         <tr>
             <th>Name</th>
             <th>Affiliation</th>
-            <th>Organisms</th>
             <th>Batches</th>
             <th>Simulations</th>
         </tr>
@@ -29,9 +28,8 @@ Created: 2013-09-13
     <tbody>
         {% for investigator in investigators %}
         <tr>
-            <td><a href="{% url wcdb.views.investigator id=investigator.id %}">{{ investigator.full_name }}</a></td>
+            <td><a href="{% url "wcdb.views.investigator" id=investigator.id %}">{{ investigator.full_name }}</a></td>
             <td>{{ investigator.affiliation }}</td>
-            <td>{{ investigator.n_organism }}</td>
             <td>{{ investigator.n_simulation_batches }}</td>
             <td>{{ investigator.n_simulation }}</td>
         </tr>

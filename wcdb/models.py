@@ -29,7 +29,7 @@ class Option(models.Model):
         #   "/options/processes/%s/%s" % (self.target.name, self.name)
         # else
         #   "%s/%s" % (self.target.__unicode__(), self.name)
-        return '%s/%s' % (self.target.__unicode__(), self.name)
+        return self.name
 
     class Meta:
         app_label = 'wcdb'
@@ -40,7 +40,7 @@ class OptionGroup(OptionTarget):
     target = models.ForeignKey('OptionTarget', related_name='option_groups')
 
     def __unicode__(self):
-        return '%s/%s' % (self.target.__unicode__(), self.name)
+        return self.name
 
     class Meta:
         app_label = 'wcdb'
@@ -75,7 +75,7 @@ class Parameter(models.Model):
         #   "/options/processes/%s/%s" % (self.target.name, self.name)
         # else
         #   "%s/%s" % (self.target.__unicode__(), self.name)
-        return '%s/%s' % (self.target.__unicode__(), self.name)
+        return self.name
 
     class Meta:
         app_label='wcdb'
@@ -112,10 +112,7 @@ class Property(models.Model):
     labels = models.ManyToManyField('LabelSet', through='PropertyLabelSets')
 
     def __unicode__(self):
-        return " - ".join([
-            self.state.__unicode__(),
-            self.name
-            ])
+        return self.name
 
     @property_tag
     def path(self):
@@ -152,7 +149,7 @@ class PropertyValue(models.Model):
     @property_tag
     def dataset(self):
         """ The H5Py Dataset object for this property. """
-        f = self.h5file
+        f = self.h5file()
         return f[self.path]
 
     def add_data(self, ts):
@@ -209,7 +206,7 @@ class Process(OptionTarget, ParameterTarget):
     organism_version= models.ForeignKey("OrganismVersion", related_name='processes')
 
     def __unicode__(self):
-        return "%s - %s" % (self.organism_version.__unicode__(), self.name)
+        return self.name
 
     class Meta:
         unique_together = ['name', 'organism_version']
@@ -229,7 +226,7 @@ class State(OptionTarget, ParameterTarget):
     units = models.CharField(max_length=10)
  
     def __unicode__(self):
-        return " - ".join([self.organism_version.__unicode__(), self.name])
+        return self.name
 
     @property_tag
     def path(self):
@@ -356,7 +353,7 @@ class SimulationBatch(models.Model):
         return h5py.File(self.file_path)
 
     def __unicode__(self):
-        return "%s - %s" % (self.organism_version.__unicode__(), self.name)
+        return self.name
 
 
     class Meta:
@@ -474,7 +471,7 @@ class OrganismVersion(OptionTarget, ParameterTarget):
         pass
 
     def __unicode__(self):
-        return "%s %s" % (self.organism.__unicode__(), self.version)
+        return self.version
 
     class Meta:
         ordering = ['version']
@@ -531,7 +528,7 @@ class LabelSet(models.Model):
     organism_version = models.ForeignKey('OrganismVersion', related_name='labelsets')
 
     def __unicode__(self):
-        return name
+        return self.name
 
     class Meta:
         app_label = 'wcdb'
@@ -561,7 +558,7 @@ class Label(models.Model):
     description = models.TextField()
 
     def __unicode__(self):
-        return "%s - %s" % (self.name, self.description)
+        return self.name
 
     class Meta:
         app_label = 'wcdb'

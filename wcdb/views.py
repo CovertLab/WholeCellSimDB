@@ -3,11 +3,11 @@ from django.views.decorators.csrf import csrf_exempt
 from haystack.query import SearchQuerySet
 from helpers import render_template
 from wcdb.models import * 
-from wcdb.helpers import get_option_dict, get_parameter_dict
 from WholeCellDB import settings
 import forms
 import helpers
 import time
+
 
 def index(request):
     summary = {
@@ -17,14 +17,14 @@ def index(request):
         'n_process': Process.objects.values('name').annotate(count=Count('name')).count(),
         'n_state': State.objects.values('name').annotate(count=Count('name')).count(),
         'n_property': Property.objects.values('name', 'state__name').annotate(Count('name'), Count('state__name')).count(),
-        'n_parameter': Parameter.objects.values('name', 'target__name').annotate(Count('name'), Count('target__name')).count(),
-        'n_option': Option.objects.values('name', 'target__name').annotate(Count('name'), Count('target__name')).count(),
+        'n_parameter': Parameter.objects.values('name').annotate(Count('name')).count(),
+        'n_option': Option.objects.values('name').annotate(Count('name')).count(),
         'n_investigator': Investigator.objects.all().count(),
     }
-    return render_template('index.html', request, data = {
-            'summary': summary
-        })
-        
+    return render_template('index.html', request,
+                           data = {'summary': summary})
+
+
 def list_investigators(request):
     investigators = []
     for investigator in Investigator.objects.all():
@@ -35,54 +35,90 @@ def list_investigators(request):
             'full_name': investigator.get_full_name,
             'affiliation': investigator.affiliation,
             'n_simulation_batches': batches.count(),
-            'n_simulation': sum([batch.simulations.count() for batch in batches]),
+            'n_simulation': sum([batch.simulations.count()
+                                 for batch in batches]),
             })
 
-    return render_template('list_investigators.html', request, data = {
+    return render_template('list_investigators.html', request, data={
         'investigators': investigators
         })
-    
+
+
 def investigator(request, id):
-    return render_template('investigator.html', request, data = {
+    return render_template('investigator.html', request, data={
         'investigator': Investigator.objects.get(id=id)
         })
-    
-# Organism
-def list_organisms(request):
-    organisms = helpers.get_organism_list_with_stats(Organism.objects.all())
-            
-    return render_template('list_organisms.html', request, data = {
-        'organisms': organisms
-        })
-    
-def organism(request, id):
-    organism = Organism.objects.get(id=id)
 
-    return render_template('organism.html', request, data = {
-        'organism': organism,
+
+# Organism
+def list_organisms(request):  #TODO: Replace "organism list with stats."
+    organisms = helpers.get_organism_list_with_stats(Organism.objects.all())
+    return render_template('list_organisms.html', request,
+                           data={'organisms': organisms})
+
+
+def organism(request, id):
+    o = Organism.objects.get(id=id)
+    return render_template('organism.html', request,
+                           data={'organism': o})
+
+
+# OrganismVersion
+def list_organism_versions(request):  #TODO: Create "organismversion list with stats"
+    organisms = helpers.get_organism_list_with_stats(Organism.objects.all())
+
+    return render_template('list_organisms_versions.html', request,
+                           data={'organisms': organisms})
+
+
+def organism_version(request, id):
+    ov = OrganismVersion.objects.get(id=id)
+    return render_template('organism_version.html', request, data={
+        'organism_version': ov,
         })
+
     
 # Batches
 def list_simulation_batches(request):    
-    batches = models.SimulationBatch.objects.all()
-    return render_template('list_simulation_batches.html', request, data = {
+    batches = SimulationBatch.objects.all()
+    return render_template('list_simulation_batches.html', request, data={
         'batches': batches
     })
-    
+
+
 def simulation_batch(request, id):
-    batch = models.SimulationBatch.objects.get(id=id)    
+    batch = SimulationBatch.objects.get(id=id)
     return render_template('simulation_batch.html', request, data = {
         'batch': batch,
-        'processes': batch.processes.order_by('name'),
+        'processes': batch.organism_version.processes.order_by('name'),
+        'states': batch.organism_version.states.order_by('name'),
+        'options': get_option_dict(batch),
+        'parameters': get_parameter_dict(batch),
+    })
+
+
+# Simulation
+def list_simulations(request, id):
+    sims = Simulation.objects.get(id=id)
+    return render_template('list_simulation.html', request, data={
+        'simulations': sims
+    })
+
+
+def simulation(request, id):
+    sim = Simulation.objects.get(id=id)
+    batch = sim.batch
+    return render_template('simulation.html', request, data={
+        'batch': batch,
+        'simulation': sim,
+        'processes': sim.processes.order_by('name'),
         'states': batch.states.order_by('name'),
         'options': get_option_dict(batch),
         'parameters': get_parameter_dict(batch),
     })
-    
-# Simulation
-def simulation(request, id):
-    pass
-    
+
+
+# Search
 def search_basic(request):
     query = request.GET.get('q', '')
     engine = request.GET.get('engine', 'haystack')
@@ -92,8 +128,8 @@ def search_basic(request):
     return search_basic_haystack(request, query)
     
 def search_basic_haystack(request, query):
-    organisms = helpers.get_organism_list_with_stats(SearchQuerySet().models(models.Organism).filter(text=query).order_by('name'))
-    batches = SearchQuerySet().models(models.SimulationBatch).filter(text=query).order_by('organism__name', 'name')
+    organisms = helpers.get_organism_list_with_stats(SearchQuerySet().models(Organism).filter(text=query).order_by('name'))
+    batches = SearchQuerySet().models(SimulationBatch).filter(text=query).order_by('organism__name', 'name')
 
     return render_template('search_basic_haystack.html', request, data = {
         'organisms': organisms,
@@ -103,18 +139,19 @@ def search_basic_haystack(request, query):
         })
 
 def search_basic_google(request, query):
-	return render_template('search_basic_google.html', request, data = {
+    return render_template('search_basic_google.html', request, data = {
         'query': query,
         'engine': 'google',
         })
-    
+
+
 @csrf_exempt
 def search_advanced(request):
     if request.method == "POST":
         form = forms.AdvancedSearchForm(data=request.POST)
         if form.is_valid():
-            organisms = models.Organism.objects.all()
-            batches = models.SimulationBatch.objects.all()
+            organisms = Organism.objects.all()
+            batches = SimulationBatch.objects.all()
             
             searchIsEmpty = True
             
@@ -195,9 +232,9 @@ def about(request):
     return render_template('about.html', request)
     
 def sitemap(request):
-	return render_template('sitemap.xml', request, data = {
+    return render_template('sitemap.xml', request, data = {
         'ROOT_URL': settings.ROOT_URL,
-        'organisms': models.Organism.objects.all(),
-        'investigators': models.Investigator.objects.all(),
+        'organisms': Organism.objects.all(),
+        'investigators': Investigator.objects.all(),
         })
     

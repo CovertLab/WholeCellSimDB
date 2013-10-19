@@ -21,7 +21,6 @@ Created: 2013-09-13
         <tr>
             <th>Name</th>
             <th>Versions</th>
-            <th>Investigators</th>
             <th>Batches</th>
             <th>Simulations</th>
         </tr>
@@ -29,9 +28,8 @@ Created: 2013-09-13
     <tbody>
         {% for organism in organisms %}
         <tr>
-            <td><a href="{% url wcdb.views.organism id=organism.id %}">{{ organism.name }}</a></td>
+            <td><a href="{% url "wcdb.views.organism" id=organism.id %}">{{ organism.name }}</a></td>
             <td>{{ organism.n_version }}</td>
-            <td>{{ organism.n_investigator }}</td>
             <td>{{ organism.n_simulation_batch }}</td>
             <td>{{ organism.n_simulation }}</td>
         </tr>

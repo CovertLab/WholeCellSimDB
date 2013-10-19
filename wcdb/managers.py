@@ -164,22 +164,10 @@ class SimulationBatchManager(models.Manager):
 class OrganismVersionManager(models.Manager):
     def create_organism_version(self, organism_name, version, options,
                                 parameters, processes, state_properties):
-        # Organism
-        print "Class: OrganismVersionManager\tMethod: create_organism_version"
         from wcdb.models import Organism, OrganismVersion, State, Process
-        print "\tGetting organism"
         o = Organism.objects.get_or_create(name=organism_name)[0]
-
-        # Organism Version
-        print "\tCreating OrganismVersion"
         ov = OrganismVersion.objects.create(organism=o, version=version)
-
-        # State Properties
-        print "\tTransfering control...\n\n"
         OrganismVersionManager.create_state_properties_from_dict(ov, state_properties)
-        print "Class: OrganismVersionManager\tMethod: create_organism_version"
-
-        # Processes
         OrganismVersionManager.create_processes_from_list(ov, processes)
 
         # Options
@@ -213,16 +201,10 @@ class OrganismVersionManager(models.Manager):
 
     def create_organism_version_from_mat(self, organism_name,
                                          organism_version, dir):
-        print "Class OrganismVersionManager\tMethod: create_organism_version_from_mat"
-        print "\tloading options dict"
         options = WCMatLoader.options(dir)
-        print "\tloading parameters dict"
         parameters = WCMatLoader.parameters(dir)
-        print "\tloading processes list"
         processes = WCMatLoader.processes(dir)
-        print "\tloading state property dict"
         state_properties = WCMatLoader.state_properties(dir)
-        print "\tRelinquishing control to create_organism_version"
         self.create_organism_version(organism_name, organism_version, options, parameters, processes, state_properties)
 
     def create_organism_version_from_json(self, json_description):
@@ -251,7 +233,6 @@ class OrganismVersionManager(models.Manager):
         # First keys are state names, with the values
         # being the state descriptions.
         from wcdb.models import State, Property, LabelSet, PropertyLabelSets
-        print "Class: OrganismVersionManager\tMethod: create_state_properties_from_dict" 
         for state_name, state_description in state_properties.iteritems():
 #           THE WAY IT SHOULD BE
 #            state = State.objects.create(name=state_name,
@@ -265,9 +246,7 @@ class OrganismVersionManager(models.Manager):
             state = State.objects.get_or_create(name=state_name,
                                                 units="",
                                                 organism_version=ov)[0]
-            print "\tState: %s Obj: %s" % (state_name, state)
             for p_name, p_description in state_description.iteritems():
-                print "\t\tProeprty:%s" % p_name
                 #shape = p_description['shape']
                 shape = p_description[1]
                 #dtype = p_description['dtype']

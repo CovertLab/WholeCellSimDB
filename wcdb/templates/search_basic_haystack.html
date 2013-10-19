@@ -31,7 +31,7 @@ Created: 2013-09-13
     <tbody>
         {% for organism in organisms %}
         <tr>
-            <td><a href="{% url wcdb.views.organism id=organism.id %}">{{ organism.name }}</a></td>
+            <td><a href="{% url "wcdb.views.organism" id=organism.id %}">{{ organism.name }}</a></td>
             <td>{{ organism.n_version }}</td>
             <td>{{ organism.n_investigator }}</td>
             <td>{{ organism.n_simulation_batch }}</td>
@@ -61,11 +61,11 @@ Created: 2013-09-13
         {% for tmp in batches %}
         {% with batch=tmp.object %}
         <tr>
-            <td><a href="{% url wcdb.views.organism id=batch.organism.id %}">{{ batch.organism.name }}</a></td>
+            <td><a href="{% url "wcdb.views.organism" id=batch.organism.id %}">{{ batch.organism.name }}</a></td>
             <td>{{ batch.organism_version }}</td>
-            <td><a href="{% url wcdb.views.simulation_batch id=batch.id %}">{{ batch.name }}</a></td>
+            <td><a href="{% url "wcdb.views.simulation_batch" id=batch.id %}">{{ batch.name }}</a></td>
             <td>{{ batch.simulations.all|length }}</td>
-            <td><a href="{% url wcdb.views.investigator id=batch.investigator.id %}">{{ batch.investigator.user.get_full_name }}</a></td>
+            <td><a href="{% url "wcdb.views.investigator" id=batch.investigator.id %}">{{ batch.investigator.user.get_full_name }}</a></td>
             <td>{{ batch.date|date:"M j, Y" }}</td>
         </tr>
         {% endwith %}

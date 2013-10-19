@@ -20,8 +20,8 @@ Created: 2013-09-16
 
 <h2>Meta info</h2>
 <ul class="inparagraph">
-<li><p>Organism: <a href="{% url wcdb.views.organism id=batch.organism.id %}">{{ batch.organism.name }}</a> ({{ batch.organism_version }})</p></li>
-<li><p>Investigator: <a href="{% url wcdb.views.investigator id=batch.investigator.id %}">{{ batch.investigator.user.get_full_name }}</a>, {{ batch.investigator.affiliation }}</p></li>
+<li><p>Organism: <a href="{% url "wcdb.views.organism" id=batch.organism.id %}">{{ batch.organism.name }}</a> ({{ batch.organism_version }})</p></li>
+<li><p>Investigator: <a href="{% url "wcdb.views.investigator" id=batch.investigator.id %}">{{ batch.investigator.user.get_full_name }}</a>, {{ batch.investigator.affiliation }}</p></li>
 <li><p>IP address: {{ batch.ip }}</p>
 <li><p>Date: {{ batch.date|date:"M j, Y" }}</p>
 </ul>

@@ -19,10 +19,10 @@ Created: 2013-09-16
 
 <h2>Bio</h2>
 <ul class="inparagraph">
-<li><p>Name: {{ investigator.user.get_full_name }}</p>
+<li><p>Name: {{ investigator }}</p>
 <li><p>Affiliation: {{ investigator.affiliation }}</p>
-<li><p>Contact: <a href="mailto:{{ investigator.user.email}} ">{{ investigator.user.email }}</a></p>
-<li><p>Joined: {{ investigator.user.date_joined|date:"M j, Y" }}</p>
+<li><p>Contact: <a href="mailto:{{ investigator.user.email}} ">{{ investigator.email }}</a></p>
+<li><p>Joined: {{ investigator.date_joined|date:"M j, Y" }}</p>
 </ul>
 
 <h2>Simulation batches</h2>
@@ -43,9 +43,9 @@ Created: 2013-09-16
     <tbody>
         {% for batch in investigator.simulation_batches.all %}
         <tr>
-            <td><a href="{% url wcdb.views.organism id=batch.organism.id %}">{{ batch.organism.name }}</a></td>
+            <td>{{ batch.organism.name }}</td>
             <td>{{ batch.organism_version }}</td>
-            <td><a href="{% url wcdb.views.simulation_batch id=batch.id %}">{{ batch.name }}</a></td>
+            <td><a href="{% url "wcdb.views.simulation_batch" batch.id %}">{{ batch.name }}</a></td>
             <td>{{ batch.simulations.all|length }}</td>
             <td>{{ batch.date|date:"M j, Y" }}</td>
         </tr>

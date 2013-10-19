@@ -45,26 +45,23 @@ class WCMatLoader:
                         sims_prop.add_data(data)
                     except:
                         pass
+                else:
+                    print "%s is a custom Matlab type which is currently unsupported by Whole Cell DB"
             except:
+                print "Failed to load %s/%s" % (state_name, prop_name)
                 pass
 
     @staticmethod
     def state_properties(sample_dir):
-        print "Class: WCMatLoader\tMethod: state_properties"
-        property_files = glob.glob(sample_dir + \
-                                   "/state-[a-zA-Z]*-[a-zA-Z]*.mat")
-
+        
+        property_files = glob.glob(sample_dir + "/state-[a-zA-Z]*-[a-zA-Z]*.mat")
         state_properties = {}
-        print "\tBegin..."
         for prop_file in property_files:
             state = prop_file.split("-")[1]  # State name
-            print "\tState: %s" % state
+            print prop_file
             prop = prop_file.replace(".", "-").split("-")[2]  # Property name
-            print "\tState: %s" % prop
             try:
-                print "\t\tLoading mat..."
                 mat_dict = scipy.io.loadmat(prop_file)
-                print "\t\tdone."
                 if "data" in mat_dict.keys():
                     data = mat_dict['data']
                     label_sets = [""]
@@ -72,12 +69,12 @@ class WCMatLoader:
                     # Weird syntax. Just constructing the state_property dict.
                     state_properties.setdefault(state, {}).setdefault(prop,
                                                                       d_list)
-
+                else:
+                    print "%s is a custom Matlab type which is currently unsupported by Whole Cell DB"
             except SystemError: #TODO: handle errors
                 pass
             except MemoryError: #TODO: handle errors
                 pass
-
         return state_properties
 
     @staticmethod
