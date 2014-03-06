@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% comment %}
+About page
+
+Author: Jonathan Karr, jkarr@stanford.edu
+Affiliation: Covert Lab, Department of Bioengineering, Stanford University
+Created: 2013-09-13
+{% endcomment %}
+
+{% load static %}
+
+{% block head_title %}{{ block.super }} :: About{% endblock %}
+
+{% block content %}
+<div>
+<a name="getting_started_users"></a>
+<h1>User's Guide: browsing and searching simulations.</h1>
+<p>WholeCellDB is very easy to use. Use the "browse" menu at the top-left to start browsing WholeCellDB, including all of the available in silico organisms and simulation batches.</p>
+</div>
+
+<div>
+<a name="getting_started_developers"></a>
+<h1>Developer's Guide: Installing your own WholeCellDB server and storing simulations</h1>
+<p>Fellow the steps below to install WholeCellDB on your own server, and save simulations to your own WholeCellDB server.</p>
+
+<ol>
+<li><p><a href="http://github.com/CovertLab/WholeCellDB">Download the WholeCellDB package</a> from GitHub to <tt>/path/to/WholeCellDB/</tt>.</p></li>
+<li><p>Install the required software packages:</p>
+    <ul>    
+    <li><p>apache</p></li>
+    <li><p>haystack</p></li>
+    <li><p>hdf5</p></li>
+    <li><p>hdf5-devel</p></li>
+    <li><p>mod_wsgi</p></li>
+    <li><p>mysql</p></li>
+    <li><p>python 2.7</p></li>
+    <li><p>python-django 1.5</p></li>
+    <li><p>python-numpy</p></li>
+    <li><p>python-h5py</p></li>
+    <li><p>xapian</p></li>
+    </ul></li>
+<li><p>Create a directory to store the simulations</p></li>
+<li><p>Edit the settings file <tt>/path/to/WholeCellDB/WholeCellDB/settings.py</tt></p>
+    <ul>
+    <li><p>Edit the value of <tt>DATABASES</tt>. More information is available in the <a href="https://docs.djangoproject.com/en/1.5/intro/tutorial01/#database-setup">Django tutorial</a>.</p></li>
+    <li><p>Edit the value <tt>HDF5_ROOT</tt> to point to the folder where you wish to save the simulations.</p></li>
+    </ul></li>
+<li><p>Change to <tt>/path/to/WholeCellDB/</tt></p></li>
+<li><p>Run <tt>python manage.py syncdb</tt> to setup your database</p></li>
+<li><p>Setup your webserver:</p>
+    <ul>
+    <li><p>Development mode: run <tt>python manage.py runserver</tt></p></li>
+    <li><p>Production mode: add the following to your apache configuration file
+        <pre>LoadModule wsgi_module modules/mod_wsgi.so
+
+WSGIDaemonProcess default processes=2 threads=25
+WSGIDaemonProcess wholecelldb:1 threads=1
+WSGIDaemonProcess wholecelldb:2 threads=1
+WSGIDaemonProcess wholecellkbeco:1 threads=25
+SetEnv PROCESS_GROUP default
+WSGIProcessGroup %{ENV:PROCESS_GROUP}
+WSGISocketPrefix /var/run/wsgi
+
+Alias /projects/WholeCellDB/static /home/projects/WholeCellDB/wcdbweb/static
+Alias /projects/WholeCellDB /home/projects/WholeCellDB/WholeCellDB/wsgi.py
+<Directory /home/projects/WholeCellDB/WholeCellDB>
+    WSGIApplicationGroup %{RESOURCE}
+    WSGIRestrictProcess wholecelldb:1 wholecelldb:2
+    SetEnv PROCESS_GROUP wholecelldb:1
+    AddHandler wsgi-script .py
+    Options ExecCGI
+    Order allow,deny
+    Allow from all
+</Directory></pre></p></li>
+    </ul></li>
+<li><p>Load data</p>
+    <ul>
+    <li><p>From the command line, run <tt>wcdbcli/save_simulation_batch</tt> for each simulation batch</p></li>
+    <li><p>Alternatively, you can import the package into your Python application and use the Django models to store simulations
+    <pre>import sys
+
+# Add the project to your path.
+sys.path.append('/path/to/WholeCellDB')
+
+# Setup the environment using the projects settings.
+from WholeCellDB import settings
+from django.core.management import setup_environ
+setup_environ(settings)
+
+# Import the models
+from wcdb.models import Simulation, Property</pre></p></li>
+    </ul></li>
+<li><p>Navigate to the WholeCellDB web frontend:</p>
+    <ul>
+    <li><p>Development mode: <a href="http://localhost:8000">http://localhost:8000</a></p></li>
+    <li><p>Production mode: http://path/to/WholeCellDB</p></li>
+    </ul></li>
+</ol>
+</div>
+
+<div>
+<a name="contact"></a>
+<h1>Need help?</h1>
+<p>Please contact the development team at <a href="wholecelldb@lists.stanford.edu">wholecelldb@lists.stanford.edu</a>.</p>
+</div>
+{% endblock %}

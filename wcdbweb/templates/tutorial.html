@@ -19,29 +19,41 @@ Created: 2013-09-13
 <ul>
 
 <li><h2>Browsing WholeCellDB</h2>
-    <p>Use the "browse" menu at the top-left to explore WholeCellDB including the available in silico organisms and simulation batches.</p>
+    <p>Use the "Browse" menu at the top-left to explore WholeCellDB including the available in silico organisms and simulation batches.</p>
     <img style="top:70px; left:-13px;" src="{% get_static_prefix %}img/tutorial/browse.png"/>
+    </li>
+	
+<li><h2>Searching WholeCellDB</h2>
+    <p>Use the "Browse" menu at the top-left to explore WholeCellDB including the available in silico organisms and simulation batches.</p>
+    <img style="top:70px; left:30px;" src="{% get_static_prefix %}img/tutorial/search.png"/>
     </li>
 
 <li><h2>Exporting data</h2>
-    <p>Click the icons at the bottom-right to export simulation data.</p>
-    <img style="bottom:21px; right:-10px;" src="{% get_static_prefix %}img/tutorial/export.png"/>
+    <p>Click the icons at the bottom-right to export the data described on each page. Use the "Download" menu at the top-left to download the entire database.</p>
+    <img style="top:70px; left:185px;" src="{% get_static_prefix %}img/tutorial/export-top.png"/>
+	<img style="bottom:21px; right:20px;" src="{% get_static_prefix %}img/tutorial/export-bottom.png"/>
     </li>
 
 <li><h2>Storing simulations in WholeCellDB</h2>
     <p>See the <a href="{% url wcdbweb.views.about %}#getting_started_developers">developer instructions</a> for information about how to install WholeCellDB on your own machine, and save simulations to your own instance of WholeCellDB.</p>
-    <img style="top:70px; left:205px;" src="{% get_static_prefix %}img/tutorial/help.png"/>
+    <img style="top:70px; left:188px;" src="{% get_static_prefix %}img/tutorial/install.png"/>
     </li>
     
 <li><h2>Installing WholeCellDB</h2>
     <p>See the <a href="{% url wcdbweb.views.about %}#getting_started_developers">developer instructions</a> for information about how to install WholeCellDB on your own machine, and save simulations to your own instance of WholeCellDB.</p>
-    <img style="top:70px; left:205px;" src="{% get_static_prefix %}img/tutorial/help.png"/>
+    <img style="top:70px; left:188px;" src="{% get_static_prefix %}img/tutorial/install.png"/>
     </li>
 
 <li><h2>Need more help?</h2>
     <p>Please contact the development team at <a href="wholecelldb@lists.stanford.edu">wholecelldb@lists.stanford.edu</a>.</p>
-    <img style="top:70px; left:205px;" src="{% get_static_prefix %}img/tutorial/help.png"/>
+    <img style="top:70px; left:250px;" src="{% get_static_prefix %}img/tutorial/help.png"/>
     </li>
     
 </div>
+{% endblock %}
+
+{% block action_icons %}
+<a href="#"><img src="{% get_static_prefix %}img/hdf.png" alt="HDF5" title="HDF5"/></a>
+<a href="#"><img src="{% get_static_prefix %}img/json.png" alt="JSON" title="JSON"/></a>
+{{ block.super }}
 {% endblock %}

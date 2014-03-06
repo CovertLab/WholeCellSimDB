@@ -211,6 +211,9 @@ def search_advanced(request):
 def tutorial(request):
     return render_template('tutorial.html', request)
     
+def help(request):
+    return render_template('help.html', request)
+    
 def about(request):
     return render_template('about.html', request)
     

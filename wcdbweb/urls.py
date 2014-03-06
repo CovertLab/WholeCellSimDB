@@ -37,6 +37,7 @@ urlpatterns += patterns('wcdbweb.views',
     
     #documentation
     url(r'^tutorial/*$', 'tutorial'),
+    url(r'^help/*$', 'help'),
     url(r'^about/*$', 'about'),
     
     #sitemap
