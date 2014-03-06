@@ -19,12 +19,25 @@ Created: 2013-09-16
 <h1>Simulation batch :: {{ batch.name }}</h1>
 
 <h2>Meta info</h2>
-<ul class="inparagraph">
-<li><p>Organism: <a href="{% url wcdbweb.views.organism id=batch.organism.id %}">{{ batch.organism.name }}</a> ({{ batch.organism_version }})</p></li>
-<li><p>Investigator: <a href="{% url wcdbweb.views.investigator id=batch.investigator.id %}">{{ batch.investigator.user.get_full_name }}</a>, {{ batch.investigator.affiliation }}</p></li>
-<li><p>IP address: {{ batch.ip }}</p>
-<li><p>Date: {{ batch.date|date:"M j, Y" }}</p>
-</ul>
+<script>
+var meta = [
+    {label: 'Organism: '},
+    {label: 'Investigator: '},
+    {label: 'IP address: '},
+    {label: 'Date: '},
+];
+$(function() {
+    $('#meta-tree').tree({
+        data: meta
+    });
+	$('#meta-tree > ul.jqtree-tree > li.jqtree_common:nth-child(1)').find('span.jqtree-title').html('Organism: <a href="{% url wcdbweb.views.organism id=batch.organism.id %}">{{ batch.organism.name }}</a> ({{ batch.organism_version }})');
+	$('#meta-tree > ul.jqtree-tree > li.jqtree_common:nth-child(2)').find('span.jqtree-title').html('Investigator: <a href="{% url wcdbweb.views.investigator id=batch.investigator.id %}">{{ batch.investigator.user.get_full_name }}</a>, {{ batch.investigator.affiliation }}');
+	$('#meta-tree > ul.jqtree-tree > li.jqtree_common:nth-child(3)').find('span.jqtree-title').html('IP address: {{ batch.ip }}');
+	$('#meta-tree > ul.jqtree-tree > li.jqtree_common:nth-child(4)').find('span.jqtree-title').html('Date: {{ batch.date|date:"M j, Y" }}');
+});
+</script>
+<div id="meta-tree" style="margin-top:-6px"></div>
+
 
 <h2>Processes ({{ processes|length }})</h2>
 <script>
