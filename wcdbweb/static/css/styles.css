@@ -36,6 +36,16 @@ a img{
 	border:none;
 }
 
+ul.jqtree-tree .jqtree-toggler {
+    display: block;
+    position: absolute;
+    left: -1.1em;
+    top: 10%;
+    *top: 0;  /* fix for ie7 */
+    border-bottom: none;
+    color: #000;
+}
+
 /* header */
 #header {
 	z-index: 2;
@@ -397,10 +407,10 @@ a img{
     left:0px;
     right:0px;
     width:600px;
-    height:340px;
-    border:2px solid #ccc;    
+    height:415px;
+    border:2px solid #ccc;
     border-radius:12px;
-    background:#DEDEDE;    
+    background:#DEDEDE;
     padding:10px;
     box-shadow: 10px 10px 20px #aaa;
 }

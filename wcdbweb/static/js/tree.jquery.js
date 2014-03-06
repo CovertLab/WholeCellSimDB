@@ -797,6 +797,7 @@ limitations under the License.
       dataUrl: null,
       closedIcon: '&#x25ba;',
       openedIcon: '&#x25bc;',
+	  nodeIcon: '&#8226;',
       slide: true,
       nodeClass: Node
     };
@@ -1312,7 +1313,7 @@ limitations under the License.
         }
         class_string = li_classes.join(' ');
         escaped_name = escapeIfNecessary(node.name);
-        return $("<li class=\"" + class_string + "\"><div class=\"jqtree-element jqtree_common\"><span class=\"jqtree-title jqtree_common\">" + escaped_name + "</span></div></li>");
+        return $("<li class=\"" + class_string + "\"><div class=\"jqtree-element jqtree_common\"><a class=\"jqtree_common jqtree-toggler\">" + _this.options.nodeIcon + "</a><span class=\"jqtree-title jqtree_common\">" + escaped_name + "</span></div></li>");
       };
       createFolderLi = function(node) {
         var button_char, button_classes, escaped_name, folder_classes, getButtonClasses, getFolderClasses;
