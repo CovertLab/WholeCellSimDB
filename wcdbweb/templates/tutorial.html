@@ -31,7 +31,7 @@ Created: 2013-09-13
 <li><h2>Exporting data</h2>
     <p>Click the icons at the bottom-right to export the data described on each page. Use the "Download" menu at the top-left to download the entire database.</p>
     <img style="top:70px; left:185px;" src="{% get_static_prefix %}img/tutorial/export-top.png"/>
-	<img style="bottom:21px; right:20px;" src="{% get_static_prefix %}img/tutorial/export-bottom.png"/>
+	<img style="bottom:21px; right:15px;" src="{% get_static_prefix %}img/tutorial/export-bottom.png"/>
     </li>
 
 <li><h2>Storing simulations in WholeCellDB</h2>
@@ -54,6 +54,6 @@ Created: 2013-09-13
 
 {% block action_icons %}
 <a href="#"><img src="{% get_static_prefix %}img/hdf.png" alt="HDF5" title="HDF5"/></a>
-<a href="#"><img src="{% get_static_prefix %}img/json.png" alt="JSON" title="JSON"/></a>
+<!--<a href="#"><img src="{% get_static_prefix %}img/json.png" alt="JSON" title="JSON"/></a>-->
 {{ block.super }}
 {% endblock %}
