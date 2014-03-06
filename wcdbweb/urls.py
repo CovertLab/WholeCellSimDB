@@ -27,8 +27,9 @@ urlpatterns += patterns('wcdbweb.views',
     url(r'^organism/(?P<id>[0-9]+)/*$', 'organism'),
     
     #simulations
-    url(r'^list/batches/*$', 'list_simulation_batches'),
+    url(r'^list/batch/*$', 'list_simulation_batches'),
     url(r'^simulation_batch/(?P<id>[0-9]+)/*$', 'simulation_batch'),
+    url(r'^list/simulation/*$', 'list_simulations'),
     url(r'^simulation/(?P<id>[0-9]+)/*$', 'simulation'),
     
     #search

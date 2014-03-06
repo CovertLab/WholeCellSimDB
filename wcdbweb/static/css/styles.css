@@ -309,6 +309,10 @@ ul.jqtree-tree .jqtree-toggler {
 #content div table.table tr th, #content div table.table tr td{
     padding-right: 3px;
     padding-left: 3px;
+    border-right:1px solid #BDD4E6;
+}
+#content div table.table tr th:last-child, #content div table.table tr td:last-child{
+    border-right:none;
 }
 
 #content div tt{
@@ -332,10 +336,22 @@ ul.jqtree-tree .jqtree-toggler {
     text-align: right;
 }
 
-#content div table.list_batches thead tr:nth-child(1) th:nth-child(1), 
-#content div table.list_batches thead tr:nth-child(2) th:nth-child(2), 
-#content div table.list_batches tbody tr td:nth-child(2){
+#content div table.list_batches thead tr:nth-child(1) th:nth-child(1), #content div table.list_batches thead tr:nth-child(1) th:nth-child(2), 
+#content div table.list_batches thead tr:nth-child(2) th:nth-child(2), #content div table.list_batches thead tr:nth-child(2) th:nth-child(6),
+#content div table.list_batches tbody tr td:nth-child(2), #content div table.list_batches tbody tr td:nth-child(6){
     border-right: 1px solid #3d80b3;
+}
+#content div table.list_batches tbody tr td:nth-child(4), #content div table.list_batches tbody tr td:nth-child(7){
+    text-align:right;
+}
+
+#content div table.list_simulations thead tr:nth-child(1) th:nth-child(1), #content div table.list_simulations thead tr:nth-child(1) th:nth-child(2), #content div table.list_simulations thead tr:nth-child(1) th:nth-child(3),
+#content div table.list_simulations thead tr:nth-child(2) th:nth-child(2), #content div table.list_simulations thead tr:nth-child(2) th:nth-child(4), #content div table.list_simulations thead tr:nth-child(2) th:nth-child(6),
+#content div table.list_simulations tbody tr td:nth-child(2),#content div table.list_simulations tbody tr td:nth-child(4),#content div table.list_simulations tbody tr td:nth-child(6){
+    border-right: 1px solid #3d80b3;
+}
+#content div table.list_simulations tbody tr td:nth-child(4), #content div table.list_simulations tbody tr td:nth-child(7){
+    text-align:right;
 }
 
 #content div table.list_batches_investigator thead tr:nth-child(1) th:nth-child(1), 

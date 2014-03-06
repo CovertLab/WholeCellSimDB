@@ -1,4 +1,4 @@
-from django.db.models import Count
+from django.db.models import Avg, Count
 from django.views.decorators.csrf import csrf_exempt
 from haystack.query import SearchQuerySet
 from helpers import render_template
@@ -86,6 +86,7 @@ def organism(request, id):
     
 def list_simulation_batches(request):    
     batches = models.SimulationBatch.objects.all()
+    batches = batches.annotate(length_avg=Avg('simulations__length'))
     return render_template('list_simulation_batches.html', request, data = {
         'batches': batches
     })
@@ -98,6 +99,12 @@ def simulation_batch(request, id):
         'states': batch.states.order_by('name'),
         'options': get_option_dict(batch),
         'parameters': get_parameter_dict(batch),
+    })    
+    
+def list_simulations(request):    
+    simulations = models.Simulation.objects.all()
+    return render_template('list_simulations.html', request, data = {
+        'simulations': simulations
     })
     
 def simulation(request, id):
