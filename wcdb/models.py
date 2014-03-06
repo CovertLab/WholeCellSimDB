@@ -21,6 +21,7 @@ class Option(models.Model):
     state            = models.ForeignKey('State', null=True, blank=True, related_name = 'options')
     name             = models.CharField(max_length=255)
     value            = models.CharField(max_length=255, null=True, blank=True)
+    units            = models.CharField(max_length=255)
     index            = models.IntegerField(default=0)
     simulation_batch = models.ForeignKey("SimulationBatch", related_name = 'options')
 
@@ -51,6 +52,7 @@ class Parameter(models.Model):
     state            = models.ForeignKey('State', null=True, blank=True, related_name='parameters')
     name             = models.CharField(max_length=255)
     value            = models.CharField(max_length=255, null=True, blank=True)
+    units            = models.CharField(max_length=255)
     index            = models.IntegerField(default=0)
     simulation_batch = models.ForeignKey("SimulationBatch", related_name='parameters')
 
@@ -113,11 +115,12 @@ class State(models.Model):
             self.simulation_batch.name,
             self.name
             ])
-    
+
 """ Properties """
 class Property(models.Model):
     state = models.ForeignKey('State', related_name='properties')   
-    name  = models.CharField(max_length=255)   
+    name  = models.CharField(max_length=255)
+    units = models.CharField(max_length=255)
     
     def __unicode__(self):
         return ' - '.join([
