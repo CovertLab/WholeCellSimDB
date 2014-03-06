@@ -76,23 +76,23 @@ $(function() {
 <h2>Options ({{ batch.options.all.count }})</h2>
 <script>
 var options = [
-    {% for name, value in options.iteritems %}
-    {% if value|is_dict %}
+    {% for name, value_units in options.iteritems %}
+    {% if not value_units.value %}
         {label:'{{name|capfirst}}', children: [
-        {% for subname, subvalue in value.iteritems %}
-            {label:'{{subname}}', children: [
-            {% for subsubname, subsubvalue in subvalue.iteritems %}
-                {% if subsubvalue|is_list %}
-                {label:'{{subsubname }}: {{ subsubvalue|join:', ' }}'},
+        {% for sub_name, sub_value_units in value_units.iteritems %}
+            {label:'{{sub_name}}', children: [
+            {% for sub_sub_name, sub_sub_value_units in sub_value_units.iteritems %}
+                {% if sub_sub_value_units|is_list %}
+                {label:'{{sub_sub_name }}{% with sub_sub_sub_value_units=sub_sub_value_units|first %}{% if sub_sub_sub_value_units.units %} ({{sub_sub_sub_value_units.units}}){% endif %}{% endwith %}: {% for sub_sub_sub_value_units in sub_sub_value_units %}{{sub_sub_sub_value_units.value}}{% if not forloop.last %}, {% endif %}{% endfor %}'},
                 {% else %}
-                {label:'{{subsubname }}: {{ subsubvalue }}'},
+                {label:'{{sub_sub_name }}{% if sub_sub_value_units.units %} ({{sub_sub_value_units.units}}){% endif %}: {{ sub_sub_value_units.value }}'},
                 {% endif %}
             {% endfor %}
                 ]},
         {% endfor %}
             ]},
     {% else %}
-        {label: '{{name}}: {{value}}'},
+        {label: '{{name}}{% if value_units.units %} ({{value_units.units}}){% endif %}: {{value_units.value}}'},
     {% endif %}
     {% endfor %}
     ];
@@ -107,23 +107,23 @@ $(function() {
 <h2>Parameters ({{ batch.parameters.all.count }})</h2>
 <script>
 var parameters = [
-    {% for name, value in parameters.iteritems %}
-    {% if value|is_dict %}
+    {% for name, value_units in parameters.iteritems %}
+    {% if not value_units.value %}
         {label:'{{name|capfirst}}', children: [
-        {% for subname, subvalue in value.iteritems %}
-            {label:'{{subname}}', children: [
-            {% for subsubname, subsubvalue in subvalue.iteritems %}
-                {% if subsubvalue|is_list %}
-                {label:'{{subsubname }}: [{{ subsubvalue|join:', ' }}]'},
+        {% for sub_name, sub_value_units in value_units.iteritems %}
+            {label:'{{sub_name}}', children: [
+            {% for sub_sub_name, sub_sub_value_units in sub_value_units.iteritems %}
+                {% if sub_sub_value_units|is_list %}
+                {label:'{{sub_sub_name }}{% with sub_sub_sub_value_units=sub_sub_value_units|first %}{% if sub_sub_sub_value_units.units %} ({{sub_sub_sub_value_units.units}}){% endif %}{% endwith %}: {% for sub_sub_sub_value_units in sub_sub_value_units %}{{sub_sub_sub_value_units.value}}{% if not forloop.last %}, {% endif %}{% endfor %}'},
                 {% else %}
-                {label:'{{subsubname }}: {{ subsubvalue }}'},
+                {label:'{{sub_sub_name }}{% if sub_sub_value_units.units %} ({{sub_sub_value_units.units}}){% endif %}: {{ sub_sub_value_units.value }}'},
                 {% endif %}
             {% endfor %}
                 ]},
         {% endfor %}
             ]},
     {% else %}
-        {label: '{{name}}: {{value}}'},
+        {label: '{{name}}{% if value_units.units %} ({{value_units.units}}){% endif %}: {{value_units.value}}'},
     {% endif %}
     {% endfor %}
     ];
