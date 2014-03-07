@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% comment %}
+List simulation page
+
+Author: Jonathan Karr, jkarr@stanford.edu
+Affiliation: Covert Lab, Department of Bioengineering, Stanford University
+Created: 2014-03-06
+{% endcomment %}
+
+{% load static %}
+{% load template_extras %}
+
+{% block head_title %}{{ block.super }} :: Simulation :: {{ batch.organism.name }} &ndash; {{ batch.name }} &ndash; {{ simulation.batch_index }}{% endblock %}
+
+{% block content %}
+
+<div>
+<h1>Simulation :: {{ batch.name }} &ndash; {{ simulation.batch_index }}</h1>
+
+<h2>Metadata</h2>
+<script>
+var meta = [
+    {label: 'Organism: '},
+    {label: 'Batch: '},
+    {label: 'Index: '},
+    {label: 'Investigator: '},
+    {label: 'IP address: '},
+    {label: 'Date: '},
+];
+$(function() {
+    $('#meta-tree').tree({
+        data: meta
+    });
+	$('#meta-tree > ul.jqtree-tree > li.jqtree_common:nth-child(1)').find('span.jqtree-title').html('Organism: <a href="{% url wcdbweb.views.organism id=batch.organism.id %}">{{ batch.organism.name }}</a> ({{ batch.organism_version }})');
+    $('#meta-tree > ul.jqtree-tree > li.jqtree_common:nth-child(2)').find('span.jqtree-title').html('Batch: <a href="{% url wcdbweb.views.simulation_batch id=batch.id %}">{{ batch.name }}</a>');
+    $('#meta-tree > ul.jqtree-tree > li.jqtree_common:nth-child(3)').find('span.jqtree-title').html('Index: {{ simulation.batch_index }}');
+	$('#meta-tree > ul.jqtree-tree > li.jqtree_common:nth-child(4)').find('span.jqtree-title').html('Investigator: <a href="{% url wcdbweb.views.investigator id=batch.investigator.id %}">{{ batch.investigator.user.get_full_name }}</a>, {{ batch.investigator.affiliation }}');
+	$('#meta-tree > ul.jqtree-tree > li.jqtree_common:nth-child(5)').find('span.jqtree-title').html('IP address: {{ batch.ip }}');
+	$('#meta-tree > ul.jqtree-tree > li.jqtree_common:nth-child(6)').find('span.jqtree-title').html('Date: {{ batch.date|date:"M j, Y" }}');
+});
+</script>
+<div id="meta-tree" style="margin-top:-6px"></div>
+
+{% endblock %}
+
+{% block action_icons %}
+<a href="{% url wcdbweb.views.simulation_download id=simulation.id %}"><img src="{% get_static_prefix %}img/hdf.png" alt="HDF5" title="HDF5"/></a>
+{{ block.super }}
+{% endblock %}

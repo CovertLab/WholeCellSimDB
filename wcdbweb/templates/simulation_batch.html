@@ -18,7 +18,7 @@ Created: 2013-09-16
 <div>
 <h1>Simulation batch :: {{ batch.name }}</h1>
 
-<h2>Meta info</h2>
+<h2>Metadata</h2>
 <script>
 var meta = [
     {label: 'Organism: '},
@@ -37,41 +37,6 @@ $(function() {
 });
 </script>
 <div id="meta-tree" style="margin-top:-6px"></div>
-
-
-<h2>Processes ({{ processes|length }})</h2>
-<script>
-var processes = [
-    {% for process in processes %}    
-    {label: '{{process.name}}'},
-    {% endfor %}
-];
-$(function() {
-    $('#processes-tree').tree({
-        data: processes
-    });
-});
-</script>
-<div id="processes-tree" style="margin-top:-6px"></div>
-
-<h2>States ({{ states|length }})</h2>
-<script>
-var states = [
-    {% for state in states %}    
-    {label: '{{state.name}}', children: [
-        {% for prop in state.properties.all %}
-        {label: '{{prop.name}}'},
-        {% endfor %}
-        ]},
-    {% endfor %}
-];
-$(function() {
-    $('#states-tree').tree({
-        data: states
-    });
-});
-</script>
-<div id="states-tree" style="margin-top:-6px"></div>
 
 <h2>Options ({{ batch.options.all.count }})</h2>
 <script>
@@ -135,23 +100,64 @@ $(function() {
 </script>
 <div id="parameters-tree" style="margin-top:-6px"></div>
 
+<h2>Processes ({{ processes|length }})</h2>
+<script>
+var processes = [
+    {% for process in processes %}    
+    {label: '{{process.name}}'},
+    {% endfor %}
+];
+$(function() {
+    $('#processes-tree').tree({
+        data: processes
+    });
+});
+</script>
+<div id="processes-tree" style="margin-top:-6px"></div>
+
+<h2>States ({{ states|length }})</h2>
+<script>
+var states = [
+    {% for state in states %}    
+    {label: '{{state.name}}', children: [
+        {% for prop in state.properties.all %}
+        {label: '{{prop.name}}'},
+        {% endfor %}
+        ]},
+    {% endfor %}
+];
+$(function() {
+    $('#states-tree').tree({
+        data: states
+    });
+});
+</script>
+<div id="states-tree" style="margin-top:-6px"></div>
+
 <h2>Simulations</h2>
-<table class="table list_simulations" class="inparagraph">
+<table class="table list_simulation_batch__simulations inparagraph">
     <thead>
         <tr>
             <th>Index</th>
             <th>Length</th>
+            <th>Download</th>
         </tr>
     </thead>
     <tbody>
         {% for sim in batch.simulations|order_by:'batch_index' %}
         <tr>
             <td>{{ sim.batch_index }}</td>
-            <td>{{ sim.length }}</td>            
+            <td>{{ sim.length }}</td>
+            <td><a href="{% url wcdbweb.views.simulation_download id=sim.id %}">HDF5</a></td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 </div>
 
+{% endblock %}
+
+{% block action_icons %}
+<a href="{% url wcdbweb.views.simulation_batch_download id=batch.id %}"><img src="{% get_static_prefix %}img/hdf.png" alt="HDF5" title="HDF5"/></a>
+{{ block.super }}
 {% endblock %}

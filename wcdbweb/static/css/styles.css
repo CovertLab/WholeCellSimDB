@@ -283,6 +283,21 @@ ul.jqtree-tree .jqtree-toggler {
     margin-left:-6px;    
 }
 
+
+#content div tt{
+    background-color: #dedede;
+    border:1px solid #999;
+    padding-left:2px;
+    padding-right:2px;
+    padding-bottom:2px;   
+}
+#content div pre{
+    width:100%;
+    background-color: #dedede;
+    border:1px solid #999;
+    padding:6px;
+}
+
 #content div table {
     width:100%;
 }
@@ -315,20 +330,6 @@ ul.jqtree-tree .jqtree-toggler {
     border-right:none;
 }
 
-#content div tt{
-    background-color: #dedede;
-    border:1px solid #999;
-    padding-left:2px;
-    padding-right:2px;
-    padding-bottom:2px;   
-}
-#content div pre{
-    width:100%;
-    background-color: #dedede;
-    border:1px solid #999;
-    padding:6px;
-}
-
 #content div table.summary thead tr th, #content div table.summary tbody tr th{
     text-align: left;
 }
@@ -336,40 +337,126 @@ ul.jqtree-tree .jqtree-toggler {
     text-align: right;
 }
 
-#content div table.list_batches thead tr:nth-child(1) th:nth-child(1), #content div table.list_batches thead tr:nth-child(1) th:nth-child(2), 
-#content div table.list_batches thead tr:nth-child(2) th:nth-child(2), #content div table.list_batches thead tr:nth-child(2) th:nth-child(6),
-#content div table.list_batches tbody tr td:nth-child(2), #content div table.list_batches tbody tr td:nth-child(6){
+#content div table.list_organisms thead tr:nth-child(1) th:nth-child(1),  
+#content div table.list_organisms thead tr:nth-child(2) th:nth-child(3), 
+#content div table.list_organisms tbody tr td:nth-child(3)
+{
+    border-right: 1px solid #3d80b3;
+}
+#content div table.list_organisms tbody tr td:nth-child(2), 
+#content div table.list_organisms tbody tr td:nth-child(3),
+#content div table.list_organisms tbody tr td:nth-child(4),
+#content div table.list_organisms tbody tr td:nth-child(5)
+{
+    text-align:right;
+}
+
+#content div table.list_batches thead tr:nth-child(1) th:nth-child(1),  
+#content div table.list_batches thead tr:nth-child(2) th:nth-child(2), 
+#content div table.list_batches tbody tr td:nth-child(2), 
+#content div table.list_batches thead tr:nth-child(1) th:nth-child(2),
+#content div table.list_batches thead tr:nth-child(2) th:nth-child(6),
+#content div table.list_batches tbody tr td:nth-child(6),
+#content div table.list_batches thead tr:nth-child(1) th:nth-child(3),
+#content div table.list_batches thead tr:nth-child(2) th:nth-child(7),
+#content div table.list_batches tbody tr td:nth-child(7)
+{
     border-right: 1px solid #3d80b3;
 }
 #content div table.list_batches tbody tr td:nth-child(4), #content div table.list_batches tbody tr td:nth-child(7){
     text-align:right;
 }
 
-#content div table.list_simulations thead tr:nth-child(1) th:nth-child(1), #content div table.list_simulations thead tr:nth-child(1) th:nth-child(2), #content div table.list_simulations thead tr:nth-child(1) th:nth-child(3),
-#content div table.list_simulations thead tr:nth-child(2) th:nth-child(2), #content div table.list_simulations thead tr:nth-child(2) th:nth-child(4), #content div table.list_simulations thead tr:nth-child(2) th:nth-child(6),
-#content div table.list_simulations tbody tr td:nth-child(2),#content div table.list_simulations tbody tr td:nth-child(4),#content div table.list_simulations tbody tr td:nth-child(6){
+#content div table.list_simulations thead tr:nth-child(1) th:nth-child(1),
+#content div table.list_simulations thead tr:nth-child(2) th:nth-child(2),
+#content div table.list_simulations tbody tr td:nth-child(2),
+#content div table.list_simulations thead tr:nth-child(1) th:nth-child(2),
+#content div table.list_simulations thead tr:nth-child(2) th:nth-child(4),
+#content div table.list_simulations tbody tr td:nth-child(4),
+#content div table.list_simulations thead tr:nth-child(1) th:nth-child(3),
+#content div table.list_simulations thead tr:nth-child(2) th:nth-child(6),
+#content div table.list_simulations tbody tr td:nth-child(6),
+#content div table.list_simulations thead tr:nth-child(1) th:nth-child(4),
+#content div table.list_simulations thead tr:nth-child(2) th:nth-child(7),
+#content div table.list_simulations tbody tr td:nth-child(7)
+{
     border-right: 1px solid #3d80b3;
 }
 #content div table.list_simulations tbody tr td:nth-child(4), #content div table.list_simulations tbody tr td:nth-child(7){
     text-align:right;
 }
 
-#content div table.list_batches_investigator thead tr:nth-child(1) th:nth-child(1), 
-#content div table.list_batches_investigator thead tr:nth-child(2) th:nth-child(2), 
-#content div table.list_batches_investigator tbody tr td:nth-child(2){
+#content div table.list_investigators thead tr:nth-child(1) th:nth-child(1),  
+#content div table.list_investigators thead tr:nth-child(2) th:nth-child(2), 
+#content div table.list_investigators tbody tr td:nth-child(2)
+{
     border-right: 1px solid #3d80b3;
 }
-
-#content div table.list_batches_organism thead tr:nth-child(1) th:nth-child(1), 
-#content div table.list_batches_organism thead tr:nth-child(2) th:nth-child(1), 
-#content div table.list_batches_organism tbody tr td:nth-child(1){
-    border-right: 1px solid #3d80b3;
-}
-
-#content div table.list_simulations thead tr th:last-child,
-#content div table.list_simulations tbody tr td:last-child {
+#content div table.list_investigators tbody tr td:nth-child(3),
+#content div table.list_investigators tbody tr td:nth-child(4),
+#content div table.list_investigators tbody tr td:nth-child(5)
+{
     text-align:right;
 }
+
+#content div table.list_investigator__organisms thead tr:nth-child(1) th:nth-child(1), 
+#content div table.list_investigator__organisms thead tr:nth-child(2) th:nth-child(2), 
+#content div table.list_investigator__organisms tbody tr td:nth-child(2){
+    border-right: 1px solid #3d80b3;
+}
+#content div table.list_investigator__organisms tbody tr td:nth-child(2),
+#content div table.list_investigator__organisms tbody tr td:nth-child(3),
+#content div table.list_investigator__organisms tbody tr td:nth-child(4){
+    text-align:right;
+}
+
+
+#content div table.list_investigator__simulation_batches thead tr:nth-child(1) th:nth-child(1), 
+#content div table.list_investigator__simulation_batches thead tr:nth-child(2) th:nth-child(2), 
+#content div table.list_investigator__simulation_batches tbody tr td:nth-child(2){
+    border-right: 1px solid #3d80b3;
+}
+#content div table.list_investigator__simulation_batches tbody tr td:nth-child(4){
+    text-align:right;
+}
+
+#content div table.list_organism__simulation_batches thead tr:nth-child(1) th:nth-child(1), 
+#content div table.list_organism__simulation_batches thead tr:nth-child(2) th:nth-child(1), 
+#content div table.list_organism__simulation_batches tbody tr td:nth-child(1){
+    border-right: 1px solid #3d80b3;
+}
+#content div table.list_organism__simulation_batches tbody tr td:nth-child(3){
+    text-align:right;
+}
+
+#content div table.list_organism__investigators tbody tr td:nth-child(3),
+#content div table.list_organism__investigators tbody tr td:nth-child(4){
+    text-align:right;
+}
+
+#content div table.list_simulation_batch__simulations thead tr:nth-child(1) th:nth-child(1), 
+#content div table.list_simulation_batch__simulations tbody tr td:nth-child(1),
+#content div table.list_simulation_batch__simulations thead tr:nth-child(1) th:nth-child(2), 
+#content div table.list_simulation_batch__simulations tbody tr td:nth-child(2)
+{
+    border-right: 1px solid #3d80b3;
+}
+#content div table.list_simulation_batch__simulations tbody tr td:nth-child(2){
+    text-align:right;
+}
+
+#content div table.download {border-bottom:none;}
+#content div table.download tbody tr:last-child td{border-bottom:1px solid #3d80b3;}
+#content div table.download tr th, #content div table.download tr td{border-right:none;}
+#content div table.download tbody tr:nth-child(even) th, 
+#content div table.download tbody tr:nth-child(even) td,
+#content div table.download tbody tr:nth-child(odd) th, 
+#content div table.download tbody tr:nth-child(odd) td
+{
+    background:transparent;
+}
+#content div table.download tr th:last-child, #content div table.download tr td:last-child{width:100%;}
+#content div table.download tfoot th{padding-top:10px; text-align:right;}
 
 #content div table.twocol td{
     width:50%;

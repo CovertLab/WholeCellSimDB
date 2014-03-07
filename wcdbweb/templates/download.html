@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% comment %}
+List simulation page
+
+Author: Jonathan Karr, jkarr@stanford.edu
+Affiliation: Covert Lab, Department of Bioengineering, Stanford University
+Created: 2014-03-06
+{% endcomment %}
+
+{% load static %}
+{% load template_extras %}
+
+{% block head_title %}{{ block.super }} :: Simulation :: {{ batch.organism.name }} &ndash; {{ batch.name }} &ndash; {{ simulation.batch_index }}{% endblock %}
+
+{% block content %}
+<script type="text/javascript" language="javascript">
+    function toggleAll(checked){
+        var checkboxes = $('input[type="checkbox"]');
+        checkboxes.prop('checked', checked);
+    }
+    
+    function toggleOrganism(checked, organism){
+        var allCheckBox = $('input.all');
+        var organismCheckBox = $('input.batch-organism-' + organism);
+        allCheckBox.prop('checked', allCheckBox.prop('checked') && checked);
+        organismCheckBox.prop('checked', checked);
+    }
+    
+    function toggleBatch(checked, organism) {
+        var allCheckBox = $('input.all');
+        var organismCheckBox = $('input.organism-'+organism);
+        allCheckBox.prop('checked', allCheckBox.prop('checked') && checked);
+        organismCheckBox.prop('checked', organismCheckBox.prop('checked') && checked);     
+    }    
+</script>
+
+<div>
+    <h1>Download data</h1>
+
+    <form id="form" name="download" action="{% url wcdbweb.views.download %}" method="post">
+    {% csrf_token %}
+        <table class="table download">
+            <thead>
+                <tr><th><input class="all" type="checkbox" onchange="javascript:toggleAll(this.checked);" /></th><th>All</th></tr>
+            </thead>
+        {% for organism in organisms %}
+            <tbody class="organism">
+                <tr><th><input class="organism-{{ organism.id }}" type="checkbox" onchange="javascript:toggleOrganism(this.checked, {{ organism.id }});" /></th><th><a href="{% url wcdbweb.views.organism id=organism.id %}">{{ organism.name }}</a></th></tr>
+            {% for batch in organism.simulation_batches.all %}            
+                <tr>
+                    <td><input class="batch-organism-{{ organism.id }}" type="checkbox" id="{{ form.simulation_batches.html_name }}" name="{{ form.simulation_batches.html_name }}" value="{{ batch.id }}" onchange="javascript:toggleBatch(this.checked, {{ organism.id }})" /></td>
+                    <td><a href="{% url wcdbweb.views.simulation_batch id=batch.id %}">{{ batch.name }}</a> ({{ batch.simulations.count }})</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        {% endfor %}
+            <tfoot>
+                <tr><th colspan="2"><input class="button" type="submit" value="Download" /></th></tr>
+            </tfoot>
+        </table>	
+    </form>
+</div>
+{% endblock %}

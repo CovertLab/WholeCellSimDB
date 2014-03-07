@@ -23,6 +23,7 @@ Created: 2014-03-06
             <th colspan="2">Simulation batch</th>
             <th colspan="2">Metadata</th>
             <th colspan="1">Phenotype</th>
+            <th colspan="1"></th>
         </tr>
         <tr>
             <th>Name</th>
@@ -32,6 +33,7 @@ Created: 2014-03-06
             <th>Investigator</th>
             <th>Date</th>
             <th>Length</th>
+            <th>Download</th>
         </tr>
     </thead>
     <tbody>
@@ -45,6 +47,7 @@ Created: 2014-03-06
             <td><a href="{% url wcdbweb.views.investigator id=b.investigator.id %}">{{ b.investigator.user.get_full_name }}</a></td>
             <td>{{ b.date|date:"M j, Y" }}</td>
             <td>{{ s.length }}</td>
+            <td><a href="{% url wcdbweb.views.simulation_download id=s.id %}">HDF5</a></td>
         </tr>
         {% endwith %}
         {% endfor %}        

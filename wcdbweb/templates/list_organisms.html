@@ -16,14 +16,19 @@ Created: 2013-09-13
 
 <div>
 <h1>Organisms</h1>
-<table class="table">
+<table class="table list_organisms">
     <thead>
+        <tr>
+            <th colspan="3">Metadata</th>
+            <th colspan="3">Simulations</th>
+        </tr>
         <tr>
             <th>Name</th>
             <th>Versions</th>
             <th>Investigators</th>
             <th>Batches</th>
             <th>Simulations</th>
+            <th>Download</th>
         </tr>
     </thead>
     <tbody>
@@ -34,6 +39,7 @@ Created: 2013-09-13
             <td>{{ organism.n_investigator }}</td>
             <td>{{ organism.n_simulation_batch }}</td>
             <td>{{ organism.n_simulation }}</td>
+            <td><a href="{% url wcdbweb.views.organism_download id=organism.id %}">HDF5</a></td>
         </tr>
         {% endfor %}
     </tbody>

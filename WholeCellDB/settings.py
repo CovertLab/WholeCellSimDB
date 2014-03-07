@@ -7,6 +7,7 @@ TEMPLATE_DEBUG = DEBUG
 
 ROOT_URL = 'http://wholecelldb.stanford.edu'
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
+TMP_DIR = ROOT_DIR + '/../tmp'
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),

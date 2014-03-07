@@ -12,7 +12,7 @@ Created: 2013-09-13
 {% load static %}
 <head>
 	{% block head %}
-	<!-- meta data -->
+	<!-- metadata -->
 	<title>{% block head_title %}WholeCellDB{% endblock %}</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Language" content="en-us" />
@@ -105,7 +105,7 @@ Created: 2013-09-13
             <li class="spacer"/>
             <li><a href="#">Download</a>
                 <ul>
-                <li>Data</li>
+                <li><a href="{% url wcdbweb.views.download %}">Data</a></li>
                 <li><a href="http://github.com/CovertLab/WholeCellDB">Source code</a></li>
                 </ul></li>
 			<li class="spacer"/>

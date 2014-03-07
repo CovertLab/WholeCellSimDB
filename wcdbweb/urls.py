@@ -27,10 +27,17 @@ urlpatterns += patterns('wcdbweb.views',
     url(r'^organism/(?P<id>[0-9]+)/*$', 'organism'),
     
     #simulations
-    url(r'^list/batch/*$', 'list_simulation_batches'),
+    url(r'^list/simulation_batch/*$', 'list_simulation_batches'),
     url(r'^simulation_batch/(?P<id>[0-9]+)/*$', 'simulation_batch'),
     url(r'^list/simulation/*$', 'list_simulations'),
     url(r'^simulation/(?P<id>[0-9]+)/*$', 'simulation'),
+    
+    #downloads    
+    url(r'^download/organism/(?P<id>[0-9]+)/*$', 'organism_download'),    
+    url(r'^download/simulation_batch/(?P<id>[0-9]+)/*$', 'simulation_batch_download'),
+    url(r'^download/simulation/(?P<id>[0-9]+)/*$', 'simulation_download'),
+    url(r'^download/investigator/(?P<id>[0-9]+)/*$', 'investigator_download'),
+    url(r'^download/*$', 'download'),
     
     #search
     url(r'^search_basic/*$', 'search_basic'),

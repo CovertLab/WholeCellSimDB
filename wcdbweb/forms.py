@@ -1,4 +1,5 @@
 from django import forms
+from wcdb import models
 
 class AdvancedSearchForm(forms.Form):
     #investigator
@@ -19,3 +20,15 @@ class AdvancedSearchForm(forms.Form):
 
     #values 
     simulation_states           = forms.CharField(required = False, widget = forms.Textarea, label='State values', help_text='Enter state values')    
+    
+class DownloadForm(forms.Form):
+    simulation_batches          = forms.MultipleChoiceField(required = True, widget = forms.CheckboxSelectMultiple, label = 'Simulation batches', help_text = 'Select simulation batches')
+    
+    def __init__(self, *args, **kwargs):
+        super(DownloadForm, self).__init__(*args, **kwargs)
+        
+        choices = []
+        for organism in models.Organism.objects.all():
+            for batch in organism.simulation_batches.all():
+                choices.append((batch.id, batch.name, ))
+        self.fields['simulation_batches'].choices = choices

@@ -1,4 +1,7 @@
+from django.core.servers.basehttp import FileWrapper
 from django.db.models import Avg, Count
+from django.http import HttpResponse
+from django.template.defaultfilters import slugify
 from django.views.decorators.csrf import csrf_exempt
 from haystack.query import SearchQuerySet
 from helpers import render_template
@@ -7,8 +10,14 @@ from wcdb.helpers import get_option_dict, get_parameter_dict
 from WholeCellDB import settings
 import forms
 import helpers
+import os
+import tempfile
 import time
+import zipfile
 
+###################
+### landing page
+###################
 def index(request):
     summary = {
         'n_in_silico_organism': models.Organism.objects.all().count(),
@@ -34,6 +43,9 @@ def index(request):
             'summary': summary
         })
         
+###################
+### slicing
+###################
 def list_investigators(request):
     investigators = []
     for investigator in models.Investigator.objects.all():
@@ -53,8 +65,30 @@ def list_investigators(request):
         })
     
 def investigator(request, id):
+    investigator = models.Investigator.objects.get(id=id)
+        
+    #organisms = models.Organism.objects.all().filter(simulation_batches__investigator__id=id)
+    tmp = {}
+    for batch in investigator.simulation_batches.all().annotate(n_simulations = Count('simulations')):
+        if not tmp.has_key(batch.organism.id):
+            tmp[batch.organism.id] = {'id': batch.organism.id, 'name': batch.organism.name, 'versions': [], 'n_simulation_batches': 0, 'n_simulatons': 0}
+        tmp[batch.organism.id]['versions'].append(batch.organism_version)
+        tmp[batch.organism.id]['n_simulation_batches'] += 1
+        tmp[batch.organism.id]['n_simulatons'] += batch.n_simulations
+        
+    organisms = []
+    for id, tmp2 in tmp.iteritems():
+        organisms.append({
+            'id': tmp2['id'],
+            'name': tmp2['name'],
+            'n_versions': len(set(tmp2['versions'])),
+            'n_simulation_batches': tmp2['n_simulation_batches'],
+            'n_simulatons': tmp2['n_simulatons']
+            })
+    
     return render_template('investigator.html', request, data = {
-        'investigator': models.Investigator.objects.get(id=id)
+        'investigator': investigator,
+        'organisms': organisms
         })
     
 def list_organisms(request):
@@ -99,7 +133,7 @@ def simulation_batch(request, id):
         'states': batch.states.order_by('name'),
         'options': get_option_dict(batch),
         'parameters': get_parameter_dict(batch),
-    })    
+    })
     
 def list_simulations(request):    
     simulations = models.Simulation.objects.all()
@@ -108,8 +142,136 @@ def list_simulations(request):
     })
     
 def simulation(request, id):
-    pass
+    simulation = models.Simulation.objects.get(id=id)    
+    batch = simulation.batch
+    return render_template('simulation.html', request, data = {
+        'simulation': simulation,
+        'batch': batch,
+    })    
     
+###################
+### downloading
+###################
+def download(request):
+    form = forms.DownloadForm(request.POST)
+    if not form.is_valid():        
+        return render_template(
+            request = request,
+            templateFile = 'download.html', 
+            data = {
+                'form': form,
+                'organisms': models.Organism.objects.all()
+                }
+            )
+    else:
+        if not os.path.isdir(settings.ROOT_DIR):
+            os.mkdir(settings.TMP_DIR)
+        
+        file = tempfile.TemporaryFile(dir=settings.TMP_DIR)
+        zip = zipfile.ZipFile(file, 'w')
+
+        for batch_id in form.cleaned_data['simulation_batches']:
+            batch = models.SimulationBatch.objects.get(id=batch_id)
+            for simulation in batch.simulations.all():
+                zip.write(simulation.file_path, '%s/%s/%d.h5' % (slugify(batch.organism.name), slugify(batch.name), simulation.batch_index))
+        zip.close()
+        fileWrapper = FileWrapper(file)
+        response = HttpResponse(
+            fileWrapper,
+            mimetype = "application/x-zip",
+            content_type = "application/x-zip"
+            )
+        response['Content-Disposition'] = "attachment; filename=WholeCellDB.zip"
+        response['Content-Length'] = file.tell()
+        file.seek(0)
+        return response
+
+def organism_download(request, id):
+    organism = models.Organism.objects.get(id=id)
+    
+    if not os.path.isdir(settings.ROOT_DIR):
+        os.mkdir(settings.TMP_DIR)
+    
+    file = tempfile.TemporaryFile(dir=settings.TMP_DIR)
+    zip = zipfile.ZipFile(file, 'w')
+    for batch in organism.simulation_batches.all():
+        for simulation in batch.simulations.all():
+            zip.write(simulation.file_path, '%s/%s/%d.h5' % (slugify(organism.name), slugify(batch.name), simulation.batch_index))
+    zip.close()
+    fileWrapper = FileWrapper(file)
+    response = HttpResponse(
+        fileWrapper,
+        mimetype = "application/x-zip",
+        content_type = "application/x-zip"
+        )
+    response['Content-Disposition'] = ("attachment; filename=%s.zip" % slugify(organism.name))
+    response['Content-Length'] = file.tell()
+    file.seek(0)
+    return response
+    
+def simulation_batch_download(request, id):
+    batch = models.SimulationBatch.objects.get(id=id)
+    
+    if not os.path.isdir(settings.ROOT_DIR):
+        os.mkdir(settings.TMP_DIR)
+    
+    file = tempfile.TemporaryFile(dir=settings.TMP_DIR)
+    zip = zipfile.ZipFile(file, 'w')
+    for simulation in batch.simulations.all():
+        zip.write(simulation.file_path, '%s/%s/%d.h5' % (slugify(batch.organism.name), slugify(batch.name), simulation.batch_index))
+    zip.close()
+    fileWrapper = FileWrapper(file)
+    response = HttpResponse(
+        fileWrapper,
+        mimetype = "application/x-zip",
+        content_type = "application/x-zip"
+        )
+    response['Content-Disposition'] = ("attachment; filename=%s.zip" % slugify(batch.name))
+    response['Content-Length'] = file.tell()
+    file.seek(0)
+    return response
+    
+def simulation_download(request, id):
+    simulation = models.Simulation.objects.get(id=id)
+    file = open(simulation.file_path, 'rb')
+    file.seek(0,2)
+    fileWrapper = FileWrapper(file)
+    response = HttpResponse(
+        fileWrapper,
+        mimetype = "application/x-hdf",
+        content_type = "application/x-hdf"
+        )
+    response['Content-Disposition'] = ("attachment; filename=simulation-%d.h5" % simulation.id)
+    response['Content-Length'] = file.tell()
+    file.seek(0)
+    return response
+    
+def investigator_download(request, id):
+    investigator = models.Investigator.objects.get(id=id)
+    
+    if not os.path.isdir(settings.ROOT_DIR):
+        os.mkdir(settings.TMP_DIR)
+    
+    file = tempfile.TemporaryFile(dir=settings.TMP_DIR)
+    zip = zipfile.ZipFile(file, 'w')
+    for batch in investigator.simulation_batches.all():
+        for simulation in batch.simulations.all():
+            zip.write(simulation.file_path, '%s/%s/%d.h5' % (slugify(batch.organism.name), slugify(batch.name), simulation.batch_index))
+    zip.close()
+    fileWrapper = FileWrapper(file)
+    response = HttpResponse(
+        fileWrapper,
+        mimetype = "application/x-zip",
+        content_type = "application/x-zip"
+        )
+    response['Content-Disposition'] = ("attachment; filename=%s.zip" % slugify(investigator.user.get_full_name()))
+    response['Content-Length'] = file.tell()
+    file.seek(0)
+    return response
+    
+###################
+### searching
+###################
 def search_basic(request):
     query = request.GET.get('q', '')
     engine = request.GET.get('engine', 'haystack')
@@ -130,7 +292,7 @@ def search_basic_haystack(request, query):
         })
 
 def search_basic_google(request, query):
-	return render_template('search_basic_google.html', request, data = {
+    return render_template('search_basic_google.html', request, data = {
         'query': query,
         'engine': 'google',
         })
@@ -214,7 +376,17 @@ def search_advanced(request):
     return render_template('search_advanced_form.html', request, data = {
         'form': form 
         })
-    
+
+def sitemap(request):
+    return render_template('sitemap.xml', request, data = {
+        'ROOT_URL': settings.ROOT_URL,
+        'organisms': models.Organism.objects.all(),
+        'investigators': models.Investigator.objects.all(),
+        })
+        
+###################
+### documentation
+###################
 def tutorial(request):
     return render_template('tutorial.html', request)
     
@@ -223,11 +395,4 @@ def help(request):
     
 def about(request):
     return render_template('about.html', request)
-    
-def sitemap(request):
-	return render_template('sitemap.xml', request, data = {
-        'ROOT_URL': settings.ROOT_URL,
-        'organisms': models.Organism.objects.all(),
-        'investigators': models.Investigator.objects.all(),
-        })
     

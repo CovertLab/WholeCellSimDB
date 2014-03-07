@@ -18,11 +18,11 @@ Created: 2013-09-16
 <h1>Organism :: {{ organism.name }}</h1>
 
 <h2>Simulation batches</h2>
-<table class="table list_batches_organism" class="inparagraph">
+<table class="table list_organism__simulation_batches inparagraph">
     <thead>
         <tr>
             <th colspan="1"></th>
-            <th colspan="4">Simulation batch</th>
+            <th colspan="5">Simulation batch</th>
         </tr>
         <tr>
             <th>Version</th>
@@ -30,6 +30,7 @@ Created: 2013-09-16
             <th>No. simulations</th>
             <th>Investigator</th>
             <th>Date</th>
+            <th>Download</th>
         </tr>
     </thead>
     <tbody>
@@ -40,13 +41,14 @@ Created: 2013-09-16
             <td>{{ batch.simulations.all|length }}</td>
             <td><a href="{% url wcdbweb.views.investigator id=batch.investigator.id %}">{{ batch.investigator.user.get_full_name }}</a></td>
             <td>{{ batch.date|date:"M j, Y" }}</td>
+            <td><a href="{% url wcdbweb.views.simulation_batch_download id=batch.id %}">HDF5</a></td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 
 <h2>Investigators</h2>
-<table class="table">
+<table class="table list_organism__investigators">
     <thead>
         <tr>
             <th>Name</th>
@@ -69,4 +71,9 @@ Created: 2013-09-16
 
 </div>
 
+{% endblock %}
+
+{% block action_icons %}
+<a href="{% url wcdbweb.views.organism_download id=organism.id %}"><img src="{% get_static_prefix %}img/hdf.png" alt="HDF5" title="HDF5"/></a>
+{{ block.super }}
 {% endblock %}
