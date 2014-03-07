@@ -38,8 +38,24 @@ class SimulationBatchIndex(SearchIndex):
         return self.prepared_data
             
     class Meta:
+        pass        
+        
+class InvestigatorIndex(SearchIndex):
+    text = CharField(document=True, use_template=True)
+    
+    first_name = CharField(model_attr='user__first_name')
+    last_name = CharField(model_attr='user__last_name')
+    affiliation = CharField(model_attr='affiliation')
+    
+    def prepare(self, object):
+        self.prepared_data = truncate_fields(super(InvestigatorIndex, self).prepare(object))        
+        return self.prepared_data
+            
+    class Meta:
         pass
 
 #register indices
 site.register(models.Organism, OrganismIndex)
 site.register(models.SimulationBatch, SimulationBatchIndex)
+#site.register(models.Simulation, SimulationIndex)
+site.register(models.Investigator, InvestigatorIndex)

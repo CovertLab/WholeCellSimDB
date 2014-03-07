@@ -47,18 +47,7 @@ def index(request):
 ### slicing
 ###################
 def list_investigators(request):
-    investigators = []
-    for investigator in models.Investigator.objects.all():
-        batches = investigator.simulation_batches.all()
-                
-        investigators.append({
-            'id': investigator.id,
-            'full_name': investigator.user.get_full_name,
-            'affiliation': investigator.affiliation,
-            'n_organism': batches.values('organism').annotate(Count('organism')).count(),
-            'n_simulation_batches': batches.count(),
-            'n_simulation': sum([batch.simulations.count() for batch in batches]),
-            })
+    investigators = helpers.get_investigator_list_with_stats(models.Investigator.objects.all())
 
     return render_template('list_investigators.html', request, data = {
         'investigators': investigators
@@ -119,8 +108,8 @@ def organism(request, id):
         })
     
 def list_simulation_batches(request):    
-    batches = models.SimulationBatch.objects.all()
-    batches = batches.annotate(length_avg=Avg('simulations__length'))
+    batches = helpers.get_simulation_batch_list_with_stats(models.SimulationBatch.objects.all())
+    
     return render_template('list_simulation_batches.html', request, data = {
         'batches': batches
     })
@@ -282,11 +271,13 @@ def search_basic(request):
     
 def search_basic_haystack(request, query):
     organisms = helpers.get_organism_list_with_stats(SearchQuerySet().models(models.Organism).filter(text=query).order_by('name'))
-    batches = SearchQuerySet().models(models.SimulationBatch).filter(text=query).order_by('organism__name', 'name')
+    batches = helpers.get_simulation_batch_list_with_stats(SearchQuerySet().models(models.SimulationBatch).filter(text=query).order_by('organism__name', 'name'))
+    investigators = helpers.get_investigator_list_with_stats(SearchQuerySet().models(models.Investigator).filter(text=query).order_by('last_name', 'first_name', 'affiliation'))
 
     return render_template('search_basic_haystack.html', request, data = {
         'organisms': organisms,
         'batches': batches,
+        'investigators': investigators,
         'query': query,
         'engine': 'haystack',
         })

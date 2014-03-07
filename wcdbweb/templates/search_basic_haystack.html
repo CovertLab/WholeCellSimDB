@@ -18,14 +18,19 @@ Created: 2013-09-13
 <h1>Search: "{{ query }}"</h1>
 
 <h2>Organisms</h2>
-<table class="table">
+<table class="table search_organisms">
     <thead>
         <tr>
+            <th colspan="3">Metadata</th>
+            <th colspan="3">Simulations</th>
+        </tr>
+        <tr>
             <th>Name</th>
-            <th>Versions</th>
-            <th>Investigators</th>
-            <th>Batches</th>
-            <th>Simulations</th>
+            <th>No. versions</th>
+            <th>No. investigators</th>
+            <th>No. batches</th>
+            <th>No. simulations</th>
+            <th>Download</th>
         </tr>
     </thead>
     <tbody>
@@ -36,6 +41,11 @@ Created: 2013-09-13
             <td>{{ organism.n_investigator }}</td>
             <td>{{ organism.n_simulation_batch }}</td>
             <td>{{ organism.n_simulation }}</td>
+            <td><a href="{% url wcdbweb.views.organism_download id=organism.id %}">HDF5</a></td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6">No organisms match query.</td>
         </tr>
         {% endfor %}
     </tbody>
@@ -46,7 +56,9 @@ Created: 2013-09-13
     <thead>
         <tr>
             <th colspan="2">Organism</th>
-            <th colspan="4">Simulation batch</th>
+            <th colspan="4">Metadata</th>
+            <th colspan="1">Phenotype</th>
+            <th colspan="1"></th>
         </tr>
         <tr>
             <th>Name</th>
@@ -55,11 +67,12 @@ Created: 2013-09-13
             <th>No. simulations</th>
             <th>Investigator</th>
             <th>Date</th>
+            <th>Avg length</th>
+            <th>Download</th>
         </tr>
     </thead>
     <tbody>
-        {% for tmp in batches %}
-        {% with batch=tmp.object %}
+        {% for batch in batches %}
         <tr>
             <td><a href="{% url wcdbweb.views.organism id=batch.organism.id %}">{{ batch.organism.name }}</a></td>
             <td>{{ batch.organism_version }}</td>
@@ -67,8 +80,47 @@ Created: 2013-09-13
             <td>{{ batch.simulations.all|length }}</td>
             <td><a href="{% url wcdbweb.views.investigator id=batch.investigator.id %}">{{ batch.investigator.user.get_full_name }}</a></td>
             <td>{{ batch.date|date:"M j, Y" }}</td>
+            <td>{{ batch.length_avg }} </td>
+            <td><a href="{% url wcdbweb.views.simulation_batch_download id=batch.id %}">HDF5</a></td>
         </tr>
-        {% endwith %}
+        {% empty %}
+        <tr>
+            <td colspan="8">No simulation batches match query.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h2>Investigators</h2>
+<table class="table list_investigators">
+    <thead>
+        <tr>
+            <th colspan="2">Investigator</th>
+            <th colspan="4">Simulations</th>
+        </tr>
+        <tr>
+            <th>Name</th>
+            <th>Affiliation</th>
+            <th>No. organisms</th>
+            <th>No. batches</th>
+            <th>No. simulations</th>
+            <th>Download</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for investigator in investigators %}
+        <tr>
+            <td><a href="{% url wcdbweb.views.investigator id=investigator.id %}">{{ investigator.full_name }}</a></td>
+            <td>{{ investigator.affiliation }}</td>
+            <td>{{ investigator.n_organism }}</td>
+            <td>{{ investigator.n_simulation_batches }}</td>
+            <td>{{ investigator.n_simulation }}</td>
+            <td><a href="{% url wcdbweb.views.investigator_download id=investigator.id %}">HDF5</a></td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6">No investigators match query.</td>
+        </tr>
         {% endfor %}
     </tbody>
 </table>
