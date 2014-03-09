@@ -293,15 +293,17 @@ def search_advanced(request):
     valid = request.method == "POST"
     
     #form
-    form = forms.AdvancedSearchForm(request.POST or {'n_option_filters': 3, 'n_parameter_filters': 3})
+    form = forms.AdvancedSearchForm(request.POST or {'n_option_filters': 3, 'n_parameter_filters': 3, 'n_process_filters': 3})
     valid = form.is_valid() and valid
     
     if valid:
         n_option_filters = form.cleaned_data['n_option_filters']
         n_parameter_filters = form.cleaned_data['n_parameter_filters']
+        n_process_filters = form.cleaned_data['n_process_filters']
     else:
         n_option_filters = 3
         n_parameter_filters = 3
+        n_process_filters = 3
     
     #options
     tmp = {('option-%d-operator' % i): 'eq' for i in range(n_option_filters)}
@@ -328,6 +330,19 @@ def search_advanced(request):
         parameter_form_i._changed_data = None
         parameter_forms.append(parameter_form_i)
         valid = parameter_form_i.is_valid() and valid
+        
+    #processes
+    tmp = {('process-%d-modeled' % i): '1' for i in range(n_process_filters)}
+    tmp = dict(tmp.items() + request.POST.items())
+    process_forms = []
+    process_form = forms.AdvancedSearchProcessForm(tmp)
+    for i in range(n_process_filters):
+        process_form_i = copy.deepcopy(process_form)
+        process_form_i.prefix = 'process-%d' % i
+        process_form_i._errors = None
+        process_form_i._changed_data = None
+        process_forms.append(process_form_i)
+        valid = process_form_i.is_valid() and valid
          
     #filter batches
     if valid:
@@ -359,6 +374,7 @@ def search_advanced(request):
         #options, parameters, processes, states
         batches = search_advanced_options(batches, option_forms)
         batches = search_advanced_parameters(batches, parameter_forms)
+        batches = search_advanced_processes(batches, process_forms)
                 
         #get related organisms and investigators
         organisms = models.Organism.objects.filter(simulation_batches__id__in=batches.values_list('id'))
@@ -371,25 +387,26 @@ def search_advanced(request):
     else:
         organisms = None
         batches = None
-        investigators = None        
+        investigators = None
     
     return render_template('search_advanced.html', request, data = {
         'valid': valid,
         'form': form,
         'option_forms': option_forms,
         'parameter_forms': parameter_forms,
+        'process_forms': process_forms,
         'organisms': organisms,
         'batches': batches,
         'investigators': investigators,
         })
         
-def search_advanced_options(batches, option_forms):
-    for option_form in option_forms:
-        if hasattr(option_form, 'cleaned_data') and option_form.cleaned_data['option']:
+def search_advanced_options(batches, forms):
+    for form in forms:
+        if hasattr(form, 'cleaned_data') and form.cleaned_data['option']:
             filter = {}
                 
             #state/process
-            option = option_form.cleaned_data['option']
+            option = form.cleaned_data['option']
             if ':' in option:
                 is_state_process, option = option.split(':')
                 state_process_name, option = option.split('.')
@@ -412,13 +429,13 @@ def search_advanced_options(batches, option_forms):
             filter['options__name'] = option
                 
             #operator, value                  
-            operator = option_form.cleaned_data['operator']
+            operator = form.cleaned_data['operator']
             if operator == 'eq':
                 operator = ''
             else:
                 operator = '__' + operator
                 
-            value = option_form.cleaned_data['value']
+            value = form.cleaned_data['value']
             filter['options__value' + operator] = value
             
             #filter
@@ -426,13 +443,13 @@ def search_advanced_options(batches, option_forms):
             
     return batches
     
-def search_advanced_parameters(batches, parameter_forms):
-    for parameter_form in parameter_forms:
-        if hasattr(parameter_form, 'cleaned_data') and parameter_form.cleaned_data['parameter']:
+def search_advanced_parameters(batches, forms):
+    for form in forms:
+        if hasattr(form, 'cleaned_data') and form.cleaned_data['parameter']:
             filter = {}
                 
             #state/process
-            parameter = parameter_form.cleaned_data['parameter']
+            parameter = form.cleaned_data['parameter']
             if ':' in parameter:
                 is_state_process, parameter = parameter.split(':')
                 state_process_name, parameter = parameter.split('.')
@@ -455,13 +472,13 @@ def search_advanced_parameters(batches, parameter_forms):
             filter['parameters__name'] = parameter
                 
             #operator, value                  
-            operator = parameter_form.cleaned_data['operator']
+            operator = form.cleaned_data['operator']
             if operator == 'eq':
                 operator = ''
             else:
                 operator = '__' + operator
                 
-            value = parameter_form.cleaned_data['value']
+            value = form.cleaned_data['value']
             filter['parameters__value' + operator] = value
             
             #filter
@@ -469,6 +486,15 @@ def search_advanced_parameters(batches, parameter_forms):
             
     return batches
 
+def search_advanced_processes(batches, forms):
+    for form in forms:
+        if hasattr(form, 'cleaned_data') and form.cleaned_data['process']:
+            if form.cleaned_data['modeled'] == '1':
+                batches = batches.filter(processes__name = form.cleaned_data['process'])
+            else:
+                batches = batches.exclude(processes__name = form.cleaned_data['process'])
+    
+    return batches
 
 def sitemap(request):
     return render_template('sitemap.xml', request, data = {

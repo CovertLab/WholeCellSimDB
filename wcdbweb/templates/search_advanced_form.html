@@ -9,15 +9,8 @@ Created: 2013-09-13
 {% load static %}
 
 <script>
-function addOptionFilters() {
-    var input = $('#{{form.n_option_filters.html_name}}');
-    input.val((parseInt(input.val()) + 3).toString());
-    
-    document.search_advanced.submit();
-}
-
-function addParameterFilters() {
-    var input = $('#{{form.n_parameter_filters.html_name}}');
+function addFilters(type) {
+    var input = $('#n_' + type + '_filters');
     input.val((parseInt(input.val()) + 3).toString());
     
     document.search_advanced.submit();
@@ -79,7 +72,7 @@ function addParameterFilters() {
                 <td><input class="{% if form.simulation_batch_date.errors %}error{% endif %}" type="text" name="{{form.simulation_batch_date.html_name}}" title="{{form.simulation_batch_date.help_text}}" value="{{form.simulation_batch_date.data|default_if_none:""}}" /></td>
             </tr>
             <tr>
-                <td>Options (<a href="javascript:addOptionFilters();">more</a>)</td>
+                <td>Options (<a href="javascript:addFilters('option');">more</a>)</td>
                 <td>
                     <input type="hidden" id="{{form.n_option_filters.html_name}}" name="{{form.n_option_filters.html_name}}" value="{{form.n_option_filters.data}}" />
                     <table class="options">
@@ -113,7 +106,7 @@ function addParameterFilters() {
                 </td>
             </tr>
             <tr>
-                <td>Parameters (<a href="javascript:addParameterFilters();">more</a>)</td>
+                <td>Parameters (<a href="javascript:addFilters('parameter');">more</a>)</td>
                 <td>
                     <input type="hidden" id="{{form.n_parameter_filters.html_name}}" name="{{form.n_parameter_filters.html_name}}" value="{{form.n_parameter_filters.data}}" />
                     <table class="parameters">
@@ -140,6 +133,35 @@ function addParameterFilters() {
                                 </select>
                             </td>
                             <td><input class="{% if parameter_form.value.errors %}error{% endif %}" type="text" name="{{parameter_form.value.html_name}}" title="{{parameter_form.value.help_text}}" value="{{parameter_form.value.data|default_if_none:""}}" /></td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>Proceses (<a href="javascript:addFilters('process');">more</a>)</td>
+                <td>
+                    <input type="hidden" id="{{form.n_process_filters.html_name}}" name="{{form.n_process_filters.html_name}}" value="{{form.n_process_filters.data}}" />
+                    <table class="processes">
+                        <tbody>
+                        {% for process_form in process_forms %}
+                        <tr>
+                            <td>
+                                <select class="{% if process_form.process.errors %}error{% endif %}" name="{{process_form.process.html_name}}" title="{{process_form.process.help_text}}" >
+                                    <option{% if process_form.process.data == "" %} selected{% endif %}></option>
+                                    {% for choice in process_form.process.field.choices %}
+                                    <option value="{{ choice.0 }}"{% if choice.0 == process_form.process.data %} selected{% endif %}>{{ choice.1 }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td>
+                                <select class="{% if process_form.modeled.errors %}error{% endif %}" name="{{process_form.modeled.html_name}}" title="{{process_form.modeled.help_text}}" >
+                                    {% for choice in process_form.modeled.field.choices %}
+                                    <option value="{{ choice.0 }}"{% if choice.0 == process_form.modeled.data or process_form.modeled.data == "" and forloop.first %} selected{% endif %}>{{ choice.1 }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
                         </tr>
                         {% endfor %}
                         </tbody>

@@ -21,6 +21,11 @@ OPERATOR_CHOICES = (
     #('iregex', 'Regular expression match (case insensitive)'),
 )
 
+MODELED_CHOICES = (
+    ('1', 'Modeled'),
+    ('0', 'Not modeled'),
+)
+
 class AdvancedSearchForm(forms.Form):
     #investigator
     investigator_name_first     = forms.CharField(required = False, widget = forms.TextInput, label='Investigator first name', help_text='Enter investigator first name', initial='')
@@ -38,7 +43,8 @@ class AdvancedSearchForm(forms.Form):
     
     #options, parameters, processes, states
     n_option_filters            = forms.IntegerField(required = True, widget = forms.TextInput, min_value = 0, initial=3)
-    n_parameter_filters         = forms.IntegerField(required = True, widget = forms.TextInput, min_value = 0, initial=3)   
+    n_parameter_filters         = forms.IntegerField(required = True, widget = forms.TextInput, min_value = 0, initial=3)
+    n_process_filters           = forms.IntegerField(required = True, widget = forms.TextInput, min_value = 0, initial=3)
     
 class AdvancedSearchOptionForm(forms.Form):
     option   = forms.ChoiceField(required = False, widget = forms.Select, label='Option', help_text='Select an option', initial=None)
@@ -137,6 +143,14 @@ class AdvancedSearchParameterForm(forms.Form):
         if self.cleaned_data['parameter'] == '' and not self.cleaned_data['value'] == '':
             raise ValidationError('Value must be empty if parameter not selected')
         return self.cleaned_data['value']
+        
+class AdvancedSearchProcessForm(forms.Form):
+    process = forms.ChoiceField(required = False, widget = forms.Select, label='Process', help_text='Select a process')
+    modeled = forms.ChoiceField(required = True, widget = forms.Select, label='Operator', help_text='Select a value', choices = MODELED_CHOICES)
+       
+    def __init__(self, *args, **kwargs):
+        super(AdvancedSearchProcessForm, self).__init__(*args, **kwargs)        
+        self.fields['process'].choices = [(p['name'], p['name']) for p in models.Process.objects.values('name').order_by('name').annotate(Count('name'))]
     
 class DownloadForm(forms.Form):
     simulation_batches = forms.MultipleChoiceField(required = True, widget = forms.CheckboxSelectMultiple, label = 'Simulation batches', help_text = 'Select simulation batches')

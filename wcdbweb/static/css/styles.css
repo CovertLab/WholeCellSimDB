@@ -537,6 +537,11 @@ select.error {border-color:red;}
 #content div table.search_advanced table.parameters td:nth-child(2) select{width:36px;}
 #content div table.search_advanced table.parameters td:nth-child(3) input{width:319px;}
 
+#content div table.search_advanced table.processes { width:100%;}
+#content div table.search_advanced table.processes td:first-child{padding-right:4px;}
+#content div table.search_advanced table.processes td:nth-child(1) select{width:580px;}
+#content div table.search_advanced table.processes td:nth-child(2) select{width:100px;}
+
 /* tutorial */
 #content #tutorial{
     position:absolute;
