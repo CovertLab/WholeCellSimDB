@@ -56,3 +56,8 @@ Created: 2014-03-06
 </div>
 
 {% endblock %}
+
+{% block action_icons %}
+<a href="{% url wcdbweb.views.download %}"><img src="{% get_static_prefix %}img/hdf.png" alt="HDF5" title="HDF5"/></a>
+{{ block.super }}
+{% endblock %}

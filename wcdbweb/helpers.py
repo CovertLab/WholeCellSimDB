@@ -1,10 +1,15 @@
+from django.core.servers.basehttp import FileWrapper
 from django.db.models import Avg, Count
+from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.template.defaultfilters import slugify
 from haystack.models import SearchResult
 from WholeCellDB import settings
 import datetime
 import os
+import tempfile
+import zipfile
 
 def render_template(templateFile, request, data = {}):
     #add data
@@ -63,3 +68,24 @@ def get_investigator_list_with_stats(qs):
             })
             
     return investigators
+    
+def download_batches(batches, filename):
+    if not os.path.isdir(settings.ROOT_DIR):
+        os.mkdir(settings.TMP_DIR)
+    
+    file = tempfile.TemporaryFile(dir=settings.TMP_DIR)
+    zip = zipfile.ZipFile(file, 'w')
+    for batch in batches:
+        for simulation in batch.simulations.all():
+            zip.write(simulation.file_path, '%s/%s/%d.h5' % (slugify(batch.organism.name), slugify(batch.name), simulation.batch_index))
+    zip.close()
+    fileWrapper = FileWrapper(file)
+    response = HttpResponse(
+        fileWrapper,
+        mimetype = "application/x-zip",
+        content_type = "application/x-zip"
+        )
+    response['Content-Disposition'] = "attachment; filename=%s.zip" % slugify(filename)
+    response['Content-Length'] = file.tell()
+    file.seek(0)
+    return response

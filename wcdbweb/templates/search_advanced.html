@@ -28,3 +28,10 @@ Created: 2014-03-07
 </div>
 
 {% endblock %}
+
+{% block action_icons %}
+{% if valid %}
+<a href="javascript:$('#{{form.result_format.html_name}}').val('hdf5'); document.search_advanced.submit();"><img src="{% get_static_prefix %}img/hdf.png" alt="HDF5" title="HDF5"/></a>
+{% endif %}
+{{ block.super }}
+{% endblock %}

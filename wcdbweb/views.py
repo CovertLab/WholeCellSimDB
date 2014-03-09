@@ -1,7 +1,6 @@
 from django.core.servers.basehttp import FileWrapper
 from django.db.models import Avg, Count
 from django.http import HttpResponse
-from django.template.defaultfilters import slugify
 from haystack.query import SearchQuerySet
 from helpers import render_template
 from wcdb import models
@@ -10,11 +9,6 @@ from WholeCellDB import settings
 import copy
 import forms
 import helpers
-import os
-import re
-import tempfile
-import time
-import zipfile
 
 ###################
 ### landing page
@@ -154,72 +148,16 @@ def download(request):
                 }
             )
     else:
-        if not os.path.isdir(settings.ROOT_DIR):
-            os.mkdir(settings.TMP_DIR)
-        
-        file = tempfile.TemporaryFile(dir=settings.TMP_DIR)
-        zip = zipfile.ZipFile(file, 'w')
-
-        for batch_id in form.cleaned_data['simulation_batches']:
-            batch = models.SimulationBatch.objects.get(id=batch_id)
-            for simulation in batch.simulations.all():
-                zip.write(simulation.file_path, '%s/%s/%d.h5' % (slugify(batch.organism.name), slugify(batch.name), simulation.batch_index))
-        zip.close()
-        fileWrapper = FileWrapper(file)
-        response = HttpResponse(
-            fileWrapper,
-            mimetype = "application/x-zip",
-            content_type = "application/x-zip"
-            )
-        response['Content-Disposition'] = "attachment; filename=WholeCellDB.zip"
-        response['Content-Length'] = file.tell()
-        file.seek(0)
-        return response
+        batches = models.SimulationBatches.objects.filter(id__in=form.cleaned_data['simulation_batches'])
+        return helpers.download_batches(batches, 'WholeCellDB')        
 
 def organism_download(request, id):
-    organism = models.Organism.objects.get(id=id)
-    
-    if not os.path.isdir(settings.ROOT_DIR):
-        os.mkdir(settings.TMP_DIR)
-    
-    file = tempfile.TemporaryFile(dir=settings.TMP_DIR)
-    zip = zipfile.ZipFile(file, 'w')
-    for batch in organism.simulation_batches.all():
-        for simulation in batch.simulations.all():
-            zip.write(simulation.file_path, '%s/%s/%d.h5' % (slugify(organism.name), slugify(batch.name), simulation.batch_index))
-    zip.close()
-    fileWrapper = FileWrapper(file)
-    response = HttpResponse(
-        fileWrapper,
-        mimetype = "application/x-zip",
-        content_type = "application/x-zip"
-        )
-    response['Content-Disposition'] = ("attachment; filename=%s.zip" % slugify(organism.name))
-    response['Content-Length'] = file.tell()
-    file.seek(0)
-    return response
+    organism = models.Organism.objects.get(id=id)    
+    return helpers.download_batches(organism.simulation_batches.all(), organism.name)   
     
 def simulation_batch_download(request, id):
-    batch = models.SimulationBatch.objects.get(id=id)
-    
-    if not os.path.isdir(settings.ROOT_DIR):
-        os.mkdir(settings.TMP_DIR)
-    
-    file = tempfile.TemporaryFile(dir=settings.TMP_DIR)
-    zip = zipfile.ZipFile(file, 'w')
-    for simulation in batch.simulations.all():
-        zip.write(simulation.file_path, '%s/%s/%d.h5' % (slugify(batch.organism.name), slugify(batch.name), simulation.batch_index))
-    zip.close()
-    fileWrapper = FileWrapper(file)
-    response = HttpResponse(
-        fileWrapper,
-        mimetype = "application/x-zip",
-        content_type = "application/x-zip"
-        )
-    response['Content-Disposition'] = ("attachment; filename=%s.zip" % slugify(batch.name))
-    response['Content-Length'] = file.tell()
-    file.seek(0)
-    return response
+    batch = models.SimulationBatch.objects.get(id=id)    
+    return helpers.download_batches([batch], batch.name)    
     
 def simulation_download(request, id):
     simulation = models.Simulation.objects.get(id=id)
@@ -237,48 +175,41 @@ def simulation_download(request, id):
     return response
     
 def investigator_download(request, id):
-    investigator = models.Investigator.objects.get(id=id)
-    
-    if not os.path.isdir(settings.ROOT_DIR):
-        os.mkdir(settings.TMP_DIR)
-    
-    file = tempfile.TemporaryFile(dir=settings.TMP_DIR)
-    zip = zipfile.ZipFile(file, 'w')
-    for batch in investigator.simulation_batches.all():
-        for simulation in batch.simulations.all():
-            zip.write(simulation.file_path, '%s/%s/%d.h5' % (slugify(batch.organism.name), slugify(batch.name), simulation.batch_index))
-    zip.close()
-    fileWrapper = FileWrapper(file)
-    response = HttpResponse(
-        fileWrapper,
-        mimetype = "application/x-zip",
-        content_type = "application/x-zip"
-        )
-    response['Content-Disposition'] = ("attachment; filename=%s.zip" % slugify(investigator.user.get_full_name()))
-    response['Content-Length'] = file.tell()
-    file.seek(0)
-    return response
+    investigator = models.Investigator.objects.get(id=id)    
+    return helpers.download_batches(investigator.simulation_batches.all(), investigator.user.get_full_name())
     
 ###################
 ### searching
 ###################
 def search_basic(request):
-    query = request.GET.get('q', '')
+    query = request.GET.get('query', '')
+    format = request.GET.get('format', 'html')
     engine = request.GET.get('engine', 'haystack')
     
     if engine == 'google':
         return search_basic_google(request, query)
-    return search_basic_haystack(request, query)
+    return search_basic_haystack(request, query, format)
     
-def search_basic_haystack(request, query):
-    organisms = helpers.get_organism_list_with_stats(SearchQuerySet().models(models.Organism).filter(text=query).order_by('name'))
-    batches = helpers.get_simulation_batch_list_with_stats(SearchQuerySet().models(models.SimulationBatch).filter(text=query).order_by('organism__name', 'name'))
-    investigators = helpers.get_investigator_list_with_stats(SearchQuerySet().models(models.Investigator).filter(text=query).order_by('last_name', 'first_name', 'affiliation'))
+def search_basic_haystack(request, query, format='html'):
+    batches = SearchQuerySet().models(models.SimulationBatch).filter(text=query).order_by('organism__name', 'name')
+    organisms = SearchQuerySet().models(models.Organism).filter(text=query).order_by('name')
+    investigators = SearchQuerySet().models(models.Investigator).filter(text=query).order_by('last_name', 'first_name', 'affiliation')
+    
+    if format == 'hdf5':
+        batches = [batch.object for batch in batches] 
+        for organism in organisms:
+            batches = batches + list(organism.object.simulation_batches.all())
+        for investigator in investigators:
+            batches = batches + list(investigator.object.simulation_batches.all())
+            
+        batches = set(batches)
+        
+        return helpers.download_batches(batches, 'WholeCellDB-search-basic')
 
     return render_template('search_basic_haystack.html', request, data = {
-        'organisms': organisms,
-        'batches': batches,
-        'investigators': investigators,
+        'organisms': helpers.get_organism_list_with_stats(organisms),
+        'batches': helpers.get_simulation_batch_list_with_stats(batches),
+        'investigators': helpers.get_investigator_list_with_stats(investigators),
         'query': query,
         'engine': 'haystack',
         })
@@ -293,7 +224,7 @@ def search_advanced(request):
     valid = request.method == "POST"
     
     #form
-    form = forms.AdvancedSearchForm(request.POST or {'n_option_filters': 3, 'n_parameter_filters': 3, 'n_process_filters': 3, 'n_state_filters': 3})
+    form = forms.AdvancedSearchForm(request.POST or {'result_format': 'html', 'n_option_filters': 3, 'n_parameter_filters': 3, 'n_process_filters': 3, 'n_state_filters': 3})
     valid = form.is_valid() and valid
     
     if valid:
@@ -391,7 +322,11 @@ def search_advanced(request):
         batches = search_advanced_parameters(batches, parameter_forms)
         batches = search_advanced_processes(batches, process_forms)
         batches = search_advanced_states(batches, state_forms)
-                
+        
+        #exit if data requested in hdf5 format
+        if form.cleaned_data['result_format'] == 'hdf5':
+            return helpers.download_batches(batches, 'WholeCellDB-advanced-search')
+            
         #get related organisms and investigators
         organisms = models.Organism.objects.filter(simulation_batches__id__in=batches.values_list('id'))
         investigators = models.Investigator.objects.filter(simulation_batches__id__in=batches.values_list('id'))

@@ -66,7 +66,7 @@ Created: 2013-09-13
 			<form name="search_basic" action="{% url wcdbweb.views.search_basic %}" method="get">
 				<table cellpadding="0" cellspacing="0">
 				<tr>
-					<td><input id="search_basic_q" name="q" type="text" class="text text-default" value="Enter search term(s)" onclick="
+					<td><input id="search_basic_query" name="query" type="text" class="text text-default" value="Enter search term(s)" onclick="
                     if ($(this).hasClass('text-default')) {
                         this.value = '';
                     }
@@ -99,7 +99,7 @@ Created: 2013-09-13
             <li class="spacer"/>
             <li><a href="#">Search</a>
                 <ul>
-                <li><a href="javascript: $('#search_basic_q').addClass('highlight');">Basic</a></li>
+                <li><a href="javascript: $('#search_basic_query').addClass('highlight');">Basic</a></li>
                 <li><a href="{% url wcdbweb.views.search_advanced %}">Advanced</a></li>
                 </ul></li>
             <li class="spacer"/>

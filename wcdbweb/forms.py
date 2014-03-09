@@ -3,6 +3,11 @@ from django.core.exceptions import ValidationError
 from django.db.models import Count
 from wcdb import models
 
+RESULT_FORMAT_CHOICES = (
+    ('hdf5', 'hdf5'),
+    ('html', 'html'),
+)
+
 OPERATOR_CHOICES = (
     ('eq', '='),
     ('gt', '>'),
@@ -27,6 +32,9 @@ MODELED_CHOICES = (
 )
 
 class AdvancedSearchForm(forms.Form):
+    #investigator
+    result_format               = forms.ChoiceField(required = True, widget = forms.TextInput, label='Result format', help_text='Select format', choices = RESULT_FORMAT_CHOICES, initial='html')
+    
     #investigator
     investigator_name_first     = forms.CharField(required = False, widget = forms.TextInput, label='Investigator first name', help_text='Enter investigator first name', initial='')
     investigator_name_last      = forms.CharField(required = False, widget = forms.TextInput, label='Investigator last name', help_text='Enter investigator last name', initial='')

@@ -22,3 +22,8 @@ Created: 2013-09-13
 </div>
 
 {% endblock %}
+
+{% block action_icons %}
+<a href="{% url wcdbweb.views.search_basic %}?query={{query}}&engine={{engine}}&format=hdf5"><img src="{% get_static_prefix %}img/hdf.png" alt="HDF5" title="HDF5"/></a>
+{{ block.super }}
+{% endblock %}

@@ -13,12 +13,15 @@ function addFilters(type) {
     var input = $('#n_' + type + '_filters');
     input.val((parseInt(input.val()) + 3).toString());
     
+    $('#{{form.result_format.html_name}}').val('html');
     document.search_advanced.submit();
 }
 </script>
 
 <form name="search_advanced" action="{% url wcdbweb.views.search_advanced %}" method="post">
 {% csrf_token %}
+    <input type="hidden" id="{{form.result_format.html_name}}" name="{{form.result_format.html_name}}" value="{{form.result_format.data|default_if_none:"html"}}" />
+
     <table class="search_advanced">
         <!-- investigator -->
         <tbody>
@@ -212,7 +215,7 @@ function addFilters(type) {
         <tbody>
             <tr>
                 <th colspan="2">
-                    <input type="Submit" name="Search" />
+                    <input type="Submit" name="Search" onclick="javascript:$('#{{form.result_format.html_name}}').val('html'); document.search_advanced.submit();"/>
                 </th>
             </tr>
         </tbody>
