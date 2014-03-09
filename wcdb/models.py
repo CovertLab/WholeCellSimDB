@@ -27,8 +27,8 @@ class Option(models.Model):
 
     def __unicode__(self):
         names = [
-            simulation_batch.organism.name,
-            simulation_batch.name,
+            self.simulation_batch.organism.name,
+            self.simulation_batch.name,
             ]
         if self.state is not None:
             names.append(self.state.name)

@@ -46,6 +46,20 @@ ul.jqtree-tree .jqtree-toggler {
     color: #000;
 }
 
+option.group span{
+    font-weight:bold;
+}    
+option.sub span{
+    margin-left:10px;
+}
+option.subsub span{
+    margin-left:20px;
+}
+
+input.error {border-color:red;}
+select.error {border-color:red;}
+
+
 /* header */
 #header {
 	z-index: 2;
@@ -468,6 +482,9 @@ ul.jqtree-tree .jqtree-toggler {
     width:25%;
 }
 
+#content div table.search_advanced {
+    margin-top:10px;
+}
 #content div table.search_advanced tbody tr:first-child th {
     padding-top:20px;
 }
@@ -476,10 +493,13 @@ ul.jqtree-tree .jqtree-toggler {
 }
 #content div table.search_advanced tbody tr td:first-child{
     min-width:98px;
+    padding-right:10px;
 }
 #content div table.search_advanced tbody tr td:last-child{
     width:100%;
-    padding-left:10px;
+    padding-left:4px;
+    height:18px;
+    overflow:visible;
 }
 #content div table.search_advanced tbody tr td input[type="text"], #content div table.search_advanced tbody tr td textarea{
     width:685px;
@@ -488,6 +508,10 @@ ul.jqtree-tree .jqtree-toggler {
 }
 #content div table.search_advanced tbody tr td input[type="text"]{
     height:12px;
+}
+#content div table.search_advanced tbody tr td select{
+    height:16px;
+    padding:0px;
 }
 #content div table.search_advanced tbody tr td textarea{
     height:80px;
@@ -500,6 +524,18 @@ ul.jqtree-tree .jqtree-toggler {
     position:relative;
     right:-2px;
 }
+
+#content div table.search_advanced table.options { width:100%;}
+#content div table.search_advanced table.options td:first-child{padding-right:4px;}
+#content div table.search_advanced table.options td:nth-child(1) select{width:319px;}
+#content div table.search_advanced table.options td:nth-child(2) select{width:36px;}
+#content div table.search_advanced table.options td:nth-child(3) input{width:319px;}
+
+#content div table.search_advanced table.parameters { width:100%;}
+#content div table.search_advanced table.parameters td:first-child{padding-right:4px;}
+#content div table.search_advanced table.parameters td:nth-child(1) select{width:319px;}
+#content div table.search_advanced table.parameters td:nth-child(2) select{width:36px;}
+#content div table.search_advanced table.parameters td:nth-child(3) input{width:319px;}
 
 /* tutorial */
 #content #tutorial{

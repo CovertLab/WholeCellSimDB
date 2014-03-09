@@ -5,19 +5,25 @@ List simulation batches page
 
 Author: Jonathan Karr, jkarr@stanford.edu
 Affiliation: Covert Lab, Department of Bioengineering, Stanford University
-Created: 2013-09-13
+Created: 2014-03-07
 {% endcomment %}
 
 {% load static %}
 
-{% block head_title %}{{ block.super }} :: Search{% endblock %}
+{% block head_title %}{{ block.super }} :: Advanced search{% if valid %} :: Results{% endif %}{% endblock %}
 
 {% block content %}
 
 <div>
-<h1>Search: "{{ query }}"</h1>
+<h1>Advanced search{% if valid %} :: Results{% endif %}</h1>
 
+{% if valid %}
 {% include "search_results.html" %}
+<br/><br/>
+<h2>Query</h2>
+{% endif %}
+
+{% include "search_advanced_form.html" %}
 
 </div>
 

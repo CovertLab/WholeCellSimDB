@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from dateutil.tz import tzlocal
 from django import template
 from WholeCellDB import settings
@@ -26,7 +27,7 @@ def order_by(qs, field):
     
 @register.filter
 def is_dict(obj):
-    return isinstance(obj, dict)
+    return isinstance(obj, (dict, OrderedDict))
     
 @register.filter
 def is_list(obj):

@@ -2,15 +2,16 @@ from django.core.servers.basehttp import FileWrapper
 from django.db.models import Avg, Count
 from django.http import HttpResponse
 from django.template.defaultfilters import slugify
-from django.views.decorators.csrf import csrf_exempt
 from haystack.query import SearchQuerySet
 from helpers import render_template
 from wcdb import models
 from wcdb.helpers import get_option_dict, get_parameter_dict
 from WholeCellDB import settings
+import copy
 import forms
 import helpers
 import os
+import re
 import tempfile
 import time
 import zipfile
@@ -287,86 +288,187 @@ def search_basic_google(request, query):
         'query': query,
         'engine': 'google',
         })
-    
-@csrf_exempt
+
 def search_advanced(request):
-    if request.method == "POST":
-        form = forms.AdvancedSearchForm(data=request.POST)
-        if form.is_valid():
-            organisms = models.Organism.objects.all()
-            batches = models.SimulationBatch.objects.all()
-            
-            searchIsEmpty = True
-            
-            #investigator
-            if not form.cleaned_data['investigator_name_first'] == '':
-                searchIsEmpty = False
-                organisms = organisms.filter(simulation_batches__investigator__user__first_name__icontains=form.cleaned_data['investigator_name_first'])
-                batches = batches.filter(investigator__user__first_name__icontains=form.cleaned_data['investigator_name_first'])
-            if not form.cleaned_data['investigator_name_last'] == '':
-                searchIsEmpty = False
-                organisms = organisms.filter(simulation_batches__investigator__user__last_name__icontains=form.cleaned_data['investigator_name_last'])
-                batches = batches.filter(investigator__user__last_name__icontains=form.cleaned_data['investigator_name_last'])
-            if not form.cleaned_data['investigator_affiliation'] == '':
-                searchIsEmpty = False
-                organisms = organisms.filter(simulation_batches__investigator__affiliation__icontains=form.cleaned_data['investigator_affiliation'])
-                batches = batches.filter(investigator__affiliation__icontains=form.cleaned_data['investigator_affiliation'])
-            
-            #organism
-            if not form.cleaned_data['organism_name'] == '':
-                searchIsEmpty = False
-                organisms = organisms.filter(simulation_batches__organism__name__icontains=form.cleaned_data['organism_name'])
-                batches = batches.filter(organism__name__icontains=form.cleaned_data['organism_name'])
-            if not form.cleaned_data['organism_version'] == '':
-                searchIsEmpty = False
-                organisms = organisms.filter(simulation_batches__organism_version__icontains=form.cleaned_data['organism_version'])
-                batches = batches.filter(organism_version__icontains=form.cleaned_data['organism_version'])
-            
-            #batch meta data
-            if not form.cleaned_data['simulation_batch_name'] == '':
-                searchIsEmpty = False
-                organisms = organisms.filter(simulation_batches__name__icontains=form.cleaned_data['simulation_batch_name'])
-                batches = batches.filter(name__icontains=form.cleaned_data['simulation_batch_name'])
-            if not form.cleaned_data['simulation_batch_ip'] == '':
-                searchIsEmpty = False
-                organisms = organisms.filter(simulation_batches__ip__icontains=form.cleaned_data['simulation_batch_ip'])
-                batches = batches.filter(ip__icontains=form.cleaned_data['simulation_batch_ip'])
-            if not form.cleaned_data['simulation_batch_date'] == '':                
-                try:                  
-                    date = time.strptime(form.cleaned_data['simulation_batch_date'], '%m/%d/%Y')
-                    
-                    searchIsEmpty = False
-                    organisms = organisms.filter(
-                        simulation_batches__date__year=date.tm_year, 
-                        simulation_batches__date__month=date.tm_mon,
-                        simulation_batches__date__day=date.tm_mday)
-                    batches = batches.filter(
-                        date__year=date.tm_year,
-                        date__month=date.tm_mon,
-                        date__day=date.tm_mday)
-                except:
-                    pass
-            if not form.cleaned_data['simulation_batch_options'] == '':
-                pass #TODO
-            if not form.cleaned_data['simulation_batch_parameters'] == '':
-                pass #TODO
-            
-            #values
-            if not form.cleaned_data['simulation_states'] == '':
-                pass #TODO
-            
-            if not searchIsEmpty:            
-                organisms = helpers.get_organism_list_with_stats(organisms)
-                return render_template('search_advanced_results.html', request, data = {
-                    'form': form,
-                    'organisms': organisms,
-                    'batches': batches,
-                    })
+    valid = request.method == "POST"
     
-    form = forms.AdvancedSearchForm(request)
-    return render_template('search_advanced_form.html', request, data = {
-        'form': form 
+    #form
+    form = forms.AdvancedSearchForm(request.POST or {'n_option_filters': 3, 'n_parameter_filters': 3})
+    valid = form.is_valid() and valid
+    
+    if valid:
+        n_option_filters = form.cleaned_data['n_option_filters']
+        n_parameter_filters = form.cleaned_data['n_parameter_filters']
+    else:
+        n_option_filters = 3
+        n_parameter_filters = 3
+    
+    #options
+    tmp = {('option-%d-operator' % i): 'eq' for i in range(n_option_filters)}
+    tmp = dict(tmp.items() + request.POST.items())
+    option_form = forms.AdvancedSearchOptionForm(tmp)
+    option_forms = []
+    for i in range(n_option_filters):
+        option_form_i = copy.deepcopy(option_form)
+        option_form_i.prefix = 'option-%d' % i
+        option_form_i._errors = None
+        option_form_i._changed_data = None
+        option_forms.append(option_form_i)
+        valid = option_form_i.is_valid() and valid
+    
+    #parameters
+    tmp = {('parameter-%d-operator' % i): 'eq' for i in range(n_parameter_filters)}
+    tmp = dict(tmp.items() + request.POST.items())
+    parameter_forms = []
+    parameter_form = forms.AdvancedSearchParameterForm(tmp)
+    for i in range(n_parameter_filters):
+        parameter_form_i = copy.deepcopy(parameter_form)
+        parameter_form_i.prefix = 'parameter-%d' % i
+        parameter_form_i._errors = None
+        parameter_form_i._changed_data = None
+        parameter_forms.append(parameter_form_i)
+        valid = parameter_form_i.is_valid() and valid
+         
+    #filter batches
+    if valid:
+        batches = models.SimulationBatch.objects.all()
+        
+        #investigator
+        if form.cleaned_data['investigator_name_first']:
+            batches = batches.filter(investigator__user__first_name__icontains=form.cleaned_data['investigator_name_first'])
+        if form.cleaned_data['investigator_name_last']:
+            batches = batches.filter(investigator__user__last_name__icontains=form.cleaned_data['investigator_name_last'])
+        if form.cleaned_data['investigator_affiliation']:
+            batches = batches.filter(investigator__affiliation__icontains=form.cleaned_data['investigator_affiliation'])
+        
+        #organism
+        if form.cleaned_data['organism_name']:
+            batches = batches.filter(organism__name__icontains=form.cleaned_data['organism_name'])
+        if form.cleaned_data['organism_version']:
+            batches = batches.filter(organism_version__icontains=form.cleaned_data['organism_version'])
+        
+        #batch metadata
+        if form.cleaned_data['simulation_batch_name']:
+            batches = batches.filter(name__icontains=form.cleaned_data['simulation_batch_name'])
+        if form.cleaned_data['simulation_batch_ip']:
+            batches = batches.filter(ip__icontains=form.cleaned_data['simulation_batch_ip'])
+        if form.cleaned_data['simulation_batch_date']: 
+            date = form.cleaned_data['simulation_batch_date']            
+            batches = batches.filter(date__year = date.year, date__month = date.month, date__day = date.day)
+            
+        #options, parameters, processes, states
+        batches = search_advanced_options(batches, option_forms)
+        batches = search_advanced_parameters(batches, parameter_forms)
+                
+        #get related organisms and investigators
+        organisms = models.Organism.objects.filter(simulation_batches__id__in=batches.values_list('id'))
+        investigators = models.Investigator.objects.filter(simulation_batches__id__in=batches.values_list('id'))
+    
+        #calculate stats for results table
+        organisms = helpers.get_organism_list_with_stats(organisms)
+        batches = helpers.get_simulation_batch_list_with_stats(batches)
+        investigators = helpers.get_investigator_list_with_stats(investigators)
+    else:
+        organisms = None
+        batches = None
+        investigators = None        
+    
+    return render_template('search_advanced.html', request, data = {
+        'valid': valid,
+        'form': form,
+        'option_forms': option_forms,
+        'parameter_forms': parameter_forms,
+        'organisms': organisms,
+        'batches': batches,
+        'investigators': investigators,
         })
+        
+def search_advanced_options(batches, option_forms):
+    for option_form in option_forms:
+        if hasattr(option_form, 'cleaned_data') and option_form.cleaned_data['option']:
+            filter = {}
+                
+            #state/process
+            option = option_form.cleaned_data['option']
+            if ':' in option:
+                is_state_process, option = option.split(':')
+                state_process_name, option = option.split('.')
+                if is_state_process is 'state':
+                    filter['options__state__name'] = state_process_name
+                else:
+                    filter['options__process__name'] = state_process_name
+            else:
+                filter['options__process'] = None
+                filter['options__state'] = None
+                
+            #index
+            if '[' in option:
+                option, index = option[:-1].split('[')
+                filter['options__index'] = int(float(index))
+            else:
+                filter['options__index'] = 0
+
+            #option
+            filter['options__name'] = option
+                
+            #operator, value                  
+            operator = option_form.cleaned_data['operator']
+            if operator == 'eq':
+                operator = ''
+            else:
+                operator = '__' + operator
+                
+            value = option_form.cleaned_data['value']
+            filter['options__value' + operator] = value
+            
+            #filter
+            batches = batches.filter(**filter)
+            
+    return batches
+    
+def search_advanced_parameters(batches, parameter_forms):
+    for parameter_form in parameter_forms:
+        if hasattr(parameter_form, 'cleaned_data') and parameter_form.cleaned_data['parameter']:
+            filter = {}
+                
+            #state/process
+            parameter = parameter_form.cleaned_data['parameter']
+            if ':' in parameter:
+                is_state_process, parameter = parameter.split(':')
+                state_process_name, parameter = parameter.split('.')
+                if is_state_process is 'state':
+                    filter['parameters__state__name'] = state_process_name
+                else:
+                    filter['parameters__process__name'] = state_process_name
+            else:
+                filter['parameters__process'] = None
+                filter['parameters__state'] = None
+                
+            #index
+            if '[' in parameter:
+                parameter, index = parameter[:-1].split('[')
+                filter['parameters__index'] = int(float(index))
+            else:
+                filter['parameters__index'] = 0
+
+            #parameter
+            filter['parameters__name'] = parameter
+                
+            #operator, value                  
+            operator = parameter_form.cleaned_data['operator']
+            if operator == 'eq':
+                operator = ''
+            else:
+                operator = '__' + operator
+                
+            value = parameter_form.cleaned_data['value']
+            filter['parameters__value' + operator] = value
+            
+            #filter
+            batches = batches.filter(**filter)
+            
+    return batches
+
 
 def sitemap(request):
     return render_template('sitemap.xml', request, data = {

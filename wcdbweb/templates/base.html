@@ -63,17 +63,17 @@ Created: 2013-09-13
 		<div class="title">&nbsp;</div>
 		<div class="banner"><a href="{% url wcdbweb.views.index %}"><img src="{% get_static_prefix %}img/banner.png" /></a></div>
 		<div class="search">
-			<form name="search" action="{% url wcdbweb.views.search_basic %}" method="get">
+			<form name="search_basic" action="{% url wcdbweb.views.search_basic %}" method="get">
 				<table cellpadding="0" cellspacing="0">
 				<tr>
-					<td><input id="searchq" name="q" type="text" class="text text-default" value="Enter search term(s)" onclick="
+					<td><input id="search_basic_q" name="q" type="text" class="text text-default" value="Enter search term(s)" onclick="
                     if ($(this).hasClass('text-default')) {
                         this.value = '';
                     }
                     $(this).removeClass('text-default');
                     $(this).removeClass('highlight');
                     "/></td>
-					<td><a href="javascript:document.search.submit()"><img src="{% get_static_prefix %}img/magnifier.png" /></a></td>
+					<td><a href="javascript:document.search_basic.submit();"><img src="{% get_static_prefix %}img/magnifier.png" /></a></td>
 				</tr>
                 <tr>
 					<td class="engine">
@@ -99,7 +99,7 @@ Created: 2013-09-13
             <li class="spacer"/>
             <li><a href="#">Search</a>
                 <ul>
-                <li><a href="javascript: $('#searchq').addClass('highlight');">Basic</a></li>
+                <li><a href="javascript: $('#search_basic_q').addClass('highlight');">Basic</a></li>
                 <li><a href="{% url wcdbweb.views.search_advanced %}">Advanced</a></li>
                 </ul></li>
             <li class="spacer"/>
