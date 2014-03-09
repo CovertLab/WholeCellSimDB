@@ -50,4 +50,6 @@ urlpatterns += patterns('wcdbweb.views',
     
     #sitemap
     url(r'^sitemap.xml$', 'sitemap'),
+    url(r'^sitemap_top_level.xml$', 'sitemap_top_level'),
+    url(r'^sitemap_simulation_batch.xml$', 'sitemap_simulation_batch'),
 )

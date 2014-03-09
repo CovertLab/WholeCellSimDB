@@ -462,8 +462,23 @@ def search_advanced_states(batches, forms):
 def sitemap(request):
     return render_template('sitemap.xml', request, data = {
         'ROOT_URL': settings.ROOT_URL,
+        'simulation_batches': models.SimulationBatch.objects.all(),
+        })
+        
+def sitemap_top_level(request):
+    return render_template('sitemap_top_level.xml', request, data = {
+        'ROOT_URL': settings.ROOT_URL,
         'organisms': models.Organism.objects.all(),
+        'simulation_batches': models.SimulationBatch.objects.all(),
+        'simulations': models.Simulation.objects.all(),
         'investigators': models.Investigator.objects.all(),
+        })
+        
+def sitemap_simulation_batch(request):
+    id = request.GET.get('id', None)
+    return render_template('sitemap_simulation_batch.xml', request, data = {
+        'ROOT_URL': settings.ROOT_URL,
+        'batch': models.SimulationBatch.objects.get(id=id),
         })
         
 ###################

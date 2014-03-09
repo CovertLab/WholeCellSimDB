@@ -39,7 +39,7 @@ class Option(models.Model):
 
     class Meta:
         app_label = 'wcdb'
-
+        get_latest_by = 'simulation_batch__date'
 
 class Parameter(models.Model):
     """ 
@@ -70,6 +70,7 @@ class Parameter(models.Model):
 
     class Meta:
         app_label='wcdb'
+        get_latest_by = 'simulation_batch__date'
 
 
 """ Process """      
@@ -83,16 +84,17 @@ class Process(models.Model):
     name             = models.CharField(max_length=255)
     simulation_batch = models.ForeignKey("SimulationBatch", related_name = 'processes')
 
-    class Meta:
-        verbose_name_plural = 'Processes'
-        app_label='wcdb'
-
     def __unicode__(self):
         return ' - '.join([
             self.simulation_batch.organism.name,
             self.simulation_batch.name,
             self.name
             ])
+    
+    class Meta:
+        verbose_name_plural = 'Processes'
+        app_label='wcdb'
+        get_latest_by = 'simulation_batch__date'
 
 """ States """   
 class State(models.Model):
@@ -107,7 +109,7 @@ class State(models.Model):
     """
     name             = models.CharField(max_length=255)
     simulation_batch = models.ForeignKey('SimulationBatch', related_name='states')   
-     
+        
     # Unicode
     def __unicode__(self):
         return ' - '.join([
@@ -115,6 +117,11 @@ class State(models.Model):
             self.simulation_batch.name,
             self.name
             ])
+            
+    class Meta:
+        app_label='wcdb'
+        get_latest_by = 'simulation_batch__date'
+
 
 """ Properties """
 class Property(models.Model):
@@ -129,6 +136,10 @@ class Property(models.Model):
             self.state.name,
             self.name
             ])
+            
+    class Meta:
+        app_label='wcdb'
+        get_latest_by = 'state__simulation_batch__date'
 
 """ Properties """
 class PropertyValueManager(models.Manager):
@@ -249,6 +260,7 @@ class PropertyValue(models.Model):
     class Meta:
         verbose_name_plural = 'Properties'
         app_label='wcdb'
+        get_latest_by = 'simulation__batch__date'
 
 
 class SimulationManager(models.Manager):
@@ -504,6 +516,7 @@ class Organism(models.Model):
     
     class Meta:
         app_label = 'wcdb'
+        get_latest_by = 'simulation_batches__date'
 
 class Investigator(models.Model):
     user        = models.OneToOneField(User)
@@ -514,4 +527,4 @@ class Investigator(models.Model):
     
     class Meta:
         ordering = ['user__last_name', 'user__first_name']
-        get_latest_by = 'user__date_joined'
+        get_latest_by = 'simulation_batches__date'

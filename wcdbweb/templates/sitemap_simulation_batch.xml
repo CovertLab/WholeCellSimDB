@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+{% comment %}
+Site map index
+
+Author: Jonathan Karr, jkarr@stanford.edu
+Affiliation: Covert Lab, Department of Bioengineering, Stanford University
+Created: 2014-03-09
+Updated: 2014-03-09
+{% endcomment %}
+
+{% load template_extras %}
+
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+	<!-- summary page -->
+	<url>
+		<loc>{{ ROOT_URL }}{% url wcdbweb.views.simulation_batch id=batch.id %}</loc> 
+		<lastmod>{{ batch.date|set_time_zone|date:"c" }}</lastmod>
+		<changefreq>never</changefreq>
+	</url>
+	
+	<!-- simulations -->
+	{% for simulation in batch.simulations.all %}
+	<url>
+		<loc>{{ ROOT_URL }}{% url wcdbweb.views.simulation id=simulation.id %}</loc> 
+		<lastmod>{{ batch.date|set_time_zone|date:"c" }}</lastmod>
+		<changefreq>never</changefreq>
+	</url>
+	{% endfor %}
+</urlset>

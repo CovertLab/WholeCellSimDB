@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+{% comment %}
+Site map index
+
+Author: Jonathan Karr, jkarr@stanford.edu
+Affiliation: Covert Lab, Department of Bioengineering, Stanford University
+Created: 2013-09-17
+Updated: 2014-03-09
+{% endcomment %}
+
+{% load template_extras %}
+
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+	<!-- top-level pages -->
+	<url>
+		<loc>{{ ROOT_URL }}{% url wcdbweb.views.index %}</loc>
+		<lastmod>{{ "index.html"|get_template_last_updated|set_time_zone|date:"c" }}</lastmod>
+		<changefreq>monthly</changefreq>
+	</url>
+	
+	<!-- lists -->
+	<url>
+		<loc>{{ ROOT_URL }}{% url wcdbweb.views.list_investigators %}</loc>
+		<lastmod>{{ investigators.latest.user.date_joined|set_time_zone|date:"c" }}</lastmod>
+		<changefreq>monthly</changefreq>
+	</url>
+	<url>
+		<loc>{{ ROOT_URL }}{% url wcdbweb.views.list_organisms %}</loc>
+		<lastmod>{{ organisms.latest.simulation_batches.latest.date|set_time_zone|date:"c" }}</lastmod>
+		<changefreq>monthly</changefreq>
+	</url>
+	<url>
+		<loc>{{ ROOT_URL }}{% url wcdbweb.views.list_simulation_batches %}</loc>
+		<lastmod>{{ simulation_batches.latest.date|set_time_zone|date:"c" }}</lastmod>
+		<changefreq>monthly</changefreq>
+	</url>
+	<url>
+		<loc>{{ ROOT_URL }}{% url wcdbweb.views.list_simulations %}</loc>
+		<lastmod>{{ simulations.latest.batch.date|set_time_zone|date:"c" }}</lastmod>
+		<changefreq>weekly</changefreq>
+	</url>
+	
+	<!-- search -->
+	<url>
+		<loc>{{ ROOT_URL }}{% url wcdbweb.views.search_advanced %}</loc>
+		<lastmod>{{ "search_advanced_form.html"|get_template_last_updated|set_time_zone|date:"c" }}</lastmod>
+		<changefreq>yearly</changefreq>
+	</url>
+	
+	<!-- download -->
+	<url>
+		<loc>{{ ROOT_URL }}{% url wcdbweb.views.download %}</loc>
+		<lastmod>{{ "download.html"|get_template_last_updated|set_time_zone|date:"c" }}</lastmod>
+		<changefreq>yearly</changefreq>
+	</url>
+	
+	<!-- documentation -->
+	<url>
+		<loc>{{ ROOT_URL }}{% url wcdbweb.views.tutorial %}</loc>
+		<lastmod>{{ "tutorial.html"|get_template_last_updated|set_time_zone|date:"c" }}</lastmod>
+		<changefreq>yearly</changefreq>
+	</url>
+	<url>
+		<loc>{{ ROOT_URL }}{% url wcdbweb.views.help %}</loc>
+		<lastmod>{{ "help.html"|get_template_last_updated|set_time_zone|date:"c" }}</lastmod>
+		<changefreq>yearly</changefreq>
+	</url>
+	<url>
+		<loc>{{ ROOT_URL }}{% url wcdbweb.views.about %}</loc>
+		<lastmod>{{ "about.html"|get_template_last_updated|set_time_zone|date:"c" }}</lastmod>
+		<changefreq>yearly</changefreq>
+	</url>
+	
+	<!-- organisms -->
+	{% for organism in organisms %}
+	<url>
+		<loc>{{ ROOT_URL }}{% url wcdbweb.views.organism id=organism.id %}</loc> 
+		<lastmod>{{ organism.simulation_batches.latest.date|set_time_zone|date:"c" }}</lastmod>
+		<changefreq>montly</changefreq>
+	</url>
+	{% endfor %}
+	
+	<!-- investigators -->
+	{% for investigator in investigators %}
+	<url>
+		<loc>{{ ROOT_URL }}{% url wcdbweb.views.investigator id=investigator.id %}</loc> 
+		<lastmod>{{ investigator.user.date_joined|set_time_zone|date:"c" }}</lastmod>
+		<changefreq>montly</changefreq>
+	</url>
+	{% endfor %}
+</urlset>
