@@ -45,6 +45,7 @@ class AdvancedSearchForm(forms.Form):
     n_option_filters            = forms.IntegerField(required = True, widget = forms.TextInput, min_value = 0, initial=3)
     n_parameter_filters         = forms.IntegerField(required = True, widget = forms.TextInput, min_value = 0, initial=3)
     n_process_filters           = forms.IntegerField(required = True, widget = forms.TextInput, min_value = 0, initial=3)
+    n_state_filters             = forms.IntegerField(required = True, widget = forms.TextInput, min_value = 0, initial=3)
     
 class AdvancedSearchOptionForm(forms.Form):
     option   = forms.ChoiceField(required = False, widget = forms.Select, label='Option', help_text='Select an option', initial=None)
@@ -146,11 +147,26 @@ class AdvancedSearchParameterForm(forms.Form):
         
 class AdvancedSearchProcessForm(forms.Form):
     process = forms.ChoiceField(required = False, widget = forms.Select, label='Process', help_text='Select a process')
-    modeled = forms.ChoiceField(required = True, widget = forms.Select, label='Operator', help_text='Select a value', choices = MODELED_CHOICES)
+    modeled = forms.ChoiceField(required = True, widget = forms.Select, label='Modeled', help_text='Select a value', choices = MODELED_CHOICES)
        
     def __init__(self, *args, **kwargs):
         super(AdvancedSearchProcessForm, self).__init__(*args, **kwargs)        
         self.fields['process'].choices = [(p['name'], p['name']) for p in models.Process.objects.values('name').order_by('name').annotate(Count('name'))]
+        
+class AdvancedSearchStateForm(forms.Form):
+    state_property = forms.ChoiceField(required = False, widget = forms.Select, label='State/property', help_text='Select a state/property')
+    modeled        = forms.ChoiceField(required = True, widget = forms.Select, label='Modeled', help_text='Select a value', choices = MODELED_CHOICES)
+       
+    def __init__(self, *args, **kwargs):
+        super(AdvancedSearchStateForm, self).__init__(*args, **kwargs)
+        choices = []
+        for s in models.State.objects.values('name').order_by('name').annotate(Count('name')):
+            state_choices = []
+            for p in models.Property.objects.filter(state__name=s['name']).values('name').order_by('name').annotate(Count('name')):
+                val = '%s.%s' % (s['name'], p['name'])
+                state_choices.append((val, p['name']))
+            choices.append((s['name'], state_choices))
+        self.fields['state_property'].choices = choices
     
 class DownloadForm(forms.Form):
     simulation_batches = forms.MultipleChoiceField(required = True, widget = forms.CheckboxSelectMultiple, label = 'Simulation batches', help_text = 'Select simulation batches')

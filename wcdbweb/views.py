@@ -293,17 +293,19 @@ def search_advanced(request):
     valid = request.method == "POST"
     
     #form
-    form = forms.AdvancedSearchForm(request.POST or {'n_option_filters': 3, 'n_parameter_filters': 3, 'n_process_filters': 3})
+    form = forms.AdvancedSearchForm(request.POST or {'n_option_filters': 3, 'n_parameter_filters': 3, 'n_process_filters': 3, 'n_state_filters': 3})
     valid = form.is_valid() and valid
     
     if valid:
         n_option_filters = form.cleaned_data['n_option_filters']
         n_parameter_filters = form.cleaned_data['n_parameter_filters']
         n_process_filters = form.cleaned_data['n_process_filters']
+        n_state_filters = form.cleaned_data['n_state_filters']
     else:
         n_option_filters = 3
         n_parameter_filters = 3
         n_process_filters = 3
+        n_state_filters = 3
     
     #options
     tmp = {('option-%d-operator' % i): 'eq' for i in range(n_option_filters)}
@@ -343,6 +345,19 @@ def search_advanced(request):
         process_form_i._changed_data = None
         process_forms.append(process_form_i)
         valid = process_form_i.is_valid() and valid
+        
+    #states
+    tmp = {('state-%d-modeled' % i): '1' for i in range(n_state_filters)}
+    tmp = dict(tmp.items() + request.POST.items())
+    state_forms = []
+    state_form = forms.AdvancedSearchStateForm(tmp)
+    for i in range(n_state_filters):
+        state_form_i = copy.deepcopy(state_form)
+        state_form_i.prefix = 'state-%d' % i
+        state_form_i._errors = None
+        state_form_i._changed_data = None
+        state_forms.append(state_form_i)
+        valid = state_form_i.is_valid() and valid
          
     #filter batches
     if valid:
@@ -375,6 +390,7 @@ def search_advanced(request):
         batches = search_advanced_options(batches, option_forms)
         batches = search_advanced_parameters(batches, parameter_forms)
         batches = search_advanced_processes(batches, process_forms)
+        batches = search_advanced_states(batches, state_forms)
                 
         #get related organisms and investigators
         organisms = models.Organism.objects.filter(simulation_batches__id__in=batches.values_list('id'))
@@ -395,6 +411,7 @@ def search_advanced(request):
         'option_forms': option_forms,
         'parameter_forms': parameter_forms,
         'process_forms': process_forms,
+        'state_forms': state_forms,
         'organisms': organisms,
         'batches': batches,
         'investigators': investigators,
@@ -493,6 +510,17 @@ def search_advanced_processes(batches, forms):
                 batches = batches.filter(processes__name = form.cleaned_data['process'])
             else:
                 batches = batches.exclude(processes__name = form.cleaned_data['process'])
+    
+    return batches
+    
+def search_advanced_states(batches, forms):
+    for form in forms:
+        if hasattr(form, 'cleaned_data') and form.cleaned_data['state_property']:
+            state, property = form.cleaned_data['state_property'].split('.')            
+            if form.cleaned_data['modeled'] == '1':
+                batches = batches.filter(states__name = state, states__properties__name=property)
+            else:
+                batches = batches.exclude(states__name = state, states__properties__name=property)
     
     return batches
 

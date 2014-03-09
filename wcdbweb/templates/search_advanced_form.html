@@ -71,6 +71,12 @@ function addFilters(type) {
                 <td>Date (mm/dd/yyyy)</td>
                 <td><input class="{% if form.simulation_batch_date.errors %}error{% endif %}" type="text" name="{{form.simulation_batch_date.html_name}}" title="{{form.simulation_batch_date.help_text}}" value="{{form.simulation_batch_date.data|default_if_none:""}}" /></td>
             </tr>
+        </tbody>
+        
+        <tbody>
+            <tr>
+                <th colspan="2">Simulated model</th>
+            </tr>
             <tr>
                 <td>Options (<a href="javascript:addFilters('option');">more</a>)</td>
                 <td>
@@ -140,7 +146,7 @@ function addFilters(type) {
                 </td>
             </tr>
             <tr>
-                <td>Proceses (<a href="javascript:addFilters('process');">more</a>)</td>
+                <td>Processes (<a href="javascript:addFilters('process');">more</a>)</td>
                 <td>
                     <input type="hidden" id="{{form.n_process_filters.html_name}}" name="{{form.n_process_filters.html_name}}" value="{{form.n_process_filters.data}}" />
                     <table class="processes">
@@ -168,7 +174,40 @@ function addFilters(type) {
                     </table>
                 </td>
             </tr>
-        </tbody>
+            <tr>
+                <td>States (<a href="javascript:addFilters('state');">more</a>)</td>
+                <td>
+                    <input type="hidden" id="{{form.n_state_filters.html_name}}" name="{{form.n_state_filters.html_name}}" value="{{form.n_state_filters.data}}" />
+                    <table class="states">
+                        <tbody>
+                        {% for state_form in state_forms %}
+                        <tr>
+                            <td>
+                                <select class="{% if state_form.state_property.errors %}error{% endif %}" name="{{state_form.state_property.html_name}}" title="{{state_form.state_property.help_text}}" >
+                                    <option{% if state_form.state_property.data == "" %} selected{% endif %}></option>
+                                    {% for choice_group in state_form.state_property.field.choices %}
+                                    <optgroup label="{{choice_group.0}}">
+                                        {% for choice in choice_group.1 %}
+                                        <option value="{{ choice.0 }}"{% if choice.0 == state_form.state_property.data %} selected{% endif %}>{{ choice.1 }}</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td>
+                                <select class="{% if state_form.modeled.errors %}error{% endif %}" name="{{state_form.modeled.html_name}}" title="{{state_form.modeled.help_text}}" >
+                                    {% for choice in state_form.modeled.field.choices %}
+                                    <option value="{{ choice.0 }}"{% if choice.0 == state_form.modeled.data or state_form.modeled.data == "" and forloop.first %} selected{% endif %}>{{ choice.1 }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>        
         
         <tbody>
             <tr>
