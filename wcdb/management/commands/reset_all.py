@@ -9,15 +9,17 @@ class Command(BaseCommand):
     help = 'Resets the SQL database, deletes all HDF5 files, rebuilds search index'
 
     def handle(self, *args, **options):
+        interactive = options['interactive'] if 'interactive' in options else True
+        
         #reset SQL db
-        call_command('reset', 'wcdb', interactive=False)
+        call_command('reset', 'wcdb', interactive=interactive)
         
         #delete HDF files
         for file in glob.glob(os.path.join(HDF5_ROOT, '*.h5')):
             os.remove(file)
         
         #rebuild search index
-        call_command('rebuild_index', interactive=False)
+        call_command('rebuild_index', interactive=interactive)
             
         #status message
         self.stdout.write('Successfully reset SQL and HDF databases and search indices')
