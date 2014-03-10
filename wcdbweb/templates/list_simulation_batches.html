@@ -31,7 +31,7 @@ Created: 2013-09-13
             <th>No. simulations</th>
             <th>Investigator</th>
             <th>Date</th>
-            <th>Avg length</th>
+            <th>Avg length (s)</th>
             <th>Download</th>
         </tr>
     </thead>
@@ -44,7 +44,7 @@ Created: 2013-09-13
             <td>{{ batch.simulations.all|length }}</td>
             <td><a href="{% url wcdbweb.views.investigator id=batch.investigator.id %}">{{ batch.investigator.user.get_full_name }}</a></td>
             <td>{{ batch.date|date:"M j, Y" }}</td>
-            <td>{{ batch.length_avg }} </td>
+            <td>{{ batch.length_avg|floatformat:1 }} </td>
             <td><a href="{% url wcdbweb.views.simulation_batch_download id=batch.id %}">HDF5</a></td>
         </tr>
         {% endfor %}
