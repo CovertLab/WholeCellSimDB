@@ -146,7 +146,7 @@ $(function() {
     <tbody>
         {% for sim in batch.simulations|order_by:'batch_index' %}
         <tr>
-            <td>{{ sim.batch_index }}</td>
+            <td><a href="{% url wcdbweb.views.simulation id=sim.id %}">{{ sim.batch_index }}</a></td>
             <td>{{ sim.length }}</td>
             <td><a href="{% url wcdbweb.views.simulation_download id=sim.id %}">HDF5</a></td>
         </tr>
