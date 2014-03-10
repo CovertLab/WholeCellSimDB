@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 import h5py
+import os
 import re
 import sys
 from WholeCellDB.settings import HDF5_ROOT
@@ -19,10 +20,10 @@ class Option(models.Model):
     """     
     process          = models.ForeignKey('Process', null=True, blank=True, related_name = 'options')
     state            = models.ForeignKey('State', null=True, blank=True, related_name = 'options')
-    name             = models.CharField(max_length=255)
-    value            = models.CharField(max_length=255, null=True, blank=True)
-    units            = models.CharField(max_length=255)
-    index            = models.IntegerField(default=0)
+    name             = models.CharField(max_length=255, db_index=True)
+    value            = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+    units            = models.CharField(max_length=255, null=True, blank=True)
+    index            = models.IntegerField(default=0, db_index=True)
     simulation_batch = models.ForeignKey("SimulationBatch", related_name = 'options')
 
     def __unicode__(self):
@@ -39,6 +40,7 @@ class Option(models.Model):
 
     class Meta:
         app_label = 'wcdb'
+        ordering = ['name', 'index']
         get_latest_by = 'simulation_batch__date'
 
 class Parameter(models.Model):
@@ -50,10 +52,10 @@ class Parameter(models.Model):
     """     
     process          = models.ForeignKey('Process', null=True, blank=True, related_name='parameters')
     state            = models.ForeignKey('State', null=True, blank=True, related_name='parameters')
-    name             = models.CharField(max_length=255)
-    value            = models.CharField(max_length=255, null=True, blank=True)
-    units            = models.CharField(max_length=255)
-    index            = models.IntegerField(default=0)
+    name             = models.CharField(max_length=255, db_index=True)
+    value            = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+    units            = models.CharField(max_length=255, null=True, blank=True)
+    index            = models.IntegerField(default=0, db_index=True)
     simulation_batch = models.ForeignKey("SimulationBatch", related_name='parameters')
 
     def __unicode__(self):
@@ -70,6 +72,7 @@ class Parameter(models.Model):
 
     class Meta:
         app_label='wcdb'
+        ordering = ['name', 'index']
         get_latest_by = 'simulation_batch__date'
 
 
@@ -81,7 +84,7 @@ class Process(models.Model):
     Creating Processes
         Process.objects.create(name, simulation_batch)
     """ 
-    name             = models.CharField(max_length=255)
+    name             = models.CharField(max_length=255, db_index=True)
     simulation_batch = models.ForeignKey("SimulationBatch", related_name = 'processes')
 
     def __unicode__(self):
@@ -94,6 +97,7 @@ class Process(models.Model):
     class Meta:
         verbose_name_plural = 'Processes'
         app_label='wcdb'
+        ordering = ['name']
         get_latest_by = 'simulation_batch__date'
 
 """ States """   
@@ -107,7 +111,7 @@ class State(models.Model):
         name        |   String
         simulation  |   wcdb.models.Simulation
     """
-    name             = models.CharField(max_length=255)
+    name             = models.CharField(max_length=255, db_index=True)
     simulation_batch = models.ForeignKey('SimulationBatch', related_name='states')   
         
     # Unicode
@@ -120,14 +124,15 @@ class State(models.Model):
             
     class Meta:
         app_label='wcdb'
+        ordering = ['name']
         get_latest_by = 'simulation_batch__date'
 
 
 """ Properties """
 class Property(models.Model):
     state = models.ForeignKey('State', related_name='properties')   
-    name  = models.CharField(max_length=255)
-    units = models.CharField(max_length=255)
+    name  = models.CharField(max_length=255, db_index=True)
+    units = models.CharField(max_length=255, null=True, blank=True)
     
     def __unicode__(self):
         return ' - '.join([
@@ -139,6 +144,7 @@ class Property(models.Model):
             
     class Meta:
         app_label='wcdb'
+        ordering = ['name']
         get_latest_by = 'state__simulation_batch__date'
 
 """ Properties """
@@ -260,15 +266,43 @@ class PropertyValue(models.Model):
     class Meta:
         verbose_name_plural = 'Properties'
         app_label='wcdb'
+        ordering = ['simulation__batch_index']
         get_latest_by = 'simulation__batch__date'
+        
+class PropertyLabel(models.Model):
+    property  = models.ForeignKey('Property', related_name='labels')  
+    name      = models.CharField(max_length=255, null=True, blank=True, default=None, db_index=True)
+    dimension = models.PositiveIntegerField(db_index=True)
+    index     = models.PositiveIntegerField(db_index=True)
+    
+    def get_dataset(self, batch_indices = None):
+        sims = self.property.state.simulation_batch.simulations
+        
+        if batch_indices is None:
+            batch_indices = [x[0] for x in sims.values_list('batch_index')]
+        
+        return_val = []
+        for batch_index in batch_indices:
+            prop_val = property.values.get(simulation__batch_index = batch_index)
+            return_val.append(prop_val.dataset.take(self.index, self.dimension))
+            
+        return return_val
+    
+    def __unicode__(self):
+        return self.name
+    
+    class Meta:
+        app_label = 'wcdb'
+        ordering = ['dimension', 'index']
+        get_latest_by = 'property__simulation__batch__date'
 
 
 class SimulationManager(models.Manager):
     def create_simulation(self, 
                           batch,    
                           batch_index = 1,
-                          state_properties = {},
-                          length = 0.0):
+                          length = None,
+                          state_properties = {}):
         
         simulation = batch.simulations.create(                                 
                                  batch_index = batch_index,
@@ -321,8 +355,8 @@ class Simulation(models.Model):
     """
     # Metadata
     batch       = models.ForeignKey('SimulationBatch', related_name='simulations')  
-    batch_index = models.PositiveIntegerField(default=1)
-    length      = models.FloatField(default=0.0)    
+    batch_index = models.PositiveIntegerField(default=1, db_index=True)
+    length      = models.FloatField(null=True, blank=True, default=None)
 
     # Internal
     _file_permissions = models.CharField(max_length=3, default="a")
@@ -335,7 +369,7 @@ class Simulation(models.Model):
     @property_tag
     def file_path(self):
         """ The path to the HDF5 file for the Simulation """
-        return '%s/%d.h5' % (HDF5_ROOT, self.id)
+        return os.path.join(HDF5_ROOT, '%d.h5' % self.id)
 
     @property_tag
     def h5file(self):
@@ -358,6 +392,7 @@ class Simulation(models.Model):
 
     class Meta:
         unique_together = (('batch', 'batch_index'), )
+        ordering = ['batch_index']
         get_latest_by = 'batch__date'
         app_label = 'wcdb'
         
@@ -372,6 +407,7 @@ class SimulationBatchManager(models.Manager):
                           investigator_affiliation="",
                           investigator_email="",
                           ip='0.0.0.0',
+                          date=None,
                           processes = [],
                           states = [], 
                           state_properties = {},
@@ -402,7 +438,8 @@ class SimulationBatchManager(models.Manager):
             description = description,
             organism_version = organism_version,
             investigator = investigator,
-            ip = ip)
+            ip = ip,
+            date = date)
         batch.save()
         
         #processes
@@ -418,10 +455,15 @@ class SimulationBatchManager(models.Manager):
         #state properties
         for state_name, props in state_properties.iteritems():
             state = batch.states.get(name=state_name)
-            for prop_name in props:
-                property = state.properties.create(name=prop_name)
+            for prop_name, units_labels in props.iteritems():
+                property = state.properties.create(name=prop_name, units=units_labels['units'])
                 property.save()
-        
+                
+                for dimension, dimension_labels in enumerate(units_labels['labels'] or []):
+                    for index, name in enumerate(dimension_labels):
+                        label = property.labels.create(name=name, dimension=dimension, index=index)
+                        label.save()
+                
         #options
         for prop_name, value in options.iteritems():
             if re.match(r"^__.+?__$", prop_name) or prop_name == 'processes' or prop_name == 'states':
@@ -493,29 +535,32 @@ class SimulationBatchManager(models.Manager):
 class SimulationBatch(models.Model):
     organism         = models.ForeignKey('Organism', related_name = 'simulation_batches')
     organism_version = models.CharField(max_length=255, default="")
-    name             = models.CharField(max_length=255, default="")
-    description      = models.TextField(default="")    
+    name             = models.CharField(max_length=255, default="", db_index=True)
+    description      = models.TextField(default="")
     investigator     = models.ForeignKey('Investigator', related_name = 'simulation_batches')
     ip               = models.IPAddressField(default="0.0.0.0")
-    date             = models.DateTimeField(auto_now=True, auto_now_add=True)
+    date             = models.DateTimeField(null=True, blank=True, db_index=True)
+    date_added       = models.DateTimeField(auto_now=True, auto_now_add=True)
     
     objects = SimulationBatchManager()
     
     class Meta:
         verbose_name = 'Simulation batch'
         verbose_name_plural = 'Simulation batches'
+        ordering = ['name']
         get_latest_by = 'date'
         app_label = 'wcdb'
         unique_together = (('organism', 'name'), )
         
 class Organism(models.Model):
-    name = models.CharField(max_length=255, default="", unique=True)
+    name = models.CharField(max_length=255, default="", unique=True, db_index=True)
 
     def __unicode__(self):
         return self.name
     
     class Meta:
         app_label = 'wcdb'
+        ordering = ['name']
         get_latest_by = 'simulation_batches__date'
 
 class Investigator(models.Model):

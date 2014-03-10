@@ -1,29 +1,60 @@
+import dateutil.parser
 import glob
 import numpy
+import os
+import pytz
 import re
 import scipy.io
-
 from wcdb.models import SimulationBatch, Simulation
 
-def save_simulation_batch(
-    organism_name, organism_version,
-    name, description,
-    investigator_first, investigator_last, investigator_affiliation, investigator_email,
-    ip, batch_dir
-    ):
-            
-    #load options, parameters, states, processes
-    first_sim_dir = batch_dir + '/1'
-    options = loadmat(first_sim_dir + '/options.mat')
-    parameters = loadmat(first_sim_dir + '/parameters.mat')
+def save_simulation_batch(organism_name, batch_dir):
+    
+    #path to first simulation in batch
+    first_sim_dir = os.path.join(batch_dir, '1')
+    
+    #load metadata
+    md = scipy.io.loadmat(os.path.join(first_sim_dir, 'metadata.mat'))
+    organism_version = md['revision'][0][0]
+    name = md['shortDescription'][0]
+    description = md['longDescription'][0]
+    investigator_first = md['firstName'][0]
+    investigator_last = md['lastName'][0]
+    investigator_affiliation = md['affiliation'][0]
+    investigator_email = md['email'][0]
+    ip = md['ipAddress'][0]
+    date = dateutil.parser.parse(md['startTime'][0]).replace(tzinfo=pytz.timezone('Africa/Abidjan')) 
+    
+    #load options, parameters, states, processes    
+    options = loadmat(os.path.join(first_sim_dir, 'options.mat'))
+    parameters = loadmat(os.path.join(first_sim_dir,  'parameters.mat'))
+    state_property_units_labels = loadmat(os.path.join(batch_dir, 'units_labels.mat'))
     
     processes = parameters['processes'].keys()
     states = parameters['states'].keys()
     
     state_properties = {}
-    for state_name, state in loadmat(first_sim_dir + '/state-0.mat', False).iteritems():
-        state_properties[state_name] = [prop_name for prop_name, prop_value in state.iteritems()]
-    
+    for state_name, state in loadmat(os.path.join(first_sim_dir, 'state-0.mat'), False).iteritems():
+        state_properties[state_name] = {}
+        for prop_name, prop_value in state.iteritems():
+            if state_name in state_property_units_labels and \
+                prop_name in state_property_units_labels[state_name] and \
+                'units' in state_property_units_labels[state_name][prop_name]:
+                units = state_property_units_labels[state_name][prop_name]['units']
+            else:
+                units = None
+            if state_name in state_property_units_labels and \
+                prop_name in state_property_units_labels[state_name] and \
+                'labels' in state_property_units_labels[state_name][prop_name]:
+                labels = []
+                for dim_labels in state_property_units_labels[state_name][prop_name]['labels']:
+                    if dim_labels.size > 0:
+                        labels.append([x[0] for x in dim_labels[0].tolist()])
+                    else:
+                        labels.append([])
+            else:
+                labels = None
+            state_properties[state_name][prop_name] = {'units': units, 'labels': labels}
+                
     #save batch
     SimulationBatch.objects.create_simulation_batch( 
         organism_name = organism_name,
@@ -35,6 +66,7 @@ def save_simulation_batch(
         investigator_affiliation = investigator_affiliation,
         investigator_email = investigator_email,
         ip = ip,
+        date = date,
         processes = processes,
         states = states,
         state_properties = state_properties,
@@ -42,19 +74,26 @@ def save_simulation_batch(
         parameters = parameters)
         
     #save simulations
-    sim_dirs = glob.glob(batch_dir + "/[0-9]*")
-    for sim_dir in sim_dirs:
-        batch_index = int(float(re.split("/", sim_dir).pop()))
+    sim_dirs = glob.glob(os.path.join(batch_dir, "[0-9]*"))
+    for sim_dir in sim_dirs:    
+        batch_index = int(float(re.split(os.sep, sim_dir).pop()))
         
         print "Saving simulation %d of %d ... " % (batch_index, len(sim_dirs))
-        save_simulation(organism_name, name, batch_index, sim_dir)
+        save_simulation(organism_name, batch_dir, batch_index)
     
-def save_simulation(organism_name, batch_name, batch_index, sim_dir):
+def save_simulation(organism_name, batch_dir, batch_index):
+    sim_dir = os.path.join(batch_dir, str(batch_index))
+
+    #get batch name, length
+    md = scipy.io.loadmat(os.path.join(sim_dir, 'metadata.mat'))
+    batch_name = md['shortDescription'][0]
+    length = md['lengthSec'][0][0]
+    
     # get simulation batch
     batch = SimulationBatch.objects.get(organism__name = organism_name, name = batch_name)
     
     # Get a list of all the paths to the .mat files to be loaded.
-    property_files = glob.glob(sim_dir + "/state-[a-zA-Z]*-[a-zA-Z]*.mat")
+    property_files = glob.glob(os.path.join(sim_dir, "state-[a-zA-Z]*-[a-zA-Z]*.mat"))
     
     #collect names of state properties
     state_properties = {}    
@@ -82,7 +121,8 @@ def save_simulation(organism_name, batch_name, batch_index, sim_dir):
     sim = Simulation.objects.create_simulation(
         batch = batch,
         batch_index = batch_index,
-        state_properties=state_properties)
+        length = length,
+        state_properties = state_properties)
     sim.save()
                                                
     #save property values data
