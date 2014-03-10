@@ -42,8 +42,8 @@ Created: 2013-09-13
             <td><a href="{% url wcdbweb.views.list_simulation_batches %}">{{ summary.n_simulation_batch }}</a></td>
         </tr>
         <tr>
-            <th>Simulations</th>
-            <td>{{ summary.n_simulation }}</td>
+            <th><a href="{% url wcdbweb.views.list_simulations %}">Simulations</a></th>
+            <td><a href="{% url wcdbweb.views.list_simulations %}">{{ summary.n_simulation }}</a></td>
         </tr>
         <tr>
             <th>Processes</th>
