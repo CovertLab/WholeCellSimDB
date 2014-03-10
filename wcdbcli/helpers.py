@@ -24,36 +24,94 @@ def save_simulation_batch(organism_name, batch_dir):
     ip = md['ipAddress'][0]
     date = dateutil.parser.parse(md['startTime'][0]).replace(tzinfo=pytz.timezone('Africa/Abidjan')) 
     
-    #load options, parameters, states, processes    
-    options = loadmat(os.path.join(first_sim_dir, 'options.mat'))
-    parameters = loadmat(os.path.join(first_sim_dir,  'parameters.mat'))
-    state_property_units_labels = loadmat(os.path.join(batch_dir, 'units_labels.mat'))
+    #load units, labels
+    units_labels = loadmat(os.path.join(batch_dir, 'units_labels.mat'))
     
+    #load option, parameter values
+    option_vals = loadmat(os.path.join(first_sim_dir, 'options.mat'))
+    parameter_vals = loadmat(os.path.join(first_sim_dir,  'parameters.mat'))
+    
+    options = {}
+    for prop_name, value in option_vals.iteritems():
+        if re.match(r"^__.+?__$", prop_name) or prop_name == 'processes' or prop_name == 'states':
+            continue
+        options[prop_name] = {
+            'units': units_labels[prop_name] if prop_name in units_labels else None, 
+            'value': value
+            }
+    options['processes'] = {}
+    for process_name, props in option_vals['processes'].iteritems():        
+        options['processes'][process_name] = {}
+        for prop_name, value in props.iteritems():
+            options['processes'][process_name][prop_name] = {
+                'units': units_labels['processes'][process_name][prop_name] if process_name in units_labels['processes'] and prop_name in units_labels['processes'][process_name] else None, 
+                'value': value
+                }
+    options['states'] = {}
+    for state_name, props in option_vals['states'].iteritems():
+        options['states'][state_name] = {}
+        for prop_name, value in props.iteritems():
+            options['states'][state_name][prop_name] = {
+                'units': units_labels['states'][state_name][prop_name] if state_name in units_labels['states'] and prop_name in units_labels['states'][state_name] else None, 
+                'value': value
+                }
+            
+    parameters = {}
+    for prop_name, value in parameter_vals.iteritems():
+        if re.match(r"^__.+?__$", prop_name) or prop_name == 'processes' or prop_name == 'states':
+            continue
+            
+        parameters[prop_name] = {
+            'units': units_labels[prop_name] if prop_name in units_labels else None, 
+            'value': value
+            }
+    parameters['processes'] = {}
+    for process_name, props in parameter_vals['processes'].iteritems():
+        parameters['processes'][process_name] = {}
+        for prop_name, value in props.iteritems():
+            parameters['processes'][process_name][prop_name] = {
+                'units': units_labels['processes'][process_name][prop_name] if process_name in units_labels['processes'] and prop_name in units_labels['processes'][process_name] else None, 
+                'value': value
+                }
+    parameters['states'] = {}
+    for state_name, props in parameter_vals['states'].iteritems():
+        parameters['states'][state_name] = {}
+        for prop_name, value in props.iteritems():
+            parameters['states'][state_name][prop_name] = {
+                'units': units_labels['states'][state_name][prop_name] if state_name in units_labels['states'] and prop_name in units_labels['states'][state_name] else None, 
+                'value': value
+                }
+    
+    #load states, processes
     processes = parameters['processes'].keys()
-    states = parameters['states'].keys()
     
-    state_properties = {}
+    #load state properties
+    states = {}
     for state_name, state in loadmat(os.path.join(first_sim_dir, 'state-0.mat'), False).iteritems():
-        state_properties[state_name] = {}
+        states[state_name] = {}
         for prop_name, prop_value in state.iteritems():
-            if state_name in state_property_units_labels and \
-                prop_name in state_property_units_labels[state_name] and \
-                'units' in state_property_units_labels[state_name][prop_name]:
-                units = state_property_units_labels[state_name][prop_name]['units']
+            if state_name in units_labels['states'] and \
+                prop_name in units_labels['states'][state_name] and \
+                'units' in units_labels['states'][state_name][prop_name]:
+                units = units_labels['states'][state_name][prop_name]['units']
             else:
                 units = None
-            if state_name in state_property_units_labels and \
-                prop_name in state_property_units_labels[state_name] and \
-                'labels' in state_property_units_labels[state_name][prop_name]:
+            if state_name in units_labels['states'] and \
+                prop_name in units_labels['states'][state_name] and \
+                'labels' in units_labels['states'][state_name][prop_name]:
                 labels = []
-                for dim_labels in state_property_units_labels[state_name][prop_name]['labels']:
+                for dim_labels in units_labels['states'][state_name][prop_name]['labels']:
                     if dim_labels.size > 0:
                         labels.append([x[0] for x in dim_labels[0].tolist()])
                     else:
                         labels.append([])
             else:
                 labels = None
-            state_properties[state_name][prop_name] = {'units': units, 'labels': labels}
+            states[state_name][prop_name] = {'units': units, 'labels': labels}
+            
+    for state_name in options['states'].keys() + parameters['states'].keys():
+        if state_name not in states:
+            states[state_name] = {}
                 
     #save batch
     SimulationBatch.objects.create_simulation_batch( 
@@ -69,12 +127,12 @@ def save_simulation_batch(organism_name, batch_dir):
         date = date,
         processes = processes,
         states = states,
-        state_properties = state_properties,
         options = options,
         parameters = parameters)
         
     #save simulations
     sim_dirs = glob.glob(os.path.join(batch_dir, "[0-9]*"))
+    sim_dirs = sim_dirs[:3] #remove
     for sim_dir in sim_dirs:    
         batch_index = int(float(re.split(os.sep, sim_dir).pop()))
         
@@ -96,7 +154,7 @@ def save_simulation(organism_name, batch_dir, batch_index):
     property_files = glob.glob(os.path.join(sim_dir, "state-[a-zA-Z]*-[a-zA-Z]*.mat"))
     
     #collect names of state properties
-    state_properties = {}    
+    states = {}    
     for prop_file in property_files:
         state = prop_file.split("-")[-2] # State name
         prop = prop_file.replace(".", "-").split("-")[-2] # Property name
@@ -110,7 +168,7 @@ def save_simulation(organism_name, batch_dir, batch_index):
                 data = mat_dict['data']
                 d_list = (data.shape, data.dtype)
                 # Weird syntax. Just constructing the state_property dict.
-                state_properties.setdefault(state, {}).setdefault(prop, d_list)
+                states.setdefault(state, {}).setdefault(prop, d_list)
                 
         except SystemError: #TODO: handle errors
             pass
@@ -122,7 +180,7 @@ def save_simulation(organism_name, batch_dir, batch_index):
         batch = batch,
         batch_index = batch_index,
         length = length,
-        state_properties = state_properties)
+        states = states)
     sim.save()
                                                
     #save property values data

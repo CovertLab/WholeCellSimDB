@@ -302,7 +302,7 @@ class SimulationManager(models.Manager):
                           batch,    
                           batch_index = 1,
                           length = None,
-                          state_properties = {}):
+                          states = {}):
         
         simulation = batch.simulations.create(                                 
                                  batch_index = batch_index,
@@ -310,7 +310,7 @@ class SimulationManager(models.Manager):
 
         f = simulation.h5file 
 
-        for state_name, pd in state_properties.iteritems():
+        for state_name, pd in states.iteritems():
             state = batch.states.get(name = state_name)
             
             g = f.create_group('/states/' + state_name)
@@ -337,7 +337,7 @@ class Simulation(models.Model):
         ----------------------------
         batch               | SimulationBatch
         batch_index         | Positive Integer
-        state_properties    | Dict String:Dict {"State name": PropertyDict,}
+        states              | Dict String:Dict {"State name": PropertyDict,}
         length              | Float
 
         State Dict Format:
@@ -409,8 +409,7 @@ class SimulationBatchManager(models.Manager):
                           ip='0.0.0.0',
                           date=None,
                           processes = [],
-                          states = [], 
-                          state_properties = {},
+                          states = {}, 
                           options = {},
                           parameters = {}):
 
@@ -448,86 +447,95 @@ class SimulationBatchManager(models.Manager):
             process.save()
         
         #states
-        for name in states:
-            state = batch.states.create(name=name)
+        for state_name, props in states.iteritems():
+            state = batch.states.create(name=state_name)
             state.save()
             
-        #state properties
-        for state_name, props in state_properties.iteritems():
-            state = batch.states.get(name=state_name)
             for prop_name, units_labels in props.iteritems():
                 property = state.properties.create(name=prop_name, units=units_labels['units'])
                 property.save()
                 
                 for dimension, dimension_labels in enumerate(units_labels['labels'] or []):
-                    for index, name in enumerate(dimension_labels):
-                        label = property.labels.create(name=name, dimension=dimension, index=index)
+                    for index, label_name in enumerate(dimension_labels):
+                        label = property.labels.create(name=label_name, dimension=dimension, index=index)
                         label.save()
                 
         #options
-        for prop_name, value in options.iteritems():
-            if re.match(r"^__.+?__$", prop_name) or prop_name == 'processes' or prop_name == 'states':
+        for prop_name, val in options.iteritems():
+            if prop_name == 'processes' or prop_name == 'states':
                 continue
+            units = val['units']
+            value = val['value']
             if isinstance(value, list):
                 for index in range(len(value)):
-                    option = batch.options.create(name = prop_name, value = value[index], index = index)
+                    option = batch.options.create(name = prop_name, units = units, value = value[index], index = index)
             else:
-                option = batch.options.create(name = prop_name, value = value)
+                option = batch.options.create(name = prop_name, units = units, value = value)
             option.save()
         
         for process_name, props in options['processes'].iteritems():
             process = batch.processes.get(name = process_name)
             
-            for prop_name, value in props.iteritems():
+            for prop_name, val in props.iteritems():
+                units = val['units']
+                value = val['value']
                 if isinstance(value, list):
                     for index in range(len(value)):
-                        option = batch.options.create(process = process, name = prop_name, value = value[index], index = index)
+                        option = batch.options.create(process = process, name = prop_name, units = units, value = value[index], index = index)
                 else:
-                    option = batch.options.create(process = process, name = prop_name, value = value)
+                    option = batch.options.create(process = process, name = prop_name, units = units, value = value)
                 option.save()
         
         for state_name, props in options['states'].iteritems():
             state = batch.states.get(name = state_name)
             
-            for prop_name, value in props.iteritems():
+            for prop_name, val in props.iteritems():
+                units = val['units']
+                value = val['value']
                 if isinstance(value, list):
                     for index in range(len(value)):
-                        option = batch.options.create(state = state, name = prop_name, value = value[index], index = index)
+                        option = batch.options.create(state = state, name = prop_name, units = units, value = value[index], index = index)
                 else:
-                    option = batch.options.create(state = state, name = prop_name, value = value)
+                    option = batch.options.create(state = state, name = prop_name, units = units, value = value)
                 option.save()
         
         #parameters
-        for prop_name, value in parameters.iteritems():
-            if re.match(r"^__.+?__$", prop_name) or prop_name == 'processes' or prop_name == 'states':
+        for prop_name, val in parameters.iteritems():
+            if prop_name == 'processes' or prop_name == 'states':
                 continue
+            units = val['units']
+            value = val['value']
             if isinstance(value, list):
                 for index in range(len(value)):
-                    parameter = batch.parameters.create(name = prop_name, value = value[index], index = index)
+                    parameter = batch.parameters.create(name = prop_name, units = units, value = value[index], index = index)
             else:
-                parameter = batch.parameters.create(name = prop_name, value = value)
+                parameter = batch.parameters.create(name = prop_name, units = units, value = value)
             parameter.save()
         
         for process_name, props in parameters['processes'].iteritems():
             process = batch.processes.get(name = process_name)
             
-            for prop_name, value in props.iteritems():
+            for prop_name, val in props.iteritems():  
+                units = val['units']
+                value = val['value']
                 if isinstance(value, list):
                     for index in range(len(value)):
-                        parameter = batch.parameters.create(process = process, name = prop_name, value = value[index], index = index)
+                        parameter = batch.parameters.create(process = process, name = prop_name, units = units, value = value[index], index = index)
                 else:
-                    parameter = batch.parameters.create(process = process, name = prop_name, value = value)
+                    parameter = batch.parameters.create(process = process, name = prop_name, units = units, value = value)
                 parameter.save()
         
         for state_name, props in parameters['states'].iteritems():
             state = batch.states.get(name = state_name)
             
-            for prop_name, value in props.iteritems():
+            for prop_name, val in props.iteritems():
+                units = val['units']
+                value = val['value']
                 if isinstance(value, list):
                     for index in range(len(value)):
-                        parameter = batch.parameters.create(state = state, name = prop_name, value = value[index], index = index)
+                        parameter = batch.parameters.create(state = state, name = prop_name, units = units, value = value[index], index = index)
                 else:
-                    parameter = batch.parameters.create(state = state, name = prop_name, value = value)
+                    parameter = batch.parameters.create(state = state, name = prop_name, units = units, value = value)
                 parameter.save()
         
         return batch
