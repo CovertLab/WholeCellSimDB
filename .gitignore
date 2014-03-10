@@ -50,4 +50,4 @@ Thumbs.db
 wcdb_loadmat.py
 SampleData/
 .htaccess
-.asv
+*.asv
