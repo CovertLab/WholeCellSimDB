@@ -35,7 +35,7 @@ def is_list(obj):
     
 @register.filter
 def get_template_last_updated(templateFile):
-	return datetime.datetime.fromtimestamp(os.path.getmtime(settings.TEMPLATE_DIRS[0] + '/' + templateFile), tzlocal())
+	return datetime.datetime.fromtimestamp(os.path.getmtime(os.path.join(settings.TEMPLATE_DIRS[0], templateFile)), tzlocal())
     
 @register.filter
 def set_time_zone(datetime):

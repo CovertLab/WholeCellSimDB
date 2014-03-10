@@ -7,7 +7,7 @@ TEMPLATE_DEBUG = DEBUG
 
 ROOT_URL = 'http://wholecelldb.stanford.edu'
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
-TMP_DIR = ROOT_DIR + '/../tmp'
+TMP_DIR = os.path.join(ROOT_DIR, '..', 'tmp')
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -76,7 +76,7 @@ STATIC_URL = ROOT_URL + '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
-    ROOT_DIR + "/../wcdbweb/static",
+    os.path.join(ROOT_DIR, '..', 'wcdbweb', 'static'),
 )
 
 # List of finder classes that know how to find static files in
@@ -115,14 +115,14 @@ WSGI_APPLICATION = 'WholeCellDB.wsgi.application'
 HDF5_ROOT = "/home/projects/WholeCellDB/wcdb/data"
 
 TEMPLATE_DIRS = (    
-    ROOT_DIR + "/../wcdbweb/templates",
-    ROOT_DIR + "/../wcdbsearch/templates",
+    os.path.join(ROOT_DIR, '..', 'wcdbweb', 'templates'),
+    os.path.join(ROOT_DIR, '..', 'wcdbsearch', 'templates'),
 )
 
 import os
 HAYSTACK_SITECONF = 'wcdbsearch.indexes'
 HAYSTACK_SEARCH_ENGINE  = 'xapian'
-HAYSTACK_XAPIAN_PATH = ROOT_DIR + "/../wcdbsearch/indexes"
+HAYSTACK_XAPIAN_PATH = os.path.join(ROOT_DIR, '..', 'wcdbsearch', 'indexes')
 
 INSTALLED_APPS = (
     'django.contrib.auth',

@@ -17,9 +17,9 @@ import os
 import sys
 
 paths = [
-	os.path.dirname(os.path.realpath(__file__)) + '/../wcdb',
-	os.path.dirname(os.path.realpath(__file__)) + '/..',
-	os.path.dirname(os.path.realpath(__file__)) + '/',
+	os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'wcdb'),
+	os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'),
+	os.path.dirname(os.path.realpath(__file__)),
 	]
 for path in paths:
 	if path not in sys.path:
