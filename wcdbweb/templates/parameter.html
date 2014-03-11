@@ -43,11 +43,13 @@ Created: 2014-03-10
             <th></th>
             <th></th>
         </tr>
-            {% for batch in organism.list %}
+        {% regroup organism.list by simulation_batch__name as batches %}
+            {% for batch in batches %}
+        
         <tr>
-            <td class="level1"><a href="{% url wcdbweb.views.simulation_batch id=batch.simulation_batch__id %}">{{batch.simulation_batch__name}}</a></td>
-            <td>{{batch.value}}</td>
-            <td>{{batch.units|default_if_none:""}}</td>
+            <td class="level1"><a href="{% url wcdbweb.views.simulation_batch id=batch.list.0.simulation_batch__id %}">{{batch.grouper}}</a></td>
+            <td>{% if batch.list|length > 1 %}[{% for val in batch.list %}{{val.value}}{% if not forloop.last %}, {% endif %}{% endfor %}]{% else %}{{batch.list.0.value}}{% endif %}</td>
+            <td>{{batch.list.0.units|default_if_none:""}}</td>
         </tr>
             {% endfor %}
         {% endfor %}

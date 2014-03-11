@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% comment %}
+Process page
+
+Author: Jonathan Karr, jkarr@stanford.edu
+Affiliation: Covert Lab, Department of Bioengineering, Stanford University
+Created: 2014-03-10
+{% endcomment %}
+
+{% load static %}
+{% load template_extras %}
+
+{% block head_title %}{{ block.super }} :: Process :: {{process_name}}{% endblock %}
+
+{% block content %}
+
+<div>
+<h1>Process :: {{process_name}}</h1>
+
+<table class="list_process_option_parameter">
+    <thead>
+        <tr>
+            <td></td>
+            {% regroup simulation_batches by organism__name as organism %}
+            {% for organism in organisms %}
+            <th colspan="{{organism.list|length}}"><i><a href="{% url wcdbweb.views.organism id=organism.list.0.organism__id %}">{{organism.grouper}}</i></a></th>
+            {% endfor %}
+        </tr>        
+        <tr>
+            <td></td>
+            {% for batch in simulation_batches %}
+            <th><div><a href="{% url wcdbweb.views.simulation_batch id=batch.id %}">{{batch.name}}</a></div></th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>    
+        <tr>
+            <th colspan="{{simulation_batches|length|add:1}}">Options</td>
+        </tr>
+        {% regroup options by name as option_groups %}
+        {% for option in option_groups %}
+        <tr>
+            <td class="level1"><a href="{% url wcdbweb.views.option process_name=process_name option_name=option.grouper %}">{{option.grouper}}</a>{% if not option.list.0.units == None %} ({{option.list.0.units}}){% endif %}</td>
+                {% regroup_by option.list by 'simulation_batch__id' simulation_batch_ids as batches %}
+                {% for batch in batches %}
+            <td class="level1">{% if batch.list|length > 1 %}[{%for val in batch.list%}{{val.value}}{%if not forloop.last%}, {%endif%}{%endfor%}]{% else %}{{batch.list.0.value}}{% endif %}</td>
+                {% endfor %}
+        </tr>
+        {% endfor %}
+        
+        <tr>
+            <th colspan="{{simulation_batches|length|add:1}}">Parameters</td>
+        </tr>
+        {% regroup parameters by name as parameter_groups %}
+        {% for parameter in parameter_groups %}
+        <tr>
+            <td class="level1"><a href="{% url wcdbweb.views.parameter process_name=process_name parameter_name=parameter.grouper %}">{{parameter.grouper}}</a>{% if not parameter.list.0.units == None %} ({{parameter.list.0.units}}){% endif %}</td>
+                {% regroup_by parameter.list by 'simulation_batch__id' simulation_batch_ids as batches %}
+                {% for batch in batches %}
+            <td class="level1">{% if batch.list|length > 1 %}[{%for val in batch.list%}{{val.value}}{%if not forloop.last%}, {%endif%}{%endfor%}]{% else %}{{batch.list.0.value}}{% endif %}</td>
+                {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</div>
+
+{% endblock %}
