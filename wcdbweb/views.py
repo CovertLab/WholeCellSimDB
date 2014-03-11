@@ -134,37 +134,70 @@ def simulation(request, id):
     })
     
 def list_options(request):
-    pass
+    options = models.Option.objects.all()
+    return render_template('list_options.html', request, data = {
+        'options': options
+    })
     
 def option(request, option_name, process_name=None, state_name=None):
-    pass
+    option = models.Option.objects.filter(name=option_name, process__name=process_name, state__name=state_name)
+    return render_template('option.html', request, data = {
+        'option': option
+    })
     
 def list_parameters(request):
-    pass
+    parameters = models.Parameter.objects.all()
+    return render_template('list_parameters.html', request, data = {
+        'parameters': parameters
+    })
     
 def parameter(request, parameter_name, process_name=None, state_name=None):
-    pass
+    parameter = models.Parameter.objects.filter(name=parameter_name, process__name=process_name, state__name=state_name)
+    return render_template('parameter.html', request, data = {
+        'parameter': parameter
+    })
     
 def list_processes(request):
-    pass
+    processes = models.Process.objects.all()
+    return render_template('list_options.html', request, data = {
+        'processes': processes
+    })
     
 def process(request, process_name):
-    pass
+    process = models.Process.objects.filter(name=process_name)
+    return render_template('process.html', request, data = {
+        'process': process
+    })
     
 def list_states(request):
-    pass
+    states = models.State.objects.all()
+    return render_template('list_states.html', request, data = {
+        'states': states
+    })
     
 def state(request, state_name):
-    pass
+    state = models.State.objects.filter(name=state_name)
+    return render_template('state.html', request, data = {
+        'state': state
+    })
     
 def state_property(request, state_name, property_name):
-    pass
+    property = models.Property.objects.filter(name=property_name, state__name=state_name)
+    return render_template('property.html', request, data = {
+        'property': property
+    })
     
 def state_property_row(request, state_name, property_name, row_name):
-    pass
+    row = models.Label.objects.filter(dimension=1, name=property_name, property__name=property_name, property__state__name=state_name)
+    return render_template('state_property_row.html', request, data = {
+        'row': row
+    })
     
 def state_property_row_batch(request, state_name, property_name, row_name, batch_id):
-    pass
+    row = models.Label.objects.get(dimension=1, name=property_name, property__name=property_name, property__state__name=state_name, property__state__simulation_batch__id=batch_id)
+    return render_template('state_property_row_batch.html', request, data = {
+        'row': row
+    })
     
 ###################
 ### downloading
