@@ -6,7 +6,9 @@ Affiliation: Covert Lab, Department of Bioengineering, Stanford University
 Last updated: 2012-07-17
 */
 
-/* main */
+/****************
+ * main 
+ ****************/
 body{
 	margin:0px;
 	padding:0px;
@@ -60,7 +62,9 @@ input.error {border-color:red;}
 select.error {border-color:red;}
 
 
-/* header */
+/****************
+ * header 
+ ****************/
 #header {
 	z-index: 2;
 	position:fixed;
@@ -206,7 +210,9 @@ select.error {border-color:red;}
 	margin:0px;
 }
 
-/* footer */ 
+/****************
+ * footer 
+ ****************/
 #footer {
 	z-index: 3;
 	position:fixed;
@@ -249,7 +255,9 @@ select.error {border-color:red;}
 	text-align:right;
 }
 
-/* content */
+/****************
+ * content 
+ ****************/
 #main{
 	margin:0 auto;
 	margin-top:80px;
@@ -296,8 +304,6 @@ select.error {border-color:red;}
     margin:0px;
     margin-left:-6px;    
 }
-
-
 #content div tt{
     background-color: #dedede;
     border:1px solid #999;
@@ -315,6 +321,17 @@ select.error {border-color:red;}
 #content div table {
     width:100%;
 }
+
+#content div table.twocol td{
+    width:50%;
+}
+#content div table.threecol td{
+    width:33%;
+}
+#content div table.fourcol td{
+    width:25%;
+}
+
 #content div table.table thead tr th {        
     background: #d6edff;
 }
@@ -351,6 +368,11 @@ select.error {border-color:red;}
     text-align: right;
 }
 
+/****************
+ * lists 
+ ****************/
+ 
+/* organisms */
 #content div table.list_organisms thead tr:nth-child(1) th:nth-child(1),  
 #content div table.list_organisms thead tr:nth-child(2) th:nth-child(3), 
 #content div table.list_organisms tbody tr td:nth-child(3)
@@ -365,6 +387,7 @@ select.error {border-color:red;}
     text-align:right;
 }
 
+/* batches */
 #content div table.list_batches thead tr:nth-child(1) th:nth-child(1),  
 #content div table.list_batches thead tr:nth-child(2) th:nth-child(2), 
 #content div table.list_batches tbody tr td:nth-child(2), 
@@ -381,6 +404,7 @@ select.error {border-color:red;}
     text-align:right;
 }
 
+/* simulations */
 #content div table.list_simulations thead tr:nth-child(1) th:nth-child(1),
 #content div table.list_simulations thead tr:nth-child(2) th:nth-child(2),
 #content div table.list_simulations tbody tr td:nth-child(2),
@@ -400,6 +424,66 @@ select.error {border-color:red;}
     text-align:right;
 }
 
+/* options */
+#content div table.list_options thead tr th { background: #d6edff;}
+#content div table.list_options thead tr:nth-child(1) th { border-top: 1px solid #3d80b3;}
+#content div table.list_options thead tr:nth-child(2) td, #content div table.list_options thead tr:nth-child(2) th {height:175px; overflow:hidden;}
+#content div table.list_options thead tr:nth-child(2) th div {
+    line-height: 1.5em;
+    display:block;
+    white-space:nowrap;
+    padding:0px;
+    
+    writing-mode: tb-rl;
+    filter: flipv fliph;
+    transform: rotate(270deg) translate(-175px,0);
+    transform-origin: 0 0;
+    -moz-transform: rotate(270deg) translate(-175px,0);
+    -moz-transform-origin: 0 0;
+    -webkit-transform: rotate(270deg) translate(-175px,0);
+    -webkit-transform-origin: 0 0;
+    }
+#content div table.list_options thead tr th { border-left: 1px solid #3d80b3;}
+#content div table.list_options tbody tr:last-child th, #content div table.list_options tbody tr:last-child td { border-bottom: 1px solid #3d80b3;}
+#content div table.list_options tbody tr td, #content div table.list_options tbody tr td { border-left: 1px solid #BDD4E6;}
+#content div table.list_options tbody tr td:nth-child(1), #content div table.list_options tbody tr td:nth-child(1) { border-left: none;}
+#content div table.list_options tbody tr td:nth-child(2), #content div table.list_options tbody tr td:nth-child(2) { border-left: 1px solid #3d80b3;}
+#content div table.list_options tbody th {padding-left:12px; border-top:1px solid #3d80b3; background: #efefef;}
+#content div table.list_options tbody tr .level1 {padding-left:12px; border-top:1px solid #BDD4E6;}
+#content div table.list_options tbody tr .level2 {padding-left:24px;}
+
+/* parameters */
+#content div table.list_parameters thead tr th { background: #d6edff;}
+#content div table.list_parameters thead tr:nth-child(1) th { border-top: 1px solid #3d80b3;}
+#content div table.list_parameters thead tr:nth-child(2) td, #content div table.list_parameters thead tr:nth-child(2) th {height:175px; overflow:hidden;}
+#content div table.list_parameters thead tr:nth-child(2) th div {
+    line-height: 1.5em;
+    display:block;
+    white-space:nowrap;
+    padding:0px;
+    
+    writing-mode: tb-rl;
+    filter: flipv fliph;
+    transform: rotate(270deg) translate(-175px,0);
+    transform-origin: 0 0;
+    -moz-transform: rotate(270deg) translate(-175px,0);
+    -moz-transform-origin: 0 0;
+    -webkit-transform: rotate(270deg) translate(-175px,0);
+    -webkit-transform-origin: 0 0;
+    }
+#content div table.list_parameters thead tr th { border-left: 1px solid #3d80b3;}
+#content div table.list_parameters tbody tr:last-child th, #content div table.list_parameters tbody tr:last-child td { border-bottom: 1px solid #3d80b3;}
+#content div table.list_parameters tbody tr td, #content div table.list_parameters tbody tr td { border-left: 1px solid #BDD4E6;}
+#content div table.list_parameters tbody tr td:nth-child(1), #content div table.list_parameters tbody tr td:nth-child(1) { border-left: none;}
+#content div table.list_parameters tbody tr td:nth-child(2), #content div table.list_parameters tbody tr td:nth-child(2) { border-left: 1px solid #3d80b3;}
+#content div table.list_parameters tbody th {padding-left:12px; border-top:1px solid #3d80b3; background: #efefef;}
+#content div table.list_parameters tbody tr .level1 {padding-left:12px; border-top:1px solid #BDD4E6;}
+#content div table.list_parameters tbody tr .level2 {padding-left:24px;}
+
+/* processes */
+/* states */
+
+/* investigators */
 #content div table.list_investigators thead tr:nth-child(1) th:nth-child(1),  
 #content div table.list_investigators thead tr:nth-child(2) th:nth-child(2), 
 #content div table.list_investigators tbody tr td:nth-child(2)
@@ -413,6 +497,7 @@ select.error {border-color:red;}
     text-align:right;
 }
 
+/* investigators' organisms, batches */
 #content div table.list_investigator__organisms thead tr:nth-child(1) th:nth-child(1), 
 #content div table.list_investigator__organisms thead tr:nth-child(2) th:nth-child(2), 
 #content div table.list_investigator__organisms tbody tr td:nth-child(2){
@@ -424,7 +509,6 @@ select.error {border-color:red;}
     text-align:right;
 }
 
-
 #content div table.list_investigator__simulation_batches thead tr:nth-child(1) th:nth-child(1), 
 #content div table.list_investigator__simulation_batches thead tr:nth-child(2) th:nth-child(2), 
 #content div table.list_investigator__simulation_batches tbody tr td:nth-child(2){
@@ -434,6 +518,7 @@ select.error {border-color:red;}
     text-align:right;
 }
 
+/* organism's batches, investigators */
 #content div table.list_organism__simulation_batches thead tr:nth-child(1) th:nth-child(1), 
 #content div table.list_organism__simulation_batches thead tr:nth-child(2) th:nth-child(1), 
 #content div table.list_organism__simulation_batches tbody tr td:nth-child(1){
@@ -448,6 +533,7 @@ select.error {border-color:red;}
     text-align:right;
 }
 
+/* batch's simulations */
 #content div table.list_simulation_batch__simulations thead tr:nth-child(1) th:nth-child(1), 
 #content div table.list_simulation_batch__simulations tbody tr td:nth-child(1),
 #content div table.list_simulation_batch__simulations thead tr:nth-child(1) th:nth-child(2), 
@@ -459,6 +545,9 @@ select.error {border-color:red;}
     text-align:right;
 }
 
+/****************
+ * download 
+ ****************/
 #content div table.download {border-bottom:none;}
 #content div table.download tbody tr:last-child td{border-bottom:1px solid #3d80b3;}
 #content div table.download tr th, #content div table.download tr td{border-right:none;}
@@ -472,16 +561,9 @@ select.error {border-color:red;}
 #content div table.download tr th:last-child, #content div table.download tr td:last-child{width:100%;}
 #content div table.download tfoot th{padding-top:10px; text-align:right;}
 
-#content div table.twocol td{
-    width:50%;
-}
-#content div table.threecol td{
-    width:33%;
-}
-#content div table.fourcol td{
-    width:25%;
-}
-
+/****************
+ * search 
+ ****************/
 #content div table.search_advanced {
     margin-top:10px;
 }
@@ -547,7 +629,9 @@ select.error {border-color:red;}
 #content div table.search_advanced table.states td:nth-child(1) select{width:580px;}
 #content div table.search_advanced table.states td:nth-child(2) select{width:100px;}
 
-/* tutorial */
+/****************
+ * tutorial
+ ****************/
 #content #tutorial{
     position:absolute;
     margin:auto auto;

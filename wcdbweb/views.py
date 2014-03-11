@@ -135,7 +135,28 @@ def simulation(request, id):
     
 def list_options(request):
     options = models.Option.objects.all()
+    
+    organisms = models.Organism.objects.all()
+    n_simulation_batches = models.SimulationBatch.objects.count()
+    
+    options = {
+        'Global': models.Option.objects
+            .filter(process__isnull=True, state__isnull=True)
+            .values('name', 'units', 'value', 'index', 'simulation_batch__name')
+            .order_by('name', 'simulation_batch__name', 'index'),
+        'Processes': models.Option.objects
+            .filter(process__isnull=False)
+            .values('process__name', 'name', 'units', 'value', 'index', 'simulation_batch__name')
+            .order_by('process__name', 'name', 'simulation_batch__name', 'index'),
+        'States': models.Option.objects
+            .filter(state__isnull=False)
+            .values('state__name', 'name', 'units', 'value', 'index', 'simulation_batch__name')
+            .order_by('state__name', 'name', 'simulation_batch__name', 'index'),
+        }
+    
     return render_template('list_options.html', request, data = {
+        'organisms': organisms,
+        'n_simulation_batches': n_simulation_batches,
         'options': options
     })
     
@@ -147,7 +168,28 @@ def option(request, option_name, process_name=None, state_name=None):
     
 def list_parameters(request):
     parameters = models.Parameter.objects.all()
+    
+    organisms = models.Organism.objects.all()
+    n_simulation_batches = models.SimulationBatch.objects.count()
+    
+    parameters = {
+        'Global': models.Parameter.objects
+            .filter(process__isnull=True, state__isnull=True)
+            .values('name', 'units', 'value', 'index', 'simulation_batch__name')
+            .order_by('name', 'simulation_batch__name', 'index'),
+        'Processes': models.Parameter.objects
+            .filter(process__isnull=False)
+            .values('process__name', 'name', 'units', 'value', 'index', 'simulation_batch__name')
+            .order_by('process__name', 'name', 'simulation_batch__name', 'index'),
+        'States': models.Parameter.objects
+            .filter(state__isnull=False)
+            .values('state__name', 'name', 'units', 'value', 'index', 'simulation_batch__name')
+            .order_by('state__name', 'name', 'simulation_batch__name', 'index'),
+        }
+    
     return render_template('list_parameters.html', request, data = {
+        'organisms': organisms,
+        'n_simulation_batches': n_simulation_batches,
         'parameters': parameters
     })
     

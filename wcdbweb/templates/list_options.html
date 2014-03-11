@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% comment %}
+List options page
+
+Author: Jonathan Karr, jkarr@stanford.edu
+Affiliation: Covert Lab, Department of Bioengineering, Stanford University
+Created: 2014-03-10
+{% endcomment %}
+
+{% load static %}
+{% load template_extras %}
+
+{% block head_title %}{{ block.super }} :: Options{% endblock %}
+
+{% block content %}
+
+<div>
+<h1>Options</h1>
+
+<table class="list_options">
+    <thead>
+        <tr>
+            <td></td>
+            {% for organism in organisms %}
+            <th colspan="{{organism.simulation_batches.count}}"><i><a href="{% url wcdbweb.views.organism id=organism.id %}">{{organism.name}}</i></a></th>
+            {% endfor %}
+        </tr>        
+        <tr>
+            <td></td>
+            {% for organism in organisms %}
+                {% for batch in organism.simulation_batches.all %}
+            <th><div><a href="{% url wcdbweb.views.simulation_batch id=batch.id %}">{{batch.name}}</a></div></th>
+                {% endfor %}
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        <!-- global -->
+        <tr>
+            <th colspan="{{n_simulation_batches|add:1}}">Global</th>
+        </tr>
+        {% regroup options.Global by name as options_global %}
+        {% for option in options_global %}
+        <tr>
+            <td class="level1"><a href="{% url wcdbweb.views.option option_name=option.grouper %}">{{option.grouper}}</a>{% if not option.list.0.units == None %} ({{option.list.0.units}}){% endif %}</td>            
+            {% regroup option.list by simulation_batch__name as batches %}
+            {% for batch in batches %}
+            <td class="level1">{% if batch.list|length > 1 %}[{%for val in batch.list%}{{val.value}}{%if not forloop.last%}, {%endif%}{%endfor%}]{% else %}{{batch.list.0.value}}{% endif %}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+        
+        <!-- processes -->
+        <tr>
+            <th colspan="{{n_simulation_batches|add:1}}">Processes</th>
+        </tr>
+        {% regroup options.Processes by process__name as processes %}
+        {% for process in processes %}
+        <tr>
+            <td class="level1"><a href="{% url wcdbweb.views.process process_name=process.grouper %}">{{process.grouper}}</a></td>
+            <td class="level1" colspan="{{n_simulation_batches}}"></td>
+        </tr>
+            {% regroup process.list by name as process_options %}
+            {% for option in process_options %}
+        <tr>
+            <td class="level2"><a href="{% url wcdbweb.views.option process_name=process.grouper option_name=option.grouper %}">{{option.grouper}}</a>{% if not option.list.0.units == None %} ({{option.list.0.units}}){% endif %}</td>
+                {% regroup option.list by simulation_batch__name as batches %}
+                {% for batch in batches %}
+            <td>{% if batch.list|length > 1 %}[{%for val in batch.list%}{{val.value}}{%if not forloop.last%}, {%endif%}{%endfor%}]{% else %}{{batch.list.0.value}}{% endif %}</td>
+                {% endfor %}
+        </tr>
+            {% endfor %}
+        {% endfor %}
+        
+        <!-- states -->
+        <tr>
+            <th colspan="{{n_simulation_batches|add:1}}">States</th>
+        </tr>
+        {% regroup options.States by state__name as states %}
+        {% for state in states %}
+        <tr>
+            <td class="level1"><a href="{% url wcdbweb.views.state state_name=state.grouper %}">{{state.grouper}}</a></td>
+            <td class="level1" colspan="{{n_simulation_batches}}"></td>
+        </tr>
+            {% regroup state.list by name as state_options %}
+            {% for option in state_options %}
+        <tr>
+            <td class="level2"><a href="{% url wcdbweb.views.option state_name=state.grouper option_name=option.grouper %}">{{option.grouper}}</a>{% if not option.list.0.units == None %} ({{option.list.0.units}}){% endif %}</td>
+                {% regroup option.list by simulation_batch__name as batches %}
+                {% for batch in batches %}
+            <td>{% if batch.list|length > 1 %}[{%for val in batch.list%}{{val.value}}{%if not forloop.last%}, {%endif%}{%endfor%}]{% else %}{{batch.list.0.value}}{% endif %}</td>
+                {% endfor %}
+        </tr>
+            {% endfor %}
+        {% endfor %}
+    </tbody>
+</table>
+
+</div>
+
+{% endblock %}
