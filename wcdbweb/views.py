@@ -1,5 +1,5 @@
 from django.core.servers.basehttp import FileWrapper
-from django.db.models import Avg, Count
+from django.db.models import Avg, Count, Min, Max
 from django.http import HttpResponse
 from haystack.query import SearchQuerySet
 from helpers import render_template
@@ -131,7 +131,40 @@ def simulation(request, id):
     return render_template('simulation.html', request, data = {
         'simulation': simulation,
         'batch': batch,
-    })    
+    })
+    
+def list_options(request):
+    pass
+    
+def option(request, option_name, process_name=None, state_name=None):
+    pass
+    
+def list_parameters(request):
+    pass
+    
+def parameter(request, parameter_name, process_name=None, state_name=None):
+    pass
+    
+def list_processes(request):
+    pass
+    
+def process(request, process_name):
+    pass
+    
+def list_states(request):
+    pass
+    
+def state(request, state_name):
+    pass
+    
+def state_property(request, state_name, property_name):
+    pass
+    
+def state_property_row(request, state_name, property_name, row_name):
+    pass
+    
+def state_property_row_batch(request, state_name, property_name, row_name, batch_id):
+    pass
     
 ###################
 ### downloading
@@ -472,6 +505,26 @@ def sitemap_top_level(request):
         'simulation_batches': models.SimulationBatch.objects.all(),
         'simulations': models.Simulation.objects.all(),
         'investigators': models.Investigator.objects.all(),
+        'options': models.Option.objects
+            .values('name', 'state__name', 'process__name', 'simulation_batch__date')
+            .annotate(Count('name'), Count('state__name'), Count('process__name'), date=Max('simulation_batch__date'))
+            .order_by('process__name', 'state__name', 'name'),
+        'parameters': models.Parameter.objects
+            .values('name', 'state__name', 'process__name', 'simulation_batch__date')
+            .annotate(Count('name'), Count('state__name'), Count('process__name'), date=Max('simulation_batch__date'))
+            .order_by('process__name', 'state__name', 'name'),
+        'processes': models.Process.objects
+            .values('name', 'simulation_batch__date')
+            .annotate(Count('name'), date=Max('simulation_batch__date'))
+            .order_by('name'),
+        'states': models.State.objects
+            .values('name', 'simulation_batch__date')
+            .annotate(Count('name'), date=Max('simulation_batch__date'))
+            .order_by('name'),
+        'state_properties': models.Property.objects
+            .values('name', 'state__name', 'state__simulation_batch__date')
+            .annotate(Count('name'), Count('state__name'), date=Max('state__simulation_batch__date'))
+            .order_by('state__name', 'name')
         })
         
 def sitemap_simulation_batch(request):

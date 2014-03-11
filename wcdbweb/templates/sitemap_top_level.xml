@@ -39,7 +39,28 @@ Updated: 2014-03-09
 		<loc>{{ ROOT_URL }}{% url wcdbweb.views.list_simulations %}</loc>
 		<lastmod>{{ simulations.latest.batch.date|set_time_zone|date:"c" }}</lastmod>
 		<changefreq>weekly</changefreq>
+	</url>	
+	<url>
+		<loc>{{ ROOT_URL }}{% url wcdbweb.views.list_options %}</loc>
+		<lastmod>{{ simulations.latest.batch.date|set_time_zone|date:"c" }}</lastmod>
+		<changefreq>weekly</changefreq>
 	</url>
+	<url>
+		<loc>{{ ROOT_URL }}{% url wcdbweb.views.list_parameters %}</loc>
+		<lastmod>{{ simulations.latest.batch.date|set_time_zone|date:"c" }}</lastmod>
+		<changefreq>weekly</changefreq>
+	</url>
+	<url>
+		<loc>{{ ROOT_URL }}{% url wcdbweb.views.list_processes %}</loc>
+		<lastmod>{{ simulations.latest.batch.date|set_time_zone|date:"c" }}</lastmod>
+		<changefreq>weekly</changefreq>
+	</url>
+	<url>
+		<loc>{{ ROOT_URL }}{% url wcdbweb.views.list_states %}</loc>
+		<lastmod>{{ simulations.latest.batch.date|set_time_zone|date:"c" }}</lastmod>
+		<changefreq>weekly</changefreq>
+	</url>
+	
 	
 	<!-- search -->
 	<url>
@@ -89,4 +110,62 @@ Updated: 2014-03-09
 		<changefreq>montly</changefreq>
 	</url>
 	{% endfor %}
+	
+	<!-- options -->
+	{% for option in options %}
+	<url>
+		{% if not option.process__name == None %}
+		<loc>{{ ROOT_URL }}{% url wcdbweb.views.option option_name=option.name process_name=option.process__name %}</loc> 
+		{% elif not option.state__name == None %}
+		<loc>{{ ROOT_URL }}{% url wcdbweb.views.option option_name=option.name state_name=option.state__name %}</loc> 
+		{% else %}
+		<loc>{{ ROOT_URL }}{% url wcdbweb.views.option option_name=option.name %}</loc> 
+		{% endif %}
+		<lastmod>{{ option.date|set_time_zone|date:"c" }}</lastmod>
+		<changefreq>montly</changefreq>
+	</url>
+	{% endfor %}
+	
+	<!-- parameters -->
+	{% for parameter in parameters %}
+	<url>
+		{% if not parameter.process__name == None %}
+		<loc>{{ ROOT_URL }}{% url wcdbweb.views.parameter parameter_name=parameter.name process_name=parameter.process__name %}</loc> 
+		{% elif not parameter.state__name == None %}
+		<loc>{{ ROOT_URL }}{% url wcdbweb.views.parameter parameter_name=parameter.name state_name=parameter.state__name %}</loc> 
+		{% else %}
+		<loc>{{ ROOT_URL }}{% url wcdbweb.views.parameter parameter_name=parameter.name %}</loc> 
+		{% endif %}
+		<lastmod>{{ parameter.date|set_time_zone|date:"c" }}</lastmod>
+		<changefreq>montly</changefreq>
+	</url>
+	{% endfor %}
+	
+	<!-- processes -->
+	{% for process in processes %}
+	<url>
+		<loc>{{ ROOT_URL }}{% url wcdbweb.views.process process_name=process.name %}</loc> 
+		<lastmod>{{ process.date|set_time_zone|date:"c" }}</lastmod>
+		<changefreq>montly</changefreq>
+	</url>
+	{% endfor %}
+	
+	<!-- states -->
+	{% for state in states %}
+	<url>
+		<loc>{{ ROOT_URL }}{% url wcdbweb.views.state state_name=state.name %}</loc> 
+		<lastmod>{{ state.date|set_time_zone|date:"c" }}</lastmod>
+		<changefreq>montly</changefreq>
+	</url>
+	{% endfor %}
+	
+	{% for state_property in state_properties %}
+	<url>
+		<loc>{{ ROOT_URL }}{% url wcdbweb.views.state_property state_name=state_property.state__name property_name=state_property.name %}</loc> 
+		<lastmod>{{ state_property.date|set_time_zone|date:"c" }}</lastmod>
+		<changefreq>montly</changefreq>
+	</url>
+	{% endfor %}	
+	
+	<!-- views not indexed: state_property_row, state_property_row_batch -->
 </urlset>
