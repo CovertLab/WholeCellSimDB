@@ -125,6 +125,7 @@ def list_simulations(request):
         'simulations': simulations
     })
     
+#TODO
 def simulation(request, id):
     simulation = models.Simulation.objects.get(id=id)    
     batch = simulation.batch
@@ -137,29 +138,32 @@ def list_options(request):
     options = models.Option.objects.all()
     
     organisms = models.Organism.objects.all()
-    n_simulation_batches = models.SimulationBatch.objects.count()
+    simulation_batches = models.SimulationBatch.objects.order_by('organism__name', 'name')    
+    simulation_batch_ids = [x[0] for x in simulation_batches.values_list('id')]
     
     options = {
         'Global': models.Option.objects
             .filter(process__isnull=True, state__isnull=True)
-            .values('name', 'units', 'value', 'index', 'simulation_batch__name')
+            .values('name', 'units', 'value', 'index', 'simulation_batch__id', 'simulation_batch__name')
             .order_by('name', 'simulation_batch__name', 'index'),
         'Processes': models.Option.objects
             .filter(process__isnull=False)
-            .values('process__name', 'name', 'units', 'value', 'index', 'simulation_batch__name')
+            .values('process__name', 'name', 'units', 'value', 'index', 'simulation_batch__id', 'simulation_batch__name')
             .order_by('process__name', 'name', 'simulation_batch__name', 'index'),
         'States': models.Option.objects
             .filter(state__isnull=False)
-            .values('state__name', 'name', 'units', 'value', 'index', 'simulation_batch__name')
+            .values('state__name', 'name', 'units', 'value', 'index', 'simulation_batch__id', 'simulation_batch__name')
             .order_by('state__name', 'name', 'simulation_batch__name', 'index'),
         }
     
     return render_template('list_options.html', request, data = {
         'organisms': organisms,
-        'n_simulation_batches': n_simulation_batches,
+        'simulation_batches': simulation_batches,
+        'simulation_batch_ids': simulation_batch_ids,
         'options': options
     })
     
+#TODO
 def option(request, option_name, process_name=None, state_name=None):
     option = models.Option.objects.filter(name=option_name, process__name=process_name, state__name=state_name)
     return render_template('option.html', request, data = {
@@ -167,74 +171,89 @@ def option(request, option_name, process_name=None, state_name=None):
     })
     
 def list_parameters(request):
-    parameters = models.Parameter.objects.all()
-    
     organisms = models.Organism.objects.all()
-    n_simulation_batches = models.SimulationBatch.objects.count()
+    simulation_batches = models.SimulationBatch.objects.order_by('organism__name', 'name')    
+    simulation_batch_ids = [x[0] for x in simulation_batches.values_list('id')]
     
     parameters = {
         'Global': models.Parameter.objects
             .filter(process__isnull=True, state__isnull=True)
-            .values('name', 'units', 'value', 'index', 'simulation_batch__name')
+            .values('name', 'units', 'value', 'index', 'simulation_batch__id', 'simulation_batch__name')
             .order_by('name', 'simulation_batch__name', 'index'),
         'Processes': models.Parameter.objects
             .filter(process__isnull=False)
-            .values('process__name', 'name', 'units', 'value', 'index', 'simulation_batch__name')
+            .values('process__name', 'name', 'units', 'value', 'index', 'simulation_batch__id', 'simulation_batch__name')
             .order_by('process__name', 'name', 'simulation_batch__name', 'index'),
         'States': models.Parameter.objects
             .filter(state__isnull=False)
-            .values('state__name', 'name', 'units', 'value', 'index', 'simulation_batch__name')
+            .values('state__name', 'name', 'units', 'value', 'index', 'simulation_batch__id', 'simulation_batch__name')
             .order_by('state__name', 'name', 'simulation_batch__name', 'index'),
         }
     
     return render_template('list_parameters.html', request, data = {
         'organisms': organisms,
-        'n_simulation_batches': n_simulation_batches,
+        'simulation_batches': simulation_batches,
+        'simulation_batch_ids': simulation_batch_ids,
         'parameters': parameters
     })
     
+#TODO
 def parameter(request, parameter_name, process_name=None, state_name=None):
     parameter = models.Parameter.objects.filter(name=parameter_name, process__name=process_name, state__name=state_name)
     return render_template('parameter.html', request, data = {
         'parameter': parameter
     })
     
+#TODO
 def list_processes(request):
-    processes = models.Process.objects.all()
-    return render_template('list_options.html', request, data = {
+    organisms = models.Organism.objects.all()
+    simulation_batches = models.SimulationBatch.objects.order_by('organism__name', 'name')    
+    simulation_batch_ids = [x[0] for x in simulation_batches.values_list('id')]
+    processes =  models.Process.objects.values('name', 'simulation_batch__id', 'simulation_batch__name').order_by('name', 'simulation_batch__name')
+    
+    return render_template('list_processes.html', request, data = {
+        'organisms': organisms,
+        'simulation_batches': simulation_batches,
+        'simulation_batch_ids': simulation_batch_ids,
         'processes': processes
     })
     
+#TODO
 def process(request, process_name):
     process = models.Process.objects.filter(name=process_name)
     return render_template('process.html', request, data = {
         'process': process
     })
     
+#TODO
 def list_states(request):
     states = models.State.objects.all()
     return render_template('list_states.html', request, data = {
         'states': states
     })
     
+#TODO
 def state(request, state_name):
     state = models.State.objects.filter(name=state_name)
     return render_template('state.html', request, data = {
         'state': state
     })
     
+#TODO
 def state_property(request, state_name, property_name):
     property = models.Property.objects.filter(name=property_name, state__name=state_name)
     return render_template('property.html', request, data = {
         'property': property
     })
-    
+
+#TODO    
 def state_property_row(request, state_name, property_name, row_name):
     row = models.Label.objects.filter(dimension=1, name=property_name, property__name=property_name, property__state__name=state_name)
     return render_template('state_property_row.html', request, data = {
         'row': row
     })
-    
+
+#TODO    
 def state_property_row_batch(request, state_name, property_name, row_name, batch_id):
     row = models.Label.objects.get(dimension=1, name=property_name, property__name=property_name, property__state__name=state_name, property__state__simulation_batch__id=batch_id)
     return render_template('state_property_row_batch.html', request, data = {

@@ -40,3 +40,17 @@ def get_template_last_updated(templateFile):
 @register.filter
 def set_time_zone(datetime):
 	return datetime.replace(tzinfo=tzlocal())
+    
+@register.assignment_tag
+def regroup_by(all_objects, by, field, values):
+    tmp = {}    
+    for object in all_objects:
+        if object[field] not in tmp:
+            tmp[object[field]] = []
+        tmp[object[field]].append(object)
+        
+    returnVal = []
+    for value in values:
+        returnVal.append({'grouper': value, 'list': tmp[value] if value in tmp else []})
+        
+    return returnVal

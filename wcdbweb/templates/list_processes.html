@@ -18,6 +18,35 @@ Created: 2014-03-10
 <div>
 <h1>Processes</h1>
 
+<table class="list_processes">
+    <thead>
+        <tr>
+            <td></td>
+            {% for organism in organisms %}
+            <th colspan="{{organism.simulation_batches.count}}"><i><a href="{% url wcdbweb.views.organism id=organism.id %}">{{organism.name}}</i></a></th>
+            {% endfor %}
+        </tr>        
+        <tr>
+            <td></td>
+            {% for batch in simulation_batches %}
+            <th><div><a href="{% url wcdbweb.views.simulation_batch id=batch.id %}">{{batch.name}}</a></div></th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% regroup processes by name as processes_grouped %}
+        {% for process in processes_grouped %}
+        <tr>
+            <td><a href="{% url wcdbweb.views.process process_name=process.grouper %}">{{process.grouper}}</a></td>
+            {% regroup_by process.list by 'simulation_batch__id' simulation_batch_ids as process_batches %}
+            {% for batch in process_batches %}    
+            <td>{% if batch.list|length > 0 %}x{% endif %}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>        
+
 </div>
 
 {% endblock %}
