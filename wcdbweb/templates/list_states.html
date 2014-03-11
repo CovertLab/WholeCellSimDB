@@ -18,6 +18,41 @@ Created: 2014-03-10
 <div>
 <h1>States</h1>
 
+<table class="list_states">
+    <thead>
+        <tr>
+            <td></td>
+            {% for organism in organisms %}
+            <th colspan="{{organism.simulation_batches.count}}"><i><a href="{% url wcdbweb.views.organism id=organism.id %}">{{organism.name}}</i></a></th>
+            {% endfor %}
+        </tr>        
+        <tr>
+            <td></td>
+            {% for batch in simulation_batches %}
+            <th><div><a href="{% url wcdbweb.views.simulation_batch id=batch.id %}">{{batch.name}}</a></div></th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% regroup state_properties by state__name as states %}
+        {% for state in states %}
+        <tr>
+            <th colspan="{{simulation_batches.count|add:1}}"><a href="{% url wcdbweb.views.state state_name=state.grouper %}">{{state.grouper}}</a></th>
+        </tr>
+            {% regroup state.list by name as properties %}
+            {% for property in properties %}
+        <tr>
+            <td class="level1"><a href="{% url wcdbweb.views.state_property state_name=state.grouper property_name=property.grouper %}">{{property.grouper}}</a></td>
+            {% regroup_by property.list by 'state__simulation_batch__id' simulation_batch_ids as property_batches %}
+            {% for batch in property_batches %}
+            <td class="level1">{% if batch.list|length > 0 %}x{% endif %}</td>
+            {% endfor %}
+        </tr>
+            {% endfor %}
+        {% endfor %}
+    </tbody>
+</table>        
+
 </div>
 
 {% endblock %}

@@ -204,12 +204,13 @@ def parameter(request, parameter_name, process_name=None, state_name=None):
         'parameter': parameter
     })
     
-#TODO
 def list_processes(request):
     organisms = models.Organism.objects.all()
-    simulation_batches = models.SimulationBatch.objects.order_by('organism__name', 'name')    
+    simulation_batches = models.SimulationBatch.objects.order_by('organism__name', 'name')
     simulation_batch_ids = [x[0] for x in simulation_batches.values_list('id')]
-    processes =  models.Process.objects.values('name', 'simulation_batch__id', 'simulation_batch__name').order_by('name', 'simulation_batch__name')
+    processes =  models.Process.objects \
+        .values('name', 'simulation_batch__id', 'simulation_batch__name') \
+        .order_by('name', 'simulation_batch__name')
     
     return render_template('list_processes.html', request, data = {
         'organisms': organisms,
@@ -225,11 +226,19 @@ def process(request, process_name):
         'process': process
     })
     
-#TODO
 def list_states(request):
-    states = models.State.objects.all()
+    organisms = models.Organism.objects.all()
+    simulation_batches = models.SimulationBatch.objects.order_by('organism__name', 'name')
+    simulation_batch_ids = [x[0] for x in simulation_batches.values_list('id')]
+    state_properties =  models.Property.objects \
+        .values('name', 'state__name', 'state__simulation_batch__id', 'state__simulation_batch__name') \
+        .order_by('state__name', 'name', 'state__simulation_batch__name')
+    
     return render_template('list_states.html', request, data = {
-        'states': states
+        'organisms': organisms,
+        'simulation_batches': simulation_batches,
+        'simulation_batch_ids': simulation_batch_ids,
+        'state_properties': state_properties
     })
     
 #TODO
