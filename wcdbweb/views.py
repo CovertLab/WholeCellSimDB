@@ -163,11 +163,16 @@ def list_options(request):
         'options': options
     })
     
-#TODO
 def option(request, option_name, process_name=None, state_name=None):
-    option = models.Option.objects.filter(name=option_name, process__name=process_name, state__name=state_name)
+    options = models.Option.objects \
+        .filter(name=option_name, process__name=process_name, state__name=state_name) \
+        .values('name', 'process__name', 'state__name', 'simulation_batch__organism__id', 'simulation_batch__organism__name', 'simulation_batch__id', 'simulation_batch__name', 'value', 'units') \
+        .order_by('simulation_batch__organism__name', 'simulation_batch__name')
     return render_template('option.html', request, data = {
-        'option': option
+        'option_name': option_name,
+        'process_name': process_name,
+        'state_name': state_name,
+        'options': options
     })
     
 def list_parameters(request):
@@ -197,11 +202,16 @@ def list_parameters(request):
         'parameters': parameters
     })
     
-#TODO
 def parameter(request, parameter_name, process_name=None, state_name=None):
-    parameter = models.Parameter.objects.filter(name=parameter_name, process__name=process_name, state__name=state_name)
+    parameters = models.Parameter.objects \
+        .filter(name=parameter_name, process__name=process_name, state__name=state_name) \
+        .values('name', 'process__name', 'state__name', 'simulation_batch__organism__id', 'simulation_batch__organism__name', 'simulation_batch__id', 'simulation_batch__name', 'value', 'units') \
+        .order_by('simulation_batch__organism__name', 'simulation_batch__name')
     return render_template('parameter.html', request, data = {
-        'parameter': parameter
+        'parameter_name': parameter_name,
+        'process_name': process_name,
+        'state_name': state_name,
+        'parameters': parameters
     })
     
 def list_processes(request):

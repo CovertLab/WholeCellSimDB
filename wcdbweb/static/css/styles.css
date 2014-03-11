@@ -596,6 +596,30 @@ select.error {border-color:red;}
     text-align:right;
 }
 
+/* option */
+#content div table.option {border-top:1px solid #3d80b3; border-bottom:1px solid #3d80b3;}
+#content div table.option thead tr th{background:#d6edff; border-bottom:1px solid #3d80b3;}
+#content div table.option tbody tr td.level1 {padding-left:12px;}
+#content div table.option tr th:nth-child(2), #content div table.option tr td:nth-child(2), #content div table.option tr th:nth-child(3), #content div table.option tr td:nth-child(3) {padding-left:10px; border-left: 1px solid #BDD4E6; }
+#content div table.option thead tr th:nth-child(2), #content div table.option tbody tr td:nth-child(2) {padding-right:10px; }
+#content div table.option tbody tr td:nth-child(2) {text-align:right;}
+#content div table.option tbody tr th {border-top: 1px solid #BDD4E6;}
+#content div table.option tbody tr:first-child th {border-top: none;}
+
+/* parameter */
+#content div table.parameter {border-top:1px solid #3d80b3; border-bottom:1px solid #3d80b3;}
+#content div table.parameter thead tr th{background:#d6edff; border-bottom:1px solid #3d80b3;}
+#content div table.parameter tbody tr td.level1 {padding-left:12px;}
+#content div table.parameter tr th:nth-child(2), #content div table.parameter tr td:nth-child(2), #content div table.parameter tr th:nth-child(3), #content div table.parameter tr td:nth-child(3) {padding-left:10px; border-left: 1px solid #BDD4E6; }
+#content div table.parameter thead tr th:nth-child(2), #content div table.parameter tbody tr td:nth-child(2) {padding-right:10px; }
+#content div table.parameter tbody tr td:nth-child(2) {text-align:right;}
+#content div table.parameter tbody tr th {border-top: 1px solid #BDD4E6;}
+#content div table.parameter tbody tr:first-child th {border-top: none;}
+
+/* process */
+
+/* state */
+
 /****************
  * download 
  ****************/

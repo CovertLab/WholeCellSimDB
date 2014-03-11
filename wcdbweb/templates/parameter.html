@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% comment %}
+Parameter page
+
+Author: Jonathan Karr, jkarr@stanford.edu
+Affiliation: Covert Lab, Department of Bioengineering, Stanford University
+Created: 2014-03-10
+{% endcomment %}
+
+{% load static %}
+{% load template_extras %}
+
+{% block head_title %}
+{{ block.super }}
+ :: Parameter
+{% if not process_name == None %} :: {{process_name}}{% endif %}
+{% if not state_name == None %} :: {{state_name}}{% endif %}
+ :: {{parameter_name}}
+ {% endblock %}
+
+{% block content %}
+
+<div>
+<h1>Parameter
+{% if not process_name == None %} :: <a href="{% url wcdbweb.views.process process_name=process_name %}">{{process_name}}</a>{% endif %}
+{% if not state_name == None %} :: <a href="{% url wcdbweb.views.state state_name=state_name %}">{{state_name}}</a>{% endif %}
+ :: {{parameter_name}}</h1>
+
+<table class="parameter">
+    <thead>
+        <tr>
+            <th>Organism/simulation batch</th>
+            <th>Value</th>
+            <th>Units</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% regroup parameters by simulation_batch__organism__name as organisms %}        
+        {% for organism in organisms %}
+        <tr>
+            <th><a href="{% url wcdbweb.views.organism id=organism.list.0.simulation_batch__organism__id %}">{{organism.grouper}}</a></th>
+            <th></th>
+            <th></th>
+        </tr>
+            {% for batch in organism.list %}
+        <tr>
+            <td class="level1"><a href="{% url wcdbweb.views.simulation_batch id=batch.simulation_batch__id %}">{{batch.simulation_batch__name}}</a></td>
+            <td>{{batch.value}}</td>
+            <td>{{batch.units|default_if_none:""}}</td>
+        </tr>
+            {% endfor %}
+        {% endfor %}
+    </tbody>
+</table> 
+
+</div>
+
+{% endblock %}
