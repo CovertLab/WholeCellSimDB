@@ -268,11 +268,33 @@ def list_states(request):
         'state_properties': state_properties
     })
     
-#TODO
 def state(request, state_name):
-    state = models.State.objects.filter(name=state_name)
+    simulation_batches = models.SimulationBatch.objects \
+        .filter(states__name=state_name) \
+        .values('organism__name', 'organism__id', 'name', 'id') \
+        .order_by('organism__name', 'name')
+    simulation_batch_ids = [x['id'] for x in simulation_batches]
+    
+    options = models.Option.objects \
+        .filter(state__name=state_name) \
+        .values('name', 'units', 'value', 'index', 'simulation_batch__id', 'simulation_batch__name') \
+        .order_by('name', 'simulation_batch__name', 'index')
+    parameters = models.Parameter.objects \
+        .filter(state__name=state_name) \
+        .values('name', 'units', 'value', 'index', 'simulation_batch__id', 'simulation_batch__name') \
+        .order_by('name', 'simulation_batch__name', 'index')
+    properties = models.Property.objects \
+        .filter(state__name=state_name) \
+        .values('name', 'state__simulation_batch__id', 'state__simulation_batch__name') \
+        .order_by('name', 'state__simulation_batch__name')
+        
     return render_template('state.html', request, data = {
-        'state': state
+        'state_name': state_name,
+        'simulation_batches': simulation_batches,
+        'simulation_batch_ids': simulation_batch_ids,
+        'options': options, 
+        'parameters': parameters,
+        'properties': properties,
     })
     
 #TODO

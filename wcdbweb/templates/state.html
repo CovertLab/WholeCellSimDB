@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% comment %}
-Process page
+State page
 
 Author: Jonathan Karr, jkarr@stanford.edu
 Affiliation: Covert Lab, Department of Bioengineering, Stanford University
@@ -11,14 +11,14 @@ Created: 2014-03-10
 {% load static %}
 {% load template_extras %}
 
-{% block head_title %}{{ block.super }} :: Process :: {{process_name}}{% endblock %}
+{% block head_title %}{{ block.super }} :: State :: {{state_name}}{% endblock %}
 
 {% block content %}
 
 <div>
-<h1>Process :: {{process_name}}</h1>
+<h1>State :: {{state_name}}</h1>
 
-<table class="list_process_option_parameter">
+<table class="list_state_option_parameter_property">
     <thead>
         <tr>
             <td></td>
@@ -42,7 +42,7 @@ Created: 2014-03-10
         {% regroup options by name as option_groups %}
         {% for option in option_groups %}
         <tr>
-            <td class="level1"><a href="{% url wcdbweb.views.option process_name=process_name option_name=option.grouper %}">{{option.grouper}}</a>{% if not option.list.0.units == None %} ({{option.list.0.units}}){% endif %}</td>
+            <td class="level1"><a href="{% url wcdbweb.views.option state_name=state_name option_name=option.grouper %}">{{option.grouper}}</a>{% if not option.list.0.units == None %} ({{option.list.0.units}}){% endif %}</td>
                 {% regroup_by option.list by 'simulation_batch__id' simulation_batch_ids as batches %}
                 {% for batch in batches %}
             <td class="level1">{% if batch.list|length > 1 %}[{%for val in batch.list%}{{val.value}}{%if not forloop.last%}, {%endif%}{%endfor%}]{% else %}{{batch.list.0.value}}{% endif %}</td>
@@ -57,13 +57,29 @@ Created: 2014-03-10
         {% regroup parameters by name as parameter_groups %}
         {% for parameter in parameter_groups %}
         <tr>
-            <td class="level1"><a href="{% url wcdbweb.views.parameter process_name=process_name parameter_name=parameter.grouper %}">{{parameter.grouper}}</a>{% if not parameter.list.0.units == None %} ({{parameter.list.0.units}}){% endif %}</td>
+            <td class="level1"><a href="{% url wcdbweb.views.parameter state_name=state_name parameter_name=parameter.grouper %}">{{parameter.grouper}}</a>{% if not parameter.list.0.units == None %} ({{parameter.list.0.units}}){% endif %}</td>
                 {% regroup_by parameter.list by 'simulation_batch__id' simulation_batch_ids as batches %}
                 {% for batch in batches %}
             <td class="level1">{% if batch.list|length > 1 %}[{%for val in batch.list%}{{val.value}}{%if not forloop.last%}, {%endif%}{%endfor%}]{% else %}{{batch.list.0.value}}{% endif %}</td>
                 {% endfor %}
         </tr>
         {% endfor %}
+        
+        <!-- properties -->
+        <tr>
+            <th colspan="{{simulation_batches|length|add:1}}">Properties</td>
+        </tr>
+        {% regroup properties by name as property_groups %}
+        {% for property in property_groups %}
+        <tr>
+            <td class="level1"><a href="{% url wcdbweb.views.state_property state_name=state_name property_name=property.grouper %}">{{property.grouper}}</a></td>
+                {% regroup_by property.list by 'state__simulation_batch__id' simulation_batch_ids as batches %}
+                {% for batch in batches %}
+            <td class="level1">{% if batch.list|length > 0 %}x{% endif %}</td>
+                {% endfor %}
+        </tr>
+        {% endfor %}
+        
     </tbody>
 </table>
 
