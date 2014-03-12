@@ -22,7 +22,7 @@ Created: 2014-03-10
     <thead>
         <tr>
             <td></td>
-            {% regroup simulation_batches by organism__name as organism %}
+            {% regroup simulation_batches by organism__name as organisms %}
             {% for organism in organisms %}
             <th colspan="{{organism.list|length}}"><i><a href="{% url wcdbweb.views.organism id=organism.list.0.organism__id %}">{{organism.grouper}}</i></a></th>
             {% endfor %}

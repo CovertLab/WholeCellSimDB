@@ -672,6 +672,33 @@ select.error {border-color:red;}
 #content div table.list_state_option_parameter_property tbody th {border-top:1px solid #3d80b3; background: #efefef;}
 #content div table.list_state_option_parameter_property tbody tr .level1 {padding-left:12px; border-top:1px solid #BDD4E6;}
 
+/* state property */
+#content div table.list_state_property_labels thead tr th { background: #d6edff;}
+#content div table.list_state_property_labels thead tr:nth-child(1) th { border-top: 1px solid #3d80b3;}
+#content div table.list_state_property_labels thead tr:nth-child(2) td, #content div table.list_state_property_labels thead tr:nth-child(2) th {height:175px; overflow:hidden;}
+#content div table.list_state_property_labels thead tr:nth-child(2) th div {
+    line-height: 1.5em;
+    display:block;
+    white-space:nowrap;
+    padding:0px;
+    
+    writing-mode: tb-rl;
+    filter: flipv fliph;
+    transform: rotate(270deg) translate(-175px,0);
+    transform-origin: 0 0;
+    -moz-transform: rotate(270deg) translate(-175px,0);
+    -moz-transform-origin: 0 0;
+    -webkit-transform: rotate(270deg) translate(-175px,0);
+    -webkit-transform-origin: 0 0;
+    }
+#content div table.list_state_property_labels thead tr th { border-left: 1px solid #3d80b3;}
+#content div table.list_state_property_labels tbody tr:last-child th, #content div table.list_state_property_labels tbody tr:last-child td { border-bottom: 1px solid #3d80b3;}
+#content div table.list_state_property_labels tbody tr td, #content div table.list_state_property_labels tbody tr td { border-left: 1px solid #BDD4E6;}
+#content div table.list_state_property_labels tbody tr td:nth-child(1), #content div table.list_state_property_labels tbody tr td:nth-child(1) { border-left: none;}
+#content div table.list_state_property_labels tbody tr td:nth-child(2), #content div table.list_state_property_labels tbody tr td:nth-child(2) { border-left: 1px solid #3d80b3;}
+#content div table.list_state_property_labels tbody th {border-top:1px solid #3d80b3; background: #efefef;}
+#content div table.list_state_property_labels tbody tr .level1 {padding-left:12px; border-top:1px solid #BDD4E6;}
+
 /****************
  * download 
  ****************/

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% comment %}
+State property page
+
+Author: Jonathan Karr, jkarr@stanford.edu
+Affiliation: Covert Lab, Department of Bioengineering, Stanford University
+Created: 2014-03-10
+{% endcomment %}
+
+{% load static %}
+{% load template_extras %}
+
+{% block head_title %}{{ block.super }} :: State :: {{state_name}} :: {{property_name}}{% endblock %}
+
+{% block content %}
+
+<div>
+<h1>State :: {{state_name}} :: {{property_name}}</h1>
+
+<table class="list_state_property_labels">
+    <thead>
+        <tr>
+            <td></td>
+            {% regroup simulation_batches by organism__name as organisms %}
+            {% for organism in organisms %}
+            <th colspan="{{organism.list|length}}"><i><a href="{% url wcdbweb.views.organism id=organism.list.0.organism__id %}">{{organism.grouper}}</i></a></th>
+            {% endfor %}
+        </tr>        
+        <tr>
+            <td></td>
+            {% for batch in simulation_batches %}
+            <th><div><a href="{% url wcdbweb.views.simulation_batch id=batch.id %}">{{batch.name}}</a></div></th>
+            {% endfor %}
+        </tr>
+    </thead>
+            
+    {% if labels|length > 0 %}
+        {% regroup labels by dimension as dimensions %}
+        {% for dimension in dimensions %}
+    <tr>
+        <th colspan="{{simulation_batches.count|add:1}}">
+            {% if dimension.grouper == 0 %}Rows
+            {% elif dimension.grouper == 1 %}Columns
+            {% elif dimension.grouper == 2 %}Depth
+            {% else %}Dimension-{{dimension.grouper}}
+            {% endif %}
+        </th>
+    </tr>
+            {% regroup dimension.list by name as dimension_labels %}
+            {% for label in dimension_labels %}
+    <tr>
+        <td class="level1">{% if dimension.grouper == 0 %}<a href="{% url wcdbweb.views.state_property_row state_name=state_name property_name=property_name row_name=label.grouper %}">{{label.grouper}}</a>{% else %}{{label.grouper}}{% endif %}</td>
+                {% regroup_by label.list by 'property__state__simulation_batch__id' simulation_batch_ids as batches %}
+                {% for batch in batches %}
+        <td class="level1">{% if batch.list|length > 0 %}x{% endif %}</td>
+                {% endfor %}
+    </tr>
+            {% endfor %}
+        {% endfor %}
+    {% else %}
+    <tr>
+        <td><i>state</i></td>
+        {% for batch in simulation_batches %}
+        <td>x</td>
+        {% endfor %}
+    </tr>
+    {% endif %}
+</table>
+
+</div>
+
+{% endblock %}

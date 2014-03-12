@@ -229,7 +229,7 @@ units_labels.processes.Translation.tmRNABindingProbability.units = 'dimensionles
 
 % time courses
 s = sim.state('Chromosome');
-colLabels = {'chrosome-1, (+)-strand', 'chromosome-1, (-)-strand', 'chrosome-2, (+)-strand', 'chromosome-2, (-)-strand'};
+colLabels = {'chromosome-1, (+)-strand', 'chromosome-1, (-)-strand', 'chromosome-2, (+)-strand', 'chromosome-2, (-)-strand'};
 units_labels.states.Chromosome.polymerizedRegions.units = 'nt';
 units_labels.states.Chromosome.polymerizedRegions.labels = {{} colLabels};
 units_labels.states.Chromosome.linkingNumbers.units = 'links';
