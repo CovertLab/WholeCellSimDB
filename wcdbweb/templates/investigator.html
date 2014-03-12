@@ -15,7 +15,7 @@ Created: 2013-09-16
 {% block content %}
 
 <div>
-<h1>Investigator :: {{ investigator.user.get_full_name }}</h1>
+<h1><a href="{% url wcdbweb.views.list_investigators %}">Investigator</a> :: {{ investigator.user.get_full_name }}</h1>
 
 <h2>Bio</h2>
 <ul class="inparagraph">

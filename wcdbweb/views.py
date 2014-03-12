@@ -316,17 +316,37 @@ def state_property(request, state_name, property_name):
         'labels': labels
     })
 
-#TODO    
 def state_property_row(request, state_name, property_name, row_name):
-    row = models.Label.objects.filter(dimension=1, name=property_name, property__name=property_name, property__state__name=state_name)
+    cols = models.PropertyLabel.objects \
+        .filter(dimension=1, property__name=property_name, property__state__name=state_name, property__labels__name=row_name, property__labels__dimension=0) \
+        .annotate(Count('name')) \
+        .order_by('name')
+    col_names = [col.name for col in cols]
+        
+    cols_batches_organisms = models.PropertyLabel.objects \
+        .filter(dimension=1, property__name=property_name, property__state__name=state_name, property__labels__name=row_name, property__labels__dimension=0) \
+        .values('name', 'property__state__simulation_batch__organism__id', 'property__state__simulation_batch__organism__name', 'property__state__simulation_batch__id', 'property__state__simulation_batch__name') \
+        .order_by('property__state__simulation_batch__organism__name', 'property__state__simulation_batch__name', 'name')
+    
     return render_template('state_property_row.html', request, data = {
-        'row': row
+        'state_name': state_name, 
+        'property_name': property_name, 
+        'row_name': row_name,
+        'col_names': col_names,
+        'cols_batches_organisms': cols_batches_organisms,
     })
 
-#TODO    
-def state_property_row_batch(request, state_name, property_name, row_name, batch_id):
-    row = models.Label.objects.get(dimension=1, name=property_name, property__name=property_name, property__state__name=state_name, property__state__simulation_batch__id=batch_id)
-    return render_template('state_property_row_batch.html', request, data = {
+#TODO
+def state_property_row_col_batch(request, state_name, property_name, row_name, col_name, batch_id):
+    batch = models.SimulationBatch.objects.get(id=batch_id)
+    row = models.PropertyLabel.objects.get(dimension=0, name=row_name, property__name=property_name, property__state__name=state_name, property__state__simulation_batch__id=batch_id)
+    
+    return render_template('state_property_row_col_batch.html', request, data = {
+        'state_name': state_name, 
+        'property_name': property_name, 
+        'row_name': row_name,
+        'col_name': col_name,
+        'batch': batch,
         'row': row
     })
     

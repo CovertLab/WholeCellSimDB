@@ -55,7 +55,7 @@ urlpatterns += patterns('wcdbweb.views',
     url(r'^state/(?P<state_name>[0-9A-Za-z_\-]+)/*$', 'state'),
     url(r'^state/(?P<state_name>[0-9A-Za-z_\-]+)/(?P<property_name>[0-9A-Za-z_\-]+)/*$', 'state_property'),
     url(r'^state/(?P<state_name>[0-9A-Za-z_\-]+)/(?P<property_name>[0-9A-Za-z_\-]+)/(?P<row_name>[^/]+)/*$', 'state_property_row'),
-    url(r'^state/(?P<state_name>[0-9A-Za-z_\-]+)/(?P<property_name>[0-9A-Za-z_\-]+)/(?P<row_name>[^/]+)/(?P<batch_id>[0-9]+)/*$', 'state_property_row_batch'),
+    url(r'^state/(?P<state_name>[0-9A-Za-z_\-]+)/(?P<property_name>[0-9A-Za-z_\-]+)/(?P<row_name>[^/]+)/(?P<col_name>[^/]+)/(?P<batch_id>[0-9]+)/*$', 'state_property_row_col_batch'),
     
     #downloads    
     url(r'^download/organism/(?P<id>[0-9]+)/*$', 'organism_download'),    

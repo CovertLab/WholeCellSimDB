@@ -15,7 +15,7 @@ Created: 2013-09-16
 {% block content %}
 
 <div>
-<h1>Organism :: {{ organism.name }}</h1>
+<h1><a href="{% url wcdbweb.views.list_organisms %}">Organism</a> :: {{ organism.name }}</h1>
 
 <h2>Simulation batches</h2>
 <table class="table list_organism__simulation_batches inparagraph">

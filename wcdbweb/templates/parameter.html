@@ -22,7 +22,7 @@ Created: 2014-03-10
 {% block content %}
 
 <div>
-<h1>Parameter
+<h1><a href="{% url wcdbweb.views.list_parameters %}">Parameter</a>
 {% if not process_name == None %} :: <a href="{% url wcdbweb.views.process process_name=process_name %}">{{process_name}}</a>{% endif %}
 {% if not state_name == None %} :: <a href="{% url wcdbweb.views.state state_name=state_name %}">{{state_name}}</a>{% endif %}
  :: {{parameter_name}}</h1>

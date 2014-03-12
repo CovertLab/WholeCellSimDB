@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% comment %}
+State property/row/col/batch page
+
+Author: Jonathan Karr, jkarr@stanford.edu
+Affiliation: Covert Lab, Department of Bioengineering, Stanford University
+Created: 2014-03-10
+{% endcomment %}
+
+{% load static %}
+{% load template_extras %}
+
+{% block head_title %}{{ block.super }} :: State :: {{state_name}} :: {{property_name}} :: {{row_name}}{% endblock %}
+
+{% block content %}
+
+<div>
+<h1>
+<a href="{% url wcdbweb.views.list_simulation_batches %}">Simulation batches</a> :: 
+<a href="{% url wcdbweb.views.simulation_batch id=batch.id %}">{{batch.name}}</a> :: 
+<a href="{% url wcdbweb.views.state state_name=state_name %}">{{state_name}}</a> :: 
+<a href="{% url wcdbweb.views.state_property state_name=state_name property_name=property_name %}">{{property_name}}</a> :: 
+<a href="{% url wcdbweb.views.state_property_row state_name=state_name property_name=property_name row_name=row_name %}">{{row_name}}</a> :: 
+{{col_name}}
+</h1>
+
+<h2>Metadata</h2>
+<script>
+var meta = [
+    {label: 'Simulation batch: '},
+    {label: 'Organism: '},
+    {label: 'Investigator: '},
+    {label: 'Date: '},
+    {label: 'No. simulations: '},
+];
+$(function() {
+    $('#meta-tree').tree({
+        data: meta
+    });
+    $('#meta-tree > ul.jqtree-tree > li.jqtree_common:nth-child(1)').find('span.jqtree-title').html('Simulation batch: <a href="{% url wcdbweb.views.simulation_batch id=batch.id %}">{{ batch.name }}</a> ({{ batch.organism_version }})');
+	$('#meta-tree > ul.jqtree-tree > li.jqtree_common:nth-child(2)').find('span.jqtree-title').html('Organism: <a href="{% url wcdbweb.views.organism id=batch.organism.id %}">{{ batch.organism.name }}</a> ({{ batch.organism_version }})');
+	$('#meta-tree > ul.jqtree-tree > li.jqtree_common:nth-child(3)').find('span.jqtree-title').html('Investigator: <a href="{% url wcdbweb.views.investigator id=batch.investigator.id %}">{{ batch.investigator.user.get_full_name }}</a>, {{ batch.investigator.affiliation }}');	
+	$('#meta-tree > ul.jqtree-tree > li.jqtree_common:nth-child(4)').find('span.jqtree-title').html('Date: {{ batch.date|date:"M j, Y" }}');
+    $('#meta-tree > ul.jqtree-tree > li.jqtree_common:nth-child(5)').find('span.jqtree-title').html('No. simulations: {{ batch.simulations.count }}');
+});
+</script>
+<div id="meta-tree" style="margin-top:-6px"></div>
+
+<h2>Data</h2>
+
+</div>
+
+{% endblock %}

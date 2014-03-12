@@ -16,7 +16,7 @@ Created: 2014-03-06
 {% block content %}
 
 <div>
-<h1>Simulation :: {{ batch.name }} &ndash; {{ simulation.batch_index }}</h1>
+<h1><a href="{% url wcdbweb.views.list_simulations %}">Simulation</a> :: <a href="{% url wcdbweb.views.simulation_batch id=batch.id %}">{{ batch.name }}</a> &ndash; {{ simulation.batch_index }}</h1>
 
 <h2>Metadata</h2>
 <script>
