@@ -44,26 +44,26 @@ Created: 2013-09-13
         <tr>
             <th><a href="{% url wcdbweb.views.list_simulations %}">Simulations</a></th>
             <td><a href="{% url wcdbweb.views.list_simulations %}">{{ summary.n_simulation }}</a></td>
+        </tr>        
+        <tr>
+            <th><a href="{% url wcdbweb.views.list_states %}">States</a></th>
+            <td><a href="{% url wcdbweb.views.list_states %}">{{ summary.n_state}}</a></td>
         </tr>
         <tr>
-            <th>Processes</th>
-            <td>{{ summary.n_process }}</td>
+            <th><a href="{% url wcdbweb.views.list_states %}">Properties</a></th>
+            <td><a href="{% url wcdbweb.views.list_states %}">{{ summary.n_property }}</a></td>
         </tr>
         <tr>
-            <th>States</th>
-            <td>{{ summary.n_state}}</td>
+            <th><a href="{% url wcdbweb.views.list_processes %}">Processes</a></th>
+            <td><a href="{% url wcdbweb.views.list_processes %}">{{ summary.n_process }}</a></td>
         </tr>
         <tr>
-            <th>Properties</th>
-            <td>{{ summary.n_property }}</td>
+            <th><a href="{% url wcdbweb.views.list_parameters %}">Parameters</a></th>
+            <td><a href="{% url wcdbweb.views.list_parameters %}">{{ summary.n_parameter }}</a></td>
         </tr>
         <tr>
-            <th>Parameters</th>
-            <td>{{ summary.n_parameter }}</td>
-        </tr>
-        <tr>
-            <th>Options</th>
-            <td>{{ summary.n_option }}</td>
+            <th><a href="{% url wcdbweb.views.list_options %}">Options</a></th>
+            <td><a href="{% url wcdbweb.views.list_options %}">{{ summary.n_option }}</a></td>
         </tr>
         <tr>
             <th><a href="{% url wcdbweb.views.list_investigators %}">Investigators</a></th>
