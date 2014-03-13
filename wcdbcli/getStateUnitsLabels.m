@@ -253,52 +253,73 @@ units_labels.states.Chromosome.strandBreaks.labels = {{} colLabels};
 units_labels.states.Chromosome.hollidayJunctions.units = 'dimensionless';
 units_labels.states.Chromosome.hollidayJunctions.labels = {{} colLabels};
 units_labels.states.Chromosome.segregated.units = 'dimensionless';
+units_labels.states.Chromosome.segregated.labels = {{''}, {''}};
 units_labels.states.Chromosome.singleStrandedRegions.units = 'nt';
 units_labels.states.Chromosome.singleStrandedRegions.labels = {{} colLabels};
 units_labels.states.Chromosome.doubleStrandedRegions.units = 'nt';
 units_labels.states.Chromosome.doubleStrandedRegions.labels = {{} colLabels};
 units_labels.states.Chromosome.geneCopyNumbers.units = 'molecules';
-units_labels.states.Chromosome.geneCopyNumbers.labels = {s.gene.wholeCellModelIDs' {}};
+units_labels.states.Chromosome.geneCopyNumbers.labels = {s.gene.wholeCellModelIDs' {''}};
 units_labels.states.Chromosome.transcriptionUnitCopyNumbers.units = 'molecules';
-units_labels.states.Chromosome.transcriptionUnitCopyNumbers.labels = {s.transcriptionUnitWholeCellModelIDs' {}};
+units_labels.states.Chromosome.transcriptionUnitCopyNumbers.labels = {s.transcriptionUnitWholeCellModelIDs' {''}};
 units_labels.states.Chromosome.ploidy.units = 'molecules';
+units_labels.states.Chromosome.ploidy.labels = {{''}, {''}};
 units_labels.states.Chromosome.superhelicalDensity.units = 'dimensionless';
 units_labels.states.Chromosome.superhelicalDensity.labels = {{} colLabels};
 
 units_labels.states.FtsZRing.numEdgesOneStraight.units = 'molecules';
+units_labels.states.FtsZRing.numEdgesOneStraight.labels = {{''}, {''}};
 units_labels.states.FtsZRing.numEdgesTwoStraight.units = 'molecules';
+units_labels.states.FtsZRing.numEdgesTwoStraight.labels = {{''}, {''}};
 units_labels.states.FtsZRing.numEdgesTwoBent.units = 'molecules';
+units_labels.states.FtsZRing.numEdgesTwoBent.labels = {{''}, {''}};
 units_labels.states.FtsZRing.numResidualBent.units = 'molecules';
+units_labels.states.FtsZRing.numResidualBent.labels = {{''}, {''}};
 units_labels.states.FtsZRing.numEdges.units = 'dimensionless';
+units_labels.states.FtsZRing.numEdges.labels = {{''}, {''}};
 
 units_labels.states.Geometry.width.units = 'm';
+units_labels.states.Geometry.width.labels = {{''}, {''}};
 units_labels.states.Geometry.pinchedDiameter.units = 'm';
+units_labels.states.Geometry.pinchedDiameter.labels = {{''}, {''}};
 units_labels.states.Geometry.volume.units = 'L';
+units_labels.states.Geometry.volume.labels = {{''}, {''}};
 units_labels.states.Geometry.cylindricalLength.units = 'm';
+units_labels.states.Geometry.cylindricalLength.labels = {{''}, {''}};
 units_labels.states.Geometry.surfaceArea.units = 'm^2';
+units_labels.states.Geometry.surfaceArea.labels = {{''}, {''}};
 units_labels.states.Geometry.totalLength.units = 'm';
+units_labels.states.Geometry.totalLength.labels = {{''}, {''}};
 units_labels.states.Geometry.pinchedCircumference.units = 'm';
+units_labels.states.Geometry.pinchedCircumference.labels = {{''}, {''}};
 units_labels.states.Geometry.pinched.units = 'dimensionless';
+units_labels.states.Geometry.pinched.labels = {{''}, {''}};
 units_labels.states.Geometry.chamberVolume.units = 'L';
+units_labels.states.Geometry.chamberVolume.labels = {{''}, {''}};
 
 s = sim.state('Host');
 units_labels.states.Host.isBacteriumAdherent.units = 'dimensionless';
+units_labels.states.Host.isBacteriumAdherent.labels = {{''}, {''}};
 units_labels.states.Host.isTLRActivated.units = 'dimensionless';
-units_labels.states.Host.isTLRActivated.labels = {s.tlrIDs' {}};
+units_labels.states.Host.isTLRActivated.labels = {s.tlrIDs' {''}};
 units_labels.states.Host.isNFkBActivated.units = 'dimensionless';
+units_labels.states.Host.isNFkBActivated.labels = {{''}, {''}};
 units_labels.states.Host.isInflammatoryResponseActivated.units = 'dimensionless';
+units_labels.states.Host.isInflammatoryResponseActivated.labels = {{''}, {''}};
 
 s = sim.state('Mass');
 for i = 1:numel(s.dependentStateNames)
     units_labels.states.Mass.(s.dependentStateNames{i}).units = 'g';
-    units_labels.states.Mass.(s.dependentStateNames{i}).labels = {{} s.compartment.wholeCellModelIDs'};
+    units_labels.states.Mass.(s.dependentStateNames{i}).labels = {{''} s.compartment.wholeCellModelIDs'};
 end
 
 s = sim.state('MetabolicReaction');
 units_labels.states.MetabolicReaction.growth.units = 'cells/s';
+units_labels.states.MetabolicReaction.growth.labels = {{''}, {''}};
 units_labels.states.MetabolicReaction.fluxs.units = 'rxn/s';
-units_labels.states.MetabolicReaction.fluxs.labels = {s.reactionWholeCellModelIDs' {}};
+units_labels.states.MetabolicReaction.fluxs.labels = {s.reactionWholeCellModelIDs' {''}};
 units_labels.states.MetabolicReaction.doublingTime.units = 's';
+units_labels.states.MetabolicReaction.doublingTime.labels = {{''}, {''}};
 
 s = sim.state('Metabolite');
 tiledLabels = cellfun(@(x,y) sprintf('%s[%s]', x, y), s.wholeCellModelIDs(:, ones(size(s.compartment.wholeCellModelIDs))), s.compartment.wholeCellModelIDs(:, ones(size(s.wholeCellModelIDs)))', 'UniformOutput', false);
@@ -313,8 +334,11 @@ units_labels.states.Metabolite.processUsages.units = 'molecules';
 units_labels.states.Metabolite.processUsages.labels = {tiledLabels' sim.processWholeCellModelIDs'};
 
 units_labels.states.Polypeptide.boundMRNAs.units = 'protein coding gene index';
+units_labels.states.Polypeptide.boundMRNAs.labels = {{}, {''}};
 units_labels.states.Polypeptide.nascentMonomerLengths.units = 'aa';
+units_labels.states.Polypeptide.nascentMonomerLengths.labels = {{}, {''}};
 units_labels.states.Polypeptide.proteolysisTagLengths.units = 'aa';
+units_labels.states.Polypeptide.proteolysisTagLengths.labels = {{}, {''}};
 
 s = sim.state('ProteinComplex');
 row_labels = s.wholeCellModelIDs;
@@ -343,14 +367,21 @@ units_labels.states.ProteinMonomer.counts.units = 'molecules';
 units_labels.states.ProteinMonomer.counts.labels = {row_labels' s.compartment.wholeCellModelIDs'};
 
 units_labels.states.Ribosome.states.units = 'state index (-1=>stalled, 0=>not exist, 1=>actively translating)'; 
+units_labels.states.Ribosome.states.labels = {{} {''}}; 
 units_labels.states.Ribosome.boundMRNAs.units = 'protein coding gene index';
+units_labels.states.Ribosome.boundMRNAs.labels = {{} {''}};
 units_labels.states.Ribosome.mRNAPositions.units = 'nt';
+units_labels.states.Ribosome.mRNAPositions.labels = {{} {''}};
 units_labels.states.Ribosome.tmRNAPositions.units = 'nt';
+units_labels.states.Ribosome.tmRNAPositions.labels = {{} {''}};
 units_labels.states.Ribosome.stateOccupancies.units = '%';
-units_labels.states.Ribosome.stateOccupancies.labels = {{'actively translating', 'not exist', 'stalled'} {}};
+units_labels.states.Ribosome.stateOccupancies.labels = {{'actively translating', 'not exist', 'stalled'} {''}};
 units_labels.states.Ribosome.nActive.units = 'molecules';
+units_labels.states.Ribosome.nActive.labels = {{''}, {''}};
 units_labels.states.Ribosome.nNotExist.units = 'molecules';
+units_labels.states.Ribosome.nNotExist.labels = {{''}, {''}};
 units_labels.states.Ribosome.nStalled.units = 'molecules';
+units_labels.states.Ribosome.nStalled.labels = {{''}, {''}};
 
 s = sim.state('Rna');
 row_labels = s.wholeCellModelIDs;
@@ -367,28 +398,39 @@ units_labels.states.Rna.counts.labels = {row_labels' s.compartment.wholeCellMode
 
 s = sim.state('Rna');
 units_labels.states.RNAPolymerase.states.units = 'state index (-3=>promoter bound, -2=>free, -1=>non-specifically bound, 0=>not exist, 1=>actively transcribing)';
+units_labels.states.RNAPolymerase.states.labels = {{} {''}};
 units_labels.states.RNAPolymerase.positionStrands.units = 'nt';
+units_labels.states.RNAPolymerase.positionStrands.labels = {{} {'position', 'strand'}};
 units_labels.states.RNAPolymerase.transcriptionFactorBindingProbFoldChange.units = 'dimensionless';
 units_labels.states.RNAPolymerase.transcriptionFactorBindingProbFoldChange.labels = {s.wholeCellModelIDs(s.nascentIndexs)' {'chromosome-1', 'chromosome-2'}};
 units_labels.states.RNAPolymerase.supercoilingBindingProbFoldChange.units = 'dimensionless';
 units_labels.states.RNAPolymerase.supercoilingBindingProbFoldChange.labels = {s.wholeCellModelIDs(s.nascentIndexs)' {'chromosome-1', 'chromosome-2'}};
 units_labels.states.RNAPolymerase.stateOccupancies.units = '%';
-units_labels.states.RNAPolymerase.stateOccupancies.labels = {{'actively transcribing' 'promoter bound' 'non-specifically bound' 'free'} {}};
+units_labels.states.RNAPolymerase.stateOccupancies.labels = {{'actively transcribing' 'promoter bound' 'non-specifically bound' 'free'} {''}};
 units_labels.states.RNAPolymerase.nActive.units = 'molecules';
+units_labels.states.RNAPolymerase.nActive.labels = {{''}, {''}};
 units_labels.states.RNAPolymerase.nSpecificallyBound.units = 'molecules';
+units_labels.states.RNAPolymerase.nSpecificallyBound.labels = {{''}, {''}};
 units_labels.states.RNAPolymerase.nNonSpecificallyBound.units = 'molecules';
+units_labels.states.RNAPolymerase.nNonSpecificallyBound.labels = {{''}, {''}};
 units_labels.states.RNAPolymerase.nFree.units = 'molecules';
+units_labels.states.RNAPolymerase.nFree.labels = {{''}, {''}};
 
 s = sim.state('Stimulus');
 units_labels.states.Stimulus.values.units = 'various';
 units_labels.states.Stimulus.values.labels = {s.wholeCellModelIDs' s.compartment.wholeCellModelIDs'};
 
 units_labels.states.Time.values.units = 's';
+units_labels.states.Time.values.labels = {{''} {''}};
 
 units_labels.states.Transcript.boundTranscriptionUnits.units = 'transcription unit index';
+units_labels.states.Transcript.boundTranscriptionUnits.labels = {{} {''}};
 units_labels.states.Transcript.boundTranscriptProgress.units = 'nt';
+units_labels.states.Transcript.boundTranscriptProgress.labels = {{} {''}};
 units_labels.states.Transcript.boundTranscriptChromosome.units = 'chromosome index';
+units_labels.states.Transcript.boundTranscriptChromosome.labels = {{} {''}};
 units_labels.states.Transcript.rnaBoundRNAPolymerases.units = 'molecules';
+units_labels.states.Transcript.rnaBoundRNAPolymerases.labels = {{} {''}};
 
 %% verify label dimensions
 propNames = setdiff(fieldnames(units_labels), {'processes', 'states'});
