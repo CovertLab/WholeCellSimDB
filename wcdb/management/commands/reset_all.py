@@ -22,4 +22,4 @@ class Command(BaseCommand):
         call_command('rebuild_index', interactive=interactive)
             
         #status message
-        self.stdout.write('Successfully reset SQL and HDF databases and search indices')
+        self.stdout.write('Successfully reset SQL and HDF databases and search indices\n')
