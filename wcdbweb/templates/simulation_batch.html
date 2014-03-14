@@ -11,15 +11,15 @@ Created: 2013-09-16
 {% load static %}
 {% load template_extras %}
 
-{% block head_title %}{{ block.super }} :: Batch :: {{ batch.organism.name }} &ndash; {{ batch.name }}{% endblock %}
+{% block head_title %}{{ block.super }} &rsaquo; Batch &rsaquo; {{ batch.organism.name }} &ndash; {{ batch.name }}{% endblock %}
 
 {% block content %}
 
 <div>
-<h1><a href="{% url wcdbweb.views.list_simulation_batches %}">Simulation batch</a> :: {{ batch.name }}</h1>
+<h1><a href="{% url wcdbweb.views.list_simulation_batches %}">Simulation batch</a> &rsaquo; {{ batch.name }}</h1>
 
 <h2>Metadata</h2>
-<script>
+<script language="javascript" type="text/javascript">
 var meta = [
     {label: 'Organism: '},
     {label: 'Investigator: '},
@@ -39,7 +39,7 @@ $(function() {
 <div id="meta-tree" style="margin-top:-6px"></div>
 
 <h2>Options ({{ batch.options.all.count }})</h2>
-<script>
+<script language="javascript" type="text/javascript">
 var options = [
     {% for name, value_units in options.iteritems %}
     {% if not value_units.value %}
@@ -70,7 +70,7 @@ $(function() {
 <div id="options-tree" style="margin-top:-6px"></div>
 
 <h2>Parameters ({{ batch.parameters.all.count }})</h2>
-<script>
+<script language="javascript" type="text/javascript">
 var parameters = [
     {% for name, value_units in parameters.iteritems %}
     {% if not value_units.value %}
@@ -101,7 +101,7 @@ $(function() {
 <div id="parameters-tree" style="margin-top:-6px"></div>
 
 <h2>Processes ({{ processes|length }})</h2>
-<script>
+<script language="javascript" type="text/javascript">
 var processes = [
     {% for process in processes %}    
     {label: '{{process.name}}'},
@@ -116,7 +116,7 @@ $(function() {
 <div id="processes-tree" style="margin-top:-6px"></div>
 
 <h2>States ({{ states|length }})</h2>
-<script>
+<script language="javascript" type="text/javascript">
 var states = [
     {% for state in states %}    
     {label: '{{state.name}}', children: [

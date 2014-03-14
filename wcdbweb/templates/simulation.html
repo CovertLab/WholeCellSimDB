@@ -11,15 +11,15 @@ Created: 2014-03-06
 {% load static %}
 {% load template_extras %}
 
-{% block head_title %}{{ block.super }} :: Simulation :: {{ batch.organism.name }} &ndash; {{ batch.name }} &ndash; {{ simulation.batch_index }}{% endblock %}
+{% block head_title %}{{ block.super }} &rsaquo; Simulation &rsaquo; {{ batch.organism.name }} &ndash; {{ batch.name }} &ndash; {{ simulation.batch_index }}{% endblock %}
 
 {% block content %}
 
 <div>
-<h1><a href="{% url wcdbweb.views.list_simulations %}">Simulation</a> :: <a href="{% url wcdbweb.views.simulation_batch id=batch.id %}">{{ batch.name }}</a> &ndash; {{ simulation.batch_index }}</h1>
+<h1><a href="{% url wcdbweb.views.list_simulations %}">Simulation</a> &rsaquo; <a href="{% url wcdbweb.views.simulation_batch id=batch.id %}">{{ batch.name }}</a> &ndash; {{ simulation.batch_index }}</h1>
 
 <h2>Metadata</h2>
-<script>
+<script language="javascript" type="text/javascript">
 var meta = [
     {label: 'Organism: '},
     {label: 'Batch: '},
