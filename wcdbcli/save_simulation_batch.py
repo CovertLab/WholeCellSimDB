@@ -2,7 +2,10 @@
 Example: 
 >> python wcdbcli/save_simulation_batch.py \
     "Mycoplasma genitalium" \
-    "/home/projects/WholeCell/simulation/output/runSimulation/2011_10_19_02_53_45"
+    "2011_10_19_02_53_45" \
+    "/home/projects/WholeCell/simulation/output/runSimulation/2011_10_19_02_53_45" \
+    "10" \
+    "5"
 '''
 
 import datetime
@@ -17,7 +20,18 @@ setup_environ(settings)
 from helpers import save_simulation_batch
 
 def main():
-    save_simulation_batch(organism_name = sys.argv[1], batch_dir = sys.argv[2])
+    opts = {}
+    if len(sys.argv) >= 5:
+        opts['first_sim_idx'] = int(float(sys.argv[4]))
+    if len(sys.argv) >= 6:
+        opts['max_num_simulations'] = int(float(sys.argv[5]))
+    
+    save_simulation_batch(
+        organism_name = sys.argv[1], 
+        batch_name = sys.argv[2], 
+        batch_dir = sys.argv[3], 
+        **opts
+        )
 
 if __name__=="__main__":
     main()

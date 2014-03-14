@@ -1,15 +1,22 @@
 import dateutil.parser
 import glob
+import h5py
 import numpy
 import os
 import pytz
 import re
 import scipy.io
+import tempfile
+from subprocess import call
 from wcdb.models import SimulationBatch, Simulation
+from WholeCellDB import settings
 
-def save_simulation_batch(organism_name, batch_dir):   
+def save_simulation_batch(organism_name, batch_name, batch_dir, first_sim_idx = None, max_num_simulations = None):
+    if first_sim_idx is None:
+        first_sim_idx = 1
+    
     #load metadata
-    first_sim_dir = os.path.join(batch_dir, '1')
+    first_sim_dir = os.path.join(batch_dir, str(first_sim_idx))
     md = scipy.io.loadmat(os.path.join(first_sim_dir, 'metadata.mat'))
     organism_version = md['revision'][0][0]
     name = md['shortDescription'][0]
@@ -19,23 +26,23 @@ def save_simulation_batch(organism_name, batch_dir):
     investigator_affiliation = md['affiliation'][0]
     investigator_email = md['email'][0]
     ip = md['ipAddress'][0]
-    date = dateutil.parser.parse(md['startTime'][0]).replace(tzinfo=pytz.timezone('Africa/Abidjan')) 
-        
+    date = dateutil.parser.parse(md['startTime'][0]).replace(tzinfo=pytz.timezone('America/Los_Angeles')) 
+    
     #load options, parameters
-    options = load_options(batch_dir)
-    parameters = load_parameters(batch_dir)    
+    options = load_options(batch_dir, first_sim_dir)
+    parameters = load_parameters(batch_dir, first_sim_dir)
     processes = parameters['processes'].keys()
-    states = load_states(batch_dir)
+    states = load_states(batch_dir, first_sim_dir)
     
     for state_name in options['states'].keys() + parameters['states'].keys():
         if state_name not in states:
             states[state_name] = {}
-                
+    
     #save batch
     SimulationBatch.objects.create_simulation_batch( 
         organism_name = organism_name,
         organism_version = organism_version,
-        name = name, 
+        name = batch_name, 
         description = description, 
         investigator_first = investigator_first,
         investigator_last = investigator_last,
@@ -50,78 +57,78 @@ def save_simulation_batch(organism_name, batch_dir):
         
     #save simulations
     sim_dirs = glob.glob(os.path.join(batch_dir, "[0-9]*"))
-    for sim_dir in sim_dirs:    
-        batch_index = int(float(re.split(os.sep, sim_dir).pop()))
-        
-        print "Saving simulation %d of %d ... " % (batch_index, len(sim_dirs))
-        save_simulation(organism_name, batch_dir, batch_index)
+    sim_dirs = sim_dirs[first_sim_idx-1:]
+    if max_num_simulations is not None:
+        sim_dirs = sim_dirs[:max_num_simulations]
     
-def save_simulation(organism_name, batch_dir, batch_index):
-    sim_dir = os.path.join(batch_dir, str(batch_index))
+    for sim_idx, sim_dir in enumerate(sim_dirs):
+        print "Saving simulation %d of %d ... " % (sim_idx+1, len(sim_dirs))
+        save_simulation(organism_name, batch_name, sim_dir, sim_idx+1)
 
+def save_simulation(organism_name, batch_name, sim_dir, batch_index):
     #get batch name, length
     md = scipy.io.loadmat(os.path.join(sim_dir, 'metadata.mat'))
-    batch_name = md['shortDescription'][0]
     length = md['lengthSec'][0][0]
     
     # get simulation batch
     batch = SimulationBatch.objects.get(organism__name = organism_name, name = batch_name)
     
-    # Get a list of all the paths to the .mat files to be loaded.
-    property_files = glob.glob(os.path.join(sim_dir, "state-[a-zA-Z]*-[a-zA-Z]*.mat"))
-    
-    #collect names of state properties
-    states = {}    
-    for prop_file in property_files:
-        state = prop_file.split("-")[-2] # State name
-        prop = prop_file.replace(".", "-").split("-")[-2] # Property name
-
-        try:
-            # This is the .mat file loaded into python
-            mat_dict = scipy.io.loadmat(prop_file)
-
-            # This is the actual generated data.
-            if "data" in mat_dict.keys():
-                data = mat_dict['data']
-                d_list = (data.shape, data.dtype)
-                # Weird syntax. Just constructing the state_property dict.
-                states.setdefault(state, {}).setdefault(prop, d_list)
-                
-        except SystemError: #TODO: handle errors
-            pass
-        except MemoryError: #TODO: handle errors
-            pass
-        
     #create simulation
-    sim = Simulation.objects.create_simulation(
-        batch = batch,
-        batch_index = batch_index,
-        length = length,
-        states = states)
+    sim = Simulation.objects.create_simulation(batch = batch, batch_index = batch_index, length = length)
     sim.save()
-                                               
+    
     #save property values data
-    for prop_file in property_files:
-        state_name = prop_file.split("-")[-2]
-        prop_name = prop_file.replace(".", "-").split("-")[-2]
-
-        #try:
-        mat_dict = scipy.io.loadmat(prop_file)
+    for state in batch.states.all():
+        for property in state.properties.all():
+            filename = os.path.join(sim_dir, 'state-%s-%s.mat' % (state.name, property.name))
+            data = scipy.io.loadmat(filename)
+            if 'data' in data:
+                sim.property_values \
+                    .get(property = property) \
+                    .set_data(data['data'])
+            elif 'None' in data and \
+                isinstance(data['None'], scipy.io.matlab.mio5_params.MatlabOpaque) and \
+                data['None'].tolist()[0][2] == 'edu.stanford.covert.util.SparseMat':
+                
+                tmp_filedescriptor, tmp_filename = tempfile.mkstemp(dir=settings.TMP_DIR, suffix='.mat')
+                tmp_file = os.fdopen(tmp_filedescriptor, 'w')
+                tmp_file.close()
+                os.remove(tmp_filename)
+                tmp_filename_h5 = tmp_filename.replace('.mat', '.h5')
+                
+                matlab_cmd = "setWarnings(); setPath(); warning('on', 'MATLAB:save:sizeTooBigForMATFile'); in_filename='%s'; out_filename='%s'; out_filename_h5='%s'; try; in = load(in_filename); out.data = full(in.data); save(out_filename, '-struct', 'out'); [~, id] = lastwarn(); if strcmp(id, 'MATLAB:save:sizeTooBigForMATFile'); delete(out_filename); save(out_filename_h5, '-struct', 'out', '-v7.3'); end; end; exit;" % (filename, tmp_filename, tmp_filename_h5)
+                
+                call('ssh covertlab-cluster "cd /home/projects/WholeCell/simulation; matlab -nodesktop -nosplash -r \\"%s\\" > /dev/null 2>&1"' % matlab_cmd, shell=True)
+                
+                try:
+                    if os.path.isfile(tmp_filename):
+                        data = scipy.io.loadmat(tmp_filename)
+                        if 'data' in data:
+                            sim.property_values \
+                                .get(property = property) \
+                                .set_data(data['data'])
+                        data = None
+                    elif os.path.isfile(tmp_filename_h5):
+                        f = h5py.File(tmp_filename_h5, 'r')
+                        if 'data' in f.keys():
+                            sim.property_values \
+                                .get(property = property) \
+                                .set_data(f['data'])
+                        f.close()
+                        f = None
+                    else:
+                        print '  Unable to load %s.%s.%s.%s' % (batch.name, sim.batch_index, state.name, property.name)
+                except:
+                    print '  Unable to load %s.%s.%s.%s' % (batch.name, sim.batch_index, state.name, property.name)
+                    
+                if os.path.isfile(tmp_filename):
+                    os.remove(tmp_filename)
+                if os.path.isfile(tmp_filename_h5):
+                    os.remove(tmp_filename_h5)
             
-        if "data" in mat_dict.keys():
-            data = mat_dict['data']
-            p_obj = sim.property_values.get(property__state__name = state_name, property__name = prop_name)
-            p_obj.add_data(data)
-
-        #except SystemError: #TODO: handle errors
-        #    pass
-        #except MemoryError: #TODO: handle errors
-        #    pass
-        
-def load_options(batch_dir):
+def load_options(batch_dir, first_sim_dir):
     units_labels = loadmat(os.path.join(batch_dir, 'units_labels.mat'))
     
-    first_sim_dir = os.path.join(batch_dir, '1')
     option_vals = loadmat(os.path.join(first_sim_dir, 'options.mat'))
     
     options = {}
@@ -133,7 +140,7 @@ def load_options(batch_dir):
             'value': value
             }
     options['processes'] = {}
-    for process_name, props in option_vals['processes'].iteritems():        
+    for process_name, props in option_vals['processes'].iteritems():
         options['processes'][process_name] = {}
         for prop_name, value in props.iteritems():
             options['processes'][process_name][prop_name] = {
@@ -150,20 +157,18 @@ def load_options(batch_dir):
                 }
     
     return options
-        
-def load_parameters(batch_dir):
+
+def load_parameters(batch_dir, first_sim_dir):
     units_labels = loadmat(os.path.join(batch_dir, 'units_labels.mat'))
-    
-    first_sim_dir = os.path.join(batch_dir, '1')
-    parameter_vals = loadmat(os.path.join(first_sim_dir,  'parameters.mat'))    
+    parameter_vals = loadmat(os.path.join(first_sim_dir,  'parameters.mat'))
     
     parameters = {}
     for prop_name, value in parameter_vals.iteritems():
         if re.match(r"^__.+?__$", prop_name) or prop_name == 'processes' or prop_name == 'states':
             continue
-            
+        
         parameters[prop_name] = {
-            'units': units_labels[prop_name]['units'] if prop_name in units_labels and 'units' in units_labels[prop_name] else None, 
+            'units': units_labels[prop_name]['units'] if prop_name in units_labels and 'units' in units_labels[prop_name] else None,
             'value': value
             }
     parameters['processes'] = {}
@@ -184,10 +189,9 @@ def load_parameters(batch_dir):
                 }
     
     return parameters
-    
-def load_states(batch_dir):
+
+def load_states(batch_dir, first_sim_dir):
     units_labels = loadmat(os.path.join(batch_dir, 'units_labels.mat'))
-    first_sim_dir = os.path.join(batch_dir, '1')
     
     states = {}
     for state_name, state in loadmat(os.path.join(first_sim_dir, 'state-0.mat'), False).iteritems():
@@ -205,14 +209,15 @@ def load_states(batch_dir):
                 labels = []
                 for dim_labels in units_labels['states'][state_name][prop_name]['labels']:
                     if dim_labels.size > 0:
-                        labels.append([x[0] for x in dim_labels[0].tolist()])
+                        tmp = dim_labels[0].tolist()
+                        labels.append([x[0] if x.size > 0 else '' for x in tmp])
                     else:
                         labels.append([])
             else:
                 labels = None
             states[state_name][prop_name] = {'units': units, 'labels': labels}
-            
-    return states    
+    
+    return states
 
 def loadmat(filename, throw_error_on_unknown_data_format=True):
     data = scipy.io.loadmat(filename, struct_as_record=False)
@@ -246,7 +251,7 @@ def _normalize(matobj, throw_error_on_unknown_data_format):
             elif elem.ndim == 2 and elem.shape[0] == 1 and elem.shape[1] == 1:
                 dict[strg] = elem.tolist()[0][0]
             elif elem.ndim == 2 and elem.shape[0] == 1:
-                dict[strg] = elem.tolist()[0]               
+                dict[strg] = elem.tolist()[0]
             elif elem.ndim == 2 and elem.shape[1] == 1:
                 dict[strg] = [x[0] for x in elem.tolist()]
             elif elem.ndim == 2 and elem.shape[0] == 0 and elem.shape[1] == 0:
@@ -255,5 +260,5 @@ def _normalize(matobj, throw_error_on_unknown_data_format):
                 raise Exception('Invalid data')
             else:
                 dict[strg] = elem
-            
+    
     return dict
