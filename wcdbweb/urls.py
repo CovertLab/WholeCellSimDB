@@ -52,16 +52,23 @@ urlpatterns += patterns('wcdbweb.views',
     
     #states
     url(r'^list/state/*$', 'list_states'),
+    url(r'^state/(?P<state_name>[0-9A-Za-z_\-]+)/property/(?P<property_name>[0-9A-Za-z_\-]+)/row/((?P<row_name>[^/]+)/)*col/((?P<col_name>[^/]+)/)*simulation_batch/(?P<batch_id>[0-9]+)/*$', 'state_property_row_col_batch'),
+    url(r'^state/(?P<state_name>[0-9A-Za-z_\-]+)/property/(?P<property_name>[0-9A-Za-z_\-]+)/row/(?P<row_name>[^/]*)/col/(?P<col_name>[^/]*)/simulation_batch/(?P<batch_id>[0-9]+)/*$', 'state_property_row_col_batch'),
+    url(r'^state/(?P<state_name>[0-9A-Za-z_\-]+)/property/(?P<property_name>[0-9A-Za-z_\-]+)/row/(?P<row_name>[^/]*)/*$', 'state_property_row'),
+    url(r'^state/(?P<state_name>[0-9A-Za-z_\-]+)/property/(?P<property_name>[0-9A-Za-z_\-]+)/*$', 'state_property'),
     url(r'^state/(?P<state_name>[0-9A-Za-z_\-]+)/*$', 'state'),
-    url(r'^state/(?P<state_name>[0-9A-Za-z_\-]+)/(?P<property_name>[0-9A-Za-z_\-]+)/*$', 'state_property'),
-    url(r'^state/(?P<state_name>[0-9A-Za-z_\-]+)/(?P<property_name>[0-9A-Za-z_\-]+)/(?P<row_name>[^/]+)/*$', 'state_property_row'),
-    url(r'^state/(?P<state_name>[0-9A-Za-z_\-]+)/(?P<property_name>[0-9A-Za-z_\-]+)/(?P<row_name>[^/]+)/(?P<col_name>[^/]+)/(?P<batch_id>[0-9]+)/*$', 'state_property_row_col_batch'),
     
     #downloads    
-    url(r'^download/organism/(?P<id>[0-9]+)/*$', 'organism_download'),    
-    url(r'^download/simulation_batch/(?P<id>[0-9]+)/*$', 'simulation_batch_download'),
-    url(r'^download/simulation/(?P<id>[0-9]+)/*$', 'simulation_download'),
-    url(r'^download/investigator/(?P<id>[0-9]+)/*$', 'investigator_download'),
+    url(r'^organism/(?P<id>[0-9]+)/download/*$', 'organism_download'),    
+    url(r'^simulation_batch/(?P<id>[0-9]+)/download/*$', 'simulation_batch_download'),
+    url(r'^simulation/(?P<id>[0-9]+)/download/*$', 'simulation_download'),    
+    url(r'^state/(?P<state_name>[0-9A-Za-z_\-]+)/property/(?P<property_name>[0-9A-Za-z_\-]+)/row/((?P<row_name>[^/]+)/)*col/((?P<col_name>[^/]+)/)*simulation_batch/(?P<batch_id>[0-9]+)/download/*$', 'state_property_row_col_batch_download'),
+    url(r'^state/(?P<state_name>[0-9A-Za-z_\-]+)/property/(?P<property_name>[0-9A-Za-z_\-]+)/row/(?P<row_name>[^/]*)/col/(?P<col_name>[^/]*)/simulation_batch/(?P<batch_id>[0-9]+)/download/*$', 'state_property_row_col_batch_download'),
+    url(r'^state/(?P<state_name>[0-9A-Za-z_\-]+)/property/(?P<property_name>[0-9A-Za-z_\-]+)/row/(?P<row_name>[^/]*)/download/*$', 'state_property_row_download'),
+    url(r'^state/(?P<state_name>[0-9A-Za-z_\-]+)/property/(?P<property_name>[0-9A-Za-z_\-]+)/row/((?P<row_name>[^/]+)/)*download/*$', 'state_property_row_download'),
+    url(r'^state/(?P<state_name>[0-9A-Za-z_\-]+)/property/(?P<property_name>[0-9A-Za-z_\-]+)/download/*$', 'state_property_download'),
+    url(r'^state/(?P<state_name>[0-9A-Za-z_\-]+)/download/*$', 'state_download'),
+    url(r'^investigator/(?P<id>[0-9]+)/download/*$', 'investigator_download'),
     url(r'^download/*$', 'download'),
     
     #search
