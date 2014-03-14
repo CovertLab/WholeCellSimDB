@@ -51,3 +51,4 @@ wcdb_loadmat.py
 SampleData/
 .htaccess
 *.asv
+tmp/
