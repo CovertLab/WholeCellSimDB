@@ -125,6 +125,9 @@ def save_simulation(organism_name, batch_name, sim_dir, batch_index):
                     os.remove(tmp_filename)
                 if os.path.isfile(tmp_filename_h5):
                     os.remove(tmp_filename_h5)
+                    
+    sim.lock_file()
+    sim.save()
             
 def load_options(batch_dir, first_sim_dir):
     units_labels = loadmat(os.path.join(batch_dir, 'units_labels.mat'))
