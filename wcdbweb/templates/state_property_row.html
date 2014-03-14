@@ -11,25 +11,29 @@ Created: 2014-03-10
 {% load static %}
 {% load template_extras %}
 
-{% block head_title %}{{ block.super }} :: State :: {{state_name}} :: {{property_name}} :: {{row_name}}{% endblock %}
+{% block head_title %}{{ block.super }} &rsaquo; State &rsaquo; {{state_name}} &rsaquo; {{property_name}}{% if row_name != '' %} &rsaquo; {{row_name}}{% endif %}{% endblock %}
 
 {% block content %}
 
 <div>
 <h1>
-<a href="{% url wcdbweb.views.list_states %}">State</a> :: 
-<a href="{% url wcdbweb.views.state state_name=state_name %}">{{state_name}}</a> :: 
-<a href="{% url wcdbweb.views.state_property state_name=state_name property_name=property_name %}">{{property_name}}</a> :: 
-{{row_name}}
+<a href="{% url wcdbweb.views.list_states %}">State</a> &rsaquo; 
+<a href="{% url wcdbweb.views.state state_name=state_name %}">{{state_name}}</a> &rsaquo; 
+<a href="{% url wcdbweb.views.state_property state_name=state_name property_name=property_name %}">{{property_name}}</a> 
+{% if row_name != '' %} &rsaquo; {{row_name}}{% endif %}
 </h1>
 
 <table class="list_state_property_row_simulation_batches">
     <thead>
         <tr>
             <td></td>
-            {% for col_name in col_names %}
-            <th>{{col_name}}</th>
-            {% endfor %}
+            {% if col_names|length > 1 or col_names.0 != '' %}
+                {% for col_name in col_names %}
+            <th><div>{{col_name}}</div></th>
+                {% endfor %}
+            {% else %}
+            <th><div><i>State</i></div></th>
+            {% endif %}
         </tr>
     </thead>
     <tbody>
@@ -44,7 +48,15 @@ Created: 2014-03-10
                 <td class="level1"><a href="{% url wcdbweb.views.simulation_batch id=batch.list.0.property__state__simulation_batch__id %}">{{batch.grouper}}</a></td>
                 {% regroup_by batch.list by 'name' col_names as cols %}
                 {% for col in cols %}
-                <td class="level1">{% if col.list|length > 0 %}<a href="{% url wcdbweb.views.state_property_row_col_batch state_name=state_name property_name=property_name row_name=row_name col_name=col.grouper batch_id=col.list.0.property__state__simulation_batch__id %}">x</a>{% endif %}</td>
+                {% spaceless %}<td class="level1">
+                {% if col.list|length > 0 %}
+                    {% if batch.list.0.property__state__simulation_batch__id in property_value_batches %}
+                    <a href="{% url wcdbweb.views.state_property_row_col_batch state_name=state_name property_name=property_name row_name=row_name col_name=col.grouper batch_id=col.list.0.property__state__simulation_batch__id %}">x</a>
+                    {% else %}
+                    x
+                    {% endif %}                    
+                {% endif %}
+                </td>{% endspaceless %}
                 {% endfor %}
             </tr>
             {% endfor %}

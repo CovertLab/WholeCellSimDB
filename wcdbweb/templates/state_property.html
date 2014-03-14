@@ -11,14 +11,14 @@ Created: 2014-03-10
 {% load static %}
 {% load template_extras %}
 
-{% block head_title %}{{ block.super }} :: State :: {{state_name}} :: {{property_name}}{% endblock %}
+{% block head_title %}{{ block.super }} &rsaquo; State &rsaquo; {{state_name}} &rsaquo; {{property_name}}{% endblock %}
 
 {% block content %}
 
 <div>
 <h1>
-<a href="{% url wcdbweb.views.list_states %}">State</a> :: 
-<a href="{% url wcdbweb.views.state state_name=state_name %}">{{state_name}}</a> ::
+<a href="{% url wcdbweb.views.list_states %}">State</a> &rsaquo; 
+<a href="{% url wcdbweb.views.state state_name=state_name %}">{{state_name}}</a> &rsaquo;
 {{property_name}}
 </h1>
 
@@ -30,7 +30,7 @@ Created: 2014-03-10
             {% for organism in organisms %}
             <th colspan="{{organism.list|length}}"><i><a href="{% url wcdbweb.views.organism id=organism.list.0.organism__id %}">{{organism.grouper}}</i></a></th>
             {% endfor %}
-        </tr>        
+        </tr>
         <tr>
             <td></td>
             {% for batch in simulation_batches %}
@@ -38,35 +38,60 @@ Created: 2014-03-10
             {% endfor %}
         </tr>
     </thead>
-            
-    {% if labels|length > 0 %}
+    
+    {% if is_labeled %}
         {% regroup labels by dimension as dimensions %}
         {% for dimension in dimensions %}
+            {% regroup dimension.list by name as dimension_labels %}
+            {% if dimension_labels|length > 1 or dimension_labels.0.grouper != '' %}
     <tr>
         <th colspan="{{simulation_batches.count|add:1}}">
-            {% if dimension.grouper == 0 %}Rows
-            {% elif dimension.grouper == 1 %}Columns
-            {% elif dimension.grouper == 2 %}Depth
-            {% else %}Dimension-{{dimension.grouper|add:1}}
-            {% endif %}
+                {% if dimension.grouper == 0 %}Rows
+                {% elif dimension.grouper == 1 %}Columns
+                {% elif dimension.grouper == 2 %}Depth
+                {% else %}Dimension-{{dimension.grouper|add:1}}
+                {% endif %}
         </th>
     </tr>
-            {% regroup dimension.list by name as dimension_labels %}
-            {% for label in dimension_labels %}
+            
+                {% for label in dimension_labels %}
+                    {% if label.grouper != '' %}
     <tr>
-        <td class="level1">{% if dimension.grouper == 0 %}<a href="{% url wcdbweb.views.state_property_row state_name=state_name property_name=property_name row_name=label.grouper %}">{{label.grouper}}</a>{% else %}{{label.grouper}}{% endif %}</td>
-                {% regroup_by label.list by 'property__state__simulation_batch__id' simulation_batch_ids as batches %}
-                {% for batch in batches %}
+        {% spaceless %}
+        <td class="level1">
+            {% if show_slice_links and dimension.grouper == 0 %}
+                <a href="{% url wcdbweb.views.state_property_row state_name=state_name property_name=property_name row_name=label.grouper %}">{{label.grouper}}</a>
+            {% elif show_slice_links and dimension.grouper > 0 and dimensions.0.list|length == 1 and dimensions.0.list.0.name == '' %}
+                <a href="{% url wcdbweb.views.state_property_row state_name=state_name property_name=property_name row_name='' %}">{{label.grouper}}</a>
+            {% else %}
+                {{label.grouper}}
+            {% endif %}
+        </td>
+        {% endspaceless %}
+                        {% regroup_by label.list by 'property__state__simulation_batch__id' simulation_batch_ids as batches %}
+                        {% for batch in batches %}
         <td class="level1">{% if batch.list|length > 0 %}x{% endif %}</td>
-                {% endfor %}
+                        {% endfor %}
     </tr>
-            {% endfor %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
         {% endfor %}
     {% else %}
+        {% regroup_by labels by 'property__state__simulation_batch__id' simulation_batch_ids as batches %}
     <tr>
-        <th><i>state</i></td>
-        {% for batch in simulation_batches %}
-        <th>x</td>
+        {% spaceless %}
+        <th><i>
+        {% if show_slice_links %}
+            <a href="{% url wcdbweb.views.state_property_row state_name=state_name property_name=property_name row_name='' %}">state</a>
+        {% else %}
+            state
+        {% endif %}
+        </i></td>
+        {% endspaceless %}
+        
+        {% for batch in batches %}
+        <th>{% if batch.list|length > 0 %}x{% endif %}</td>
         {% endfor %}
     </tr>
     {% endif %}
