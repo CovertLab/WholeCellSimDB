@@ -113,7 +113,7 @@ def render_hdf5_response(numpy_data, attrs, pathname, filename = 'data'):
          compression_opts = 4,
          chunks = True)
     for key, val in attrs.iteritems():
-        dset.parent.attrs[key] = val
+        dset.attrs[key] = val
     tmp_file.flush()
     tmp_file.close()
         

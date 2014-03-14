@@ -457,20 +457,47 @@ def state_property_download(request, state_name, property_name):
                 compression_opts = 4,
                 chunks = True)
         
-            dset.parent.attrs['simulation_length'] = pv.simulation.length
-            dset.parent.attrs['data_units'] = prop.units
-            dset.parent.attrs['time_units'] = 's'
-            dset.parent.attrs['downsample_step'] = 1
+            dset.attrs['simulation_length'] = pv.simulation.length
+            dset.attrs['data_units'] = prop.units
+            dset.attrs['time_units'] = 's'
+            dset.attrs['downsample_step'] = 1
             
             tmp_file.flush()
     
     tmp_file.close()
     
     return helpers.render_tempfile_response(tmp_filename, '%s-%s' % (state_name, property_name), 'h5', 'application/x-hdf')
-    
-#todo
+
 def state_property_row_download(request, state_name, property_name, row_name):
-    pass
+    tmp_file = helpers.create_temp_hdf5_file()
+    tmp_filename = tmp_file.filename
+    group = tmp_file.create_group('states/%s/%s/%s' % (state_name, property_name, row_name))
+    
+    batches = models.SimulationBatch.objects.filter(states__name=state_name, states__properties__name=property_name)
+    for batch in batches:
+        prop = models.Property.objects.get(state__name=state_name, name=property_name, state__simulation_batch__id=batch.id)
+        row = prop.labels.get(name=row_name)
+        for pv in prop.values.all():
+            shape = list(pv.shape)
+            shape[0] = 1
+            
+            dset = group.create_dataset('%s/%s/%d' % (batch.organism.name, batch.name, pv.simulation.batch_index),
+                data = pv.dataset[row.index, ...],
+                shape = shape,
+                compression = "gzip",
+                compression_opts = 4,
+                chunks = True)
+        
+            dset.attrs['simulation_length'] = pv.simulation.length
+            dset.attrs['data_units'] = prop.units
+            dset.attrs['time_units'] = 's'
+            dset.attrs['downsample_step'] = 1
+            
+            tmp_file.flush()
+    
+    tmp_file.close()
+    
+    return helpers.render_tempfile_response(tmp_filename, '%s-%s-%s' % (state_name, property_name, row_name), 'h5', 'application/x-hdf')
     
 def state_property_row_col_batch_download(request, state_name, property_name, row_name, col_name, batch_id):
     if row_name is None:
@@ -507,7 +534,7 @@ def state_property_row_col_batch_download(request, state_name, property_name, ro
         }
     
     if format == 'hdf5':
-        return helpers.render_hdf5_response(data, attrs, pathname = 'states/%s/%s/%s-%s' % (state_name, property_name, row_name, col_name), filename = '%s-%s-%s-%s-%s' % (batch.name, state_name, property_name, row_name, col_name))
+        return helpers.render_hdf5_response(data, attrs, pathname = 'states/%s/%s/%s/%s/%s' % (state_name, property_name, row_name, col_name, batch.name), filename = '%s-%s-%s-%s-%s' % (batch.name, state_name, property_name, row_name, col_name))
     elif format in ['json', 'bson', 'msgpack']:
         max_datapoints = 5e5
         n_datapoints = batch.simulations.count() * batch.simulations.aggregate(Max('length'))['length__max']        
