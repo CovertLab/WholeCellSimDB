@@ -11,12 +11,12 @@ Created: 2014-03-10
 {% load static %}
 {% load template_extras %}
 
-{% block head_title %}{{ block.super }} :: Process :: {{process_name}}{% endblock %}
+{% block head_title %}{{ block.super }} &rsaquo; Process &rsaquo; {{process_name}}{% endblock %}
 
 {% block content %}
 
 <div>
-<h1><a href="{% url wcdbweb.views.list_processes %}">Process</a> :: {{process_name}}</h1>
+<h1><a href="{% url wcdbweb.views.list_processes %}">Process</a> &rsaquo; {{process_name}}</h1>
 
 <table class="list_process_option_parameter">
     <thead>

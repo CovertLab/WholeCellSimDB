@@ -13,19 +13,19 @@ Created: 2014-03-10
 
 {% block head_title %}
 {{ block.super }}
- :: Option
-{% if not process_name == None %} :: {{process_name}}{% endif %}
-{% if not state_name == None %} :: {{state_name}}{% endif %}
- :: {{option_name}}
+ &rsaquo; Option
+{% if not process_name == None %} &rsaquo; {{process_name}}{% endif %}
+{% if not state_name == None %} &rsaquo; {{state_name}}{% endif %}
+ &rsaquo; {{option_name}}
  {% endblock %}
 
 {% block content %}
 
 <div>
 <h1><a href="{% url wcdbweb.views.list_options %}">Option</a>
-{% if not process_name == None %} :: <a href="{% url wcdbweb.views.process process_name=process_name %}">{{process_name}}</a>{% endif %}
-{% if not state_name == None %} :: <a href="{% url wcdbweb.views.state state_name=state_name %}">{{state_name}}</a>{% endif %}
- :: {{option_name}}</h1>
+{% if not process_name == None %} &rsaquo; <a href="{% url wcdbweb.views.process process_name=process_name %}">{{process_name}}</a>{% endif %}
+{% if not state_name == None %} &rsaquo; <a href="{% url wcdbweb.views.state state_name=state_name %}">{{state_name}}</a>{% endif %}
+ &rsaquo; {{option_name}}</h1>
 
 <table class="option">
     <thead>

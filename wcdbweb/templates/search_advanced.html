@@ -10,12 +10,12 @@ Created: 2014-03-07
 
 {% load static %}
 
-{% block head_title %}{{ block.super }} :: Advanced search{% if valid %} :: Results{% endif %}{% endblock %}
+{% block head_title %}{{ block.super }} &rsaquo; Advanced search{% if valid %} &rsaquo; Results{% endif %}{% endblock %}
 
 {% block content %}
 
 <div>
-<h1>Advanced search{% if valid %} :: Results{% endif %}</h1>
+<h1>Advanced search{% if valid %} &rsaquo; Results{% endif %}</h1>
 
 {% if valid %}
 {% include "search_results.html" %}

@@ -10,12 +10,12 @@ Created: 2013-09-16
 
 {% load static %}
 
-{% block head_title %}{{ block.super }} :: Investigator :: {{ investigator.user.get_full_name }}{% endblock %}
+{% block head_title %}{{ block.super }} &rsaquo; Investigator &rsaquo; {{ investigator.user.get_full_name }}{% endblock %}
 
 {% block content %}
 
 <div>
-<h1><a href="{% url wcdbweb.views.list_investigators %}">Investigator</a> :: {{ investigator.user.get_full_name }}</h1>
+<h1><a href="{% url wcdbweb.views.list_investigators %}">Investigator</a> &rsaquo; {{ investigator.user.get_full_name }}</h1>
 
 <h2>Bio</h2>
 <ul class="inparagraph">

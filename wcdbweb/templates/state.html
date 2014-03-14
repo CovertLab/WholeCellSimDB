@@ -11,12 +11,12 @@ Created: 2014-03-10
 {% load static %}
 {% load template_extras %}
 
-{% block head_title %}{{ block.super }} :: State :: {{state_name}}{% endblock %}
+{% block head_title %}{{ block.super }} &rsaquo; State &rsaquo; {{state_name}}{% endblock %}
 
 {% block content %}
 
 <div>
-<h1><a href="{% url wcdbweb.views.list_states %}">State</a> :: {{state_name}}</h1>
+<h1><a href="{% url wcdbweb.views.list_states %}">State</a> &rsaquo; {{state_name}}</h1>
 
 <table class="list_state_option_parameter_property">
     <thead>

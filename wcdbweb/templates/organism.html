@@ -10,12 +10,12 @@ Created: 2013-09-16
 
 {% load static %}
 
-{% block head_title %}{{ block.super }} :: Organism :: {{ organism.name }}{% endblock %}
+{% block head_title %}{{ block.super }} &rsaquo; Organism &rsaquo; {{ organism.name }}{% endblock %}
 
 {% block content %}
 
 <div>
-<h1><a href="{% url wcdbweb.views.list_organisms %}">Organism</a> :: {{ organism.name }}</h1>
+<h1><a href="{% url wcdbweb.views.list_organisms %}">Organism</a> &rsaquo; {{ organism.name }}</h1>
 
 <h2>Simulation batches</h2>
 <table class="table list_organism__simulation_batches inparagraph">

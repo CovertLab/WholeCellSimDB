@@ -10,11 +10,11 @@ Created: 2013-09-13
 
 {% load static %}
 
-{% block head_title %}{{ block.super }} :: Search{% endblock %}
+{% block head_title %}{{ block.super }} &rsaquo; Search{% endblock %}
 
 {% block head %}
 {{ block.super }}
-<script>
+<script language="javascript" type="text/javascript">
   (function() {
     var cx = '005713974021659712118:ycgtabs97ri';
     var gcse = document.createElement('script');
@@ -29,6 +29,6 @@ Created: 2013-09-13
 {% endblock %}
 
 {% block content %}
-<h1>Search :: "{{ query }}"</h1>
+<h1>Search &rsaquo; "{{ query }}"</h1>
 <gcse:searchresults-only></gcse:searchresults-only> 
 {% endblock %}
