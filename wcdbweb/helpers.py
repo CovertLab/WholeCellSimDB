@@ -10,6 +10,7 @@ from WholeCellDB import settings
 import bson
 import datetime
 import h5py
+import numpy
 import umsgpack
 import os
 import sys
@@ -95,24 +96,25 @@ def download_batches(batches, filename):
     file.seek(0)
     return response
     
-#todo: test
-def render_hdf5_response(numpy_data, labels, pathname, filename = 'data'):
+def render_hdf5_response(numpy_data, attrs, pathname, filename = 'data'):
     tmp_filedescriptor, tmp_filename = tempfile.mkstemp(dir=settings.TMP_DIR, suffix='.h5')
     tmp_file = os.fdopen(tmp_filedescriptor,'w')
     tmp_file.close()
     
-    tmp_file = h5py.File(tmp_filename, 'w-')
+    tmp_file = h5py.File(tmp_filename, 'w')
+    
     dset = tmp_file.create_dataset(pathname, 
          data = numpy_data,
          compression = "gzip",
          compression_opts = 4,
          chunks = True)
-    dset.attr.create('labels', numpy.array(labels))
+    for key, val in attrs.iteritems():
+        dset.parent.attrs[key] = val
     tmp_file.flush()
     tmp_file.close()
-    
+        
     tmp_file = open(tmp_filename, 'rb')
-    tmp_file.seek(0,2)    
+    tmp_file.seek(0, 2)
     fileWrapper = FileWrapper(tmp_file)
     response = HttpResponse(
         fileWrapper,
@@ -122,6 +124,7 @@ def render_hdf5_response(numpy_data, labels, pathname, filename = 'data'):
     response['Content-Disposition'] = "attachment; filename=%s.h5" % slugify(filename)
     response['Content-Length'] = tmp_file.tell()
     tmp_file.seek(0)
+    os.remove(tmp_filename)
     return response
     
 def render_json_response(data, filename = 'data', indent = None):

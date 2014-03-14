@@ -467,7 +467,7 @@ def state_property_row_col_batch_download(request, state_name, property_name, ro
     if col_name is None:
         col_name = ''
     
-    labels = {
+    attrs = {
         'organism': batch.organism.name,
         'simulation_batch': batch.name,
         'simulation_batch_indices': [sim.batch_index for sim in batch.simulations.all()],
@@ -482,7 +482,7 @@ def state_property_row_col_batch_download(request, state_name, property_name, ro
         }
     
     if format == 'hdf5':
-        return helpers.render_hdf5_response(data, labels, pathname = '%s/%s/%s-%s' % (state_name, property_name, row_name, col_name), filename = '%s-%s-%s-%s-%s' % (batch.name, state_name, property_name, row_name, col_name))
+        return helpers.render_hdf5_response(data, attrs, pathname = 'states/%s/%s/%s-%s' % (state_name, property_name, row_name, col_name), filename = '%s-%s-%s-%s-%s' % (batch.name, state_name, property_name, row_name, col_name))
     elif format in ['json', 'bson', 'msgpack']:
         max_datapoints = 5e5
         n_datapoints = batch.simulations.count() * batch.simulations.aggregate(Max('length'))['length__max']        
@@ -503,13 +503,13 @@ def state_property_row_col_batch_download(request, state_name, property_name, ro
             
             downsample_step = int(downsample_step)
         
-        labels['downsample_step'] = downsample_step        
+        attrs['downsample_step'] = downsample_step        
         data = data[:,::downsample_step]
         
         data = data.tolist()
-        for idx, length in enumerate(labels['simulation_lengths']):
+        for idx, length in enumerate(attrs['simulation_lengths']):
             data[idx] = data[idx][:length/downsample_step]
-        tmp = {'labels': labels, 'data': data}
+        tmp = {'attrs': attrs, 'data': data}
         if format == 'json':
             return helpers.render_json_response(tmp, indent=2)
         elif format == 'bson':
