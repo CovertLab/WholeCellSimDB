@@ -93,6 +93,7 @@ def download_batches(batches, filename):
     file.seek(0)
     return response
     
+#todo: test
 def render_hdf5_response(numpy_data, labels, pathname, filename = 'data'):
     tmp_filedescriptor, tmp_filename = tempfile.mkstemp(dir=settings.TMP_DIR, suffix='.h5')
     tmp_file = os.fdopen(tmp_filedescriptor,'w')
