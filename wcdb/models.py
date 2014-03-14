@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 from django.db import models
+from django.db.models.query import QuerySet
 from django.contrib.auth.models import User
-
+import ast
 import h5py
 import os
 import re
@@ -9,6 +10,32 @@ import sys
 from WholeCellDB.settings import HDF5_ROOT
 
 property_tag = property
+
+class ListField(models.TextField):
+    __metaclass__ = models.SubfieldBase
+    description = "Stores a python list"
+
+    def __init__(self, *args, **kwargs):
+        super(ListField, self).__init__(*args, **kwargs)
+
+    def to_python(self, value):
+        if not value:
+            return None
+
+        if isinstance(value, (list, tuple)):
+            return value
+
+        return ast.literal_eval(value)
+
+    def get_prep_value(self, value):
+        if not value:
+            return None
+            
+        return unicode(value)
+
+    def value_to_string(self, obj):
+        value = self._get_val_from_obj(obj)
+        return self.get_db_prep_value(value)
 
 """ OPP """
 class Option(models.Model):
@@ -134,6 +161,41 @@ class Property(models.Model):
     name  = models.CharField(max_length=255, db_index=True)
     units = models.CharField(max_length=255, null=True, blank=True)
     
+    def get_dataset_slice(self, rowLabels = None, colLabels = None, simulations = None):
+        if simulations is None:
+            simulations = self.state.simulation_batch.simulations
+        if isinstance(simulations, Simulation):
+            simulations = [simulations]
+            
+        sim0 = self.state.simulation_batch.simulations.all()[0]
+        dataset0 = sim0.property_values.get(property__id=self.id).dataset
+
+        shape = dataset0.shape
+        
+        if rowLabels is None:
+            nRows = shape[0]
+        elif isinstance(rowLabels, (QuerySet, list)):
+            nRows = len(rowLabels)
+        else:
+            nRows = 1
+            
+        if colLabels is None:
+            nCols = shape[0]
+        elif isinstance(colLabels, (QuerySet, list)):
+            nCols = len(colLabels)
+        else:
+            nCols = 1
+        
+        shape[0] = nRows
+        shape[1] = nCols
+        shape[dataset0.ndim] = len(simulations)
+        returnVal = numpy.empty(shape, dtype = dataset0.dtype)
+            
+        for idx, sim in enumerate(simulations):
+            returnVal[..., idx] = sim.property_values.get(property=self).get_dataset_slice(rowLabels, colLabels)
+            
+        return returnVal
+    
     def __unicode__(self):
         return ' - '.join([
             self.state.simulation_batch.organism.name,
@@ -149,7 +211,7 @@ class Property(models.Model):
 
 """ Properties """
 class PropertyValueManager(models.Manager):
-    def create_property_value(self, simulation, property, shape, dtype):
+    def create_property_value(self, simulation, property):
         """ 
         Creates a new StatePropertyValue and the associated dataset. 
 
@@ -161,24 +223,7 @@ class PropertyValueManager(models.Manager):
             shape           | Tuple of Ints
             dtype           | Numpy.dtype
         """
-        p_obj = self.create(simulation=simulation, property=property)
-
-        maxshape = shape[:-1] + (None,)
-
-        f = simulation.h5file  # Get the simulation h5 file
-
-        # Create the datset in the simulation h5 file
-        f.create_dataset(p_obj.path, 
-                         shape = shape, 
-                         dtype = dtype,
-                         maxshape = maxshape)
-
-        # Make sure it's saved and closed.
-        f.flush()
-        f.close()
-
-        return p_obj
-
+        return self.create(simulation=simulation, property=property)
 
 class PropertyValue(models.Model):
     """
@@ -186,6 +231,8 @@ class PropertyValue(models.Model):
     """
     simulation = models.ForeignKey('Simulation', related_name='property_values')
     property   = models.ForeignKey('Property', related_name = 'values')
+    shape      = ListField(null=True, blank=True)
+    dtype      = models.CharField(max_length=255, null=True, blank=True)
 
     # Number of indices filled in in the time dimension.
     _filled = models.IntegerField(default=0) 
@@ -197,18 +244,28 @@ class PropertyValue(models.Model):
         """ The path to the dataset within the simulation h5 file """
         return "/".join([self.property.state.name,
                          self.property.name])
-
-    @property_tag
-    def shape(self):
-        """ The shape of the property's dataset """
-        return self.dataset.shape
-
+ 
     @property_tag
     def dataset(self):
         """ The H5Py Dataset object for this property. """
         f = self.simulation.h5file
         return f[self.path]
 
+    def set_data(self, data):
+        f = self.simulation.h5file
+        f.create_dataset(
+            self.path,
+            data = data,
+            compression = "gzip",
+            compression_opts = 4, 
+            chunks = True)
+        f.flush()
+        f.close()
+        
+        self.shape = data.shape
+        self.dtype = data.dtype.name
+        self.save()
+        
     def add_data(self, ts):
         """ 
         This method is for adding new time slices to the data.
@@ -248,10 +305,36 @@ class PropertyValue(models.Model):
                 self.simulation.length = new_length
 
             self.dataset[...,self._filled:self._filled+lts] = ts
+            self.shape = self.dataset.shape
+            self.dtype = self.dataset.dtype.name
             self.simulation.h5file.flush()
             self._filled += lts
+            self.save()
         else:
             return False
+            
+    def get_dataset_slice(self, rowLabels = None, colLabels = None):
+        rowIndices = None
+        colIndices = None
+        if rowLabels is not None:
+            if isinstance(rowLabels, (QuerySet, list)):
+                rowIndices = [x.index for x in rowLabels]
+            else:
+                rowIndices = [rowLabels.index]
+        if colLabels is not None:
+            if isinstance(colLabels, (QuerySet, list)):
+                colIndices = [x.index for x in colLabels]
+            else:
+                colIndices = [colLabels.index]
+    
+        if rowIndices is not None and colIndices is not None:        
+            return self.dataset[rowIndices, colIndices, ...]
+        elif rowIndices is not None:
+            return self.dataset[rowIndices, :, ...]
+        elif colIndices is not None:
+            return self.dataset[:, colIndices, ...]
+        else:
+            return self.dataset
 
     # Unicode
     def __unicode__(self):
@@ -264,7 +347,6 @@ class PropertyValue(models.Model):
             ])
 
     class Meta:
-        verbose_name_plural = 'Properties'
         app_label='wcdb'
         ordering = ['simulation__batch_index']
         get_latest_by = 'simulation__batch__date'
@@ -274,19 +356,6 @@ class PropertyLabel(models.Model):
     name      = models.CharField(max_length=255, null=True, blank=True, default=None, db_index=True)
     dimension = models.PositiveIntegerField(db_index=True)
     index     = models.PositiveIntegerField(db_index=True)
-    
-    def get_dataset(self, batch_indices = None):
-        sims = self.property.state.simulation_batch.simulations
-        
-        if batch_indices is None:
-            batch_indices = [x[0] for x in sims.values_list('batch_index')]
-        
-        return_val = []
-        for batch_index in batch_indices:
-            prop_val = property.values.get(simulation__batch_index = batch_index)
-            return_val.append(prop_val.dataset.take(self.index, self.dimension))
-            
-        return return_val
     
     def __unicode__(self):
         return self.name
@@ -298,30 +367,19 @@ class PropertyLabel(models.Model):
 
 
 class SimulationManager(models.Manager):
-    def create_simulation(self, 
-                          batch,    
-                          batch_index = 1,
-                          length = None,
-                          states = {}):
+    def create_simulation(self, batch, batch_index = 1, length = None):        
+        simulation = batch.simulations.create(
+             batch_index = batch_index,
+             length = length)
+
+        f = simulation.h5file
         
-        simulation = batch.simulations.create(                                 
-                                 batch_index = batch_index,
-                                 length = length)
-
-        f = simulation.h5file 
-
-        for state_name, pd in states.iteritems():
-            state = batch.states.get(name = state_name)
+        for state in batch.states.all():
+            g = f.create_group('/states/' + state.name)
             
-            g = f.create_group('/states/' + state_name)
-            f.flush()
-            
-            for prop_name, d in pd.iteritems():
-                property = state.properties.get(name=prop_name)
-                PropertyValue.objects.create_property_value(simulation, 
-                                                 property,
-                                                 d[0], # Shape
-                                                 d[1]) # dType
+            for property in state.properties.all():
+                pv = PropertyValue.objects.create_property_value(simulation, property)
+                pv.save()
 
         f.flush()
         f.close() 

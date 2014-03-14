@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.core.servers.basehttp import FileWrapper
 from django.db.models import Avg, Count, Min, Max
 from django.http import HttpResponse
@@ -5,10 +6,12 @@ from haystack.query import SearchQuerySet
 from helpers import render_template
 from wcdb import models
 from wcdb.helpers import get_option_dict, get_parameter_dict
+from wcdbweb.helpers import render_json_response, render_hdf5_response
 from WholeCellDB import settings
 import copy
 import forms
 import helpers
+import numpy
 
 ###################
 ### landing page
@@ -305,15 +308,24 @@ def state_property(request, state_name, property_name):
     simulation_batch_ids = [x['id'] for x in simulation_batches]
     
     labels = models.PropertyLabel.objects \
-        .filter(property__name=property_name, property__state__name=state_name) \
+        .filter(property__name=property_name, property__state__name=state_name)
+    dimension_values = [x['dimension'] for x in labels.values('dimension').annotate(Count('dimension'))]
+    
+    is_labeled = labels.exclude(name='').count() > 0
+    show_slice_links = 0 in dimension_values and 1 in dimension_values        
+    
+    label_values = labels \
         .values('dimension', 'name', 'property__state__simulation_batch__id', 'property__state__simulation_batch__name') \
         .order_by('dimension', 'name')
+        
     return render_template('state_property.html', request, data = {
         'state_name': state_name,
         'property_name': property_name,
         'simulation_batches': simulation_batches,
         'simulation_batch_ids': simulation_batch_ids,
-        'labels': labels
+        'is_labeled': is_labeled,
+        'show_slice_links': show_slice_links,
+        'labels': label_values,
     })
 
 def state_property_row(request, state_name, property_name, row_name):
@@ -327,6 +339,12 @@ def state_property_row(request, state_name, property_name, row_name):
         .filter(dimension=1, property__name=property_name, property__state__name=state_name, property__labels__name=row_name, property__labels__dimension=0) \
         .values('name', 'property__state__simulation_batch__organism__id', 'property__state__simulation_batch__organism__name', 'property__state__simulation_batch__id', 'property__state__simulation_batch__name') \
         .order_by('property__state__simulation_batch__organism__name', 'property__state__simulation_batch__name', 'name')
+        
+    tmp = models.PropertyValue.objects \
+        .filter(property__name=property_name, property__state__name=state_name) \
+        .values('simulation__batch__id', 'simulation__batch__name') \
+        .annotate(Count('simulation__batch__id'))
+    property_value_batches = {x['simulation__batch__id']: x['simulation__batch__name'] for x in tmp}
     
     return render_template('state_property_row.html', request, data = {
         'state_name': state_name, 
@@ -334,22 +352,47 @@ def state_property_row(request, state_name, property_name, row_name):
         'row_name': row_name,
         'col_names': col_names,
         'cols_batches_organisms': cols_batches_organisms,
+        'property_value_batches': property_value_batches,
     })
 
-#TODO
-def state_property_row_col_batch(request, state_name, property_name, row_name, col_name, batch_id):
+def state_property_row_col_batch(request, state_name, property_name, batch_id, row_name = '', col_name = ''):
+    if row_name is None:
+        row_name = ''
+    if col_name is None:
+        col_name = ''
+
     batch = models.SimulationBatch.objects.get(id=batch_id)
-    row = models.PropertyLabel.objects.get(dimension=0, name=row_name, property__name=property_name, property__state__name=state_name, property__state__simulation_batch__id=batch_id)
+    state = batch.states.get(name=state_name)
+    property = state.properties.get(name=property_name)
+    
+    x_axis = {
+        'max': max([pv.shape[2] for pv in property.values.all()]),
+        }
+
+    if property.units:
+        y_axis = {
+            'label': property_name,
+            'title': '%s (%s)'  % (property_name, property.units),
+            'units': property.units,
+            }
+    else:
+        y_axis = {
+            'label': property_name,
+            'title': property_name,
+            'units': None,
+            }
     
     return render_template('state_property_row_col_batch.html', request, data = {
         'state_name': state_name, 
         'property_name': property_name, 
         'row_name': row_name,
         'col_name': col_name,
-        'batch': batch,
-        'row': row
+        'batch': batch, 
+        'x_axis': x_axis,
+        'y_axis': y_axis
     })
     
+   
 ###################
 ### downloading
 ###################
@@ -390,6 +433,67 @@ def simulation_download(request, id):
     response['Content-Length'] = file.tell()
     file.seek(0)
     return response
+
+#todo
+def state_download(request, state_name):
+    pass
+
+#todo
+def state_property_download(request, state_name, property_name):
+    pass
+    
+#todo
+def state_property_row_download(request, state_name, property_name, row_name):
+    pass
+    
+#todo
+def state_property_row_col_batch_download(request, state_name, property_name, row_name, col_name, batch_id):
+    if row_name is None:
+        row_name = ''
+    if col_name is None:
+        col_name = ''
+        
+    format = request.GET.get('format', 'hdf5')
+    downsample_step = 500
+    
+    batch = models.SimulationBatch.objects.get(id=batch_id)
+    prop = models.Property.objects.get(name=property_name, state__name=state_name, state__simulation_batch__id=batch_id)
+    row = models.PropertyLabel.objects.get(dimension=0, name=row_name, property__name=property_name, property__state__name=state_name, property__state__simulation_batch__id=batch_id)
+    col = models.PropertyLabel.objects.get(dimension=1, name=col_name, property__name=property_name, property__state__name=state_name, property__state__simulation_batch__id=batch_id)
+    
+    data = numpy.random.rand(1, 1, 40000, 128)
+    #data = prop.get_dataset_slice(row, col)
+    data = numpy.transpose(data, (3, 2, 0, 1)).squeeze()
+    data = data[:,::downsample_step]
+    
+    if row_name is None:
+        row_name = ''
+    if col_name is None:
+        col_name = ''
+    
+    labels = {
+        'organism': batch.organism.name,
+        'simulation_batch': batch.name,
+        'simulation_batch_indices': [sim.batch_index for sim in batch.simulations.all()],
+        'simulation_lengths': [pv.shape[2] for pv in prop.values.all()],
+        'state': state_name,
+        'property': property_name,
+        'row': row_name,
+        'col': col_name,        
+        'data_units': prop.units,
+        'time_units': 's',
+        'downsample_step': downsample_step,
+        }
+    
+    if format == 'hdf5':
+        return render_hdf5_response(data, labels, pathname = '%s/%s/%s-%s' % (state_name, property_name, row_name, col_name), filename = '%s-%s-%s-%s-%s' % (batch.name, state_name, property_name, row_name, col_name))
+    elif format == 'json':
+        return render_json_response({
+            'labels': labels,
+            'data': data.tolist()
+            })
+    else:
+        raise ValidationError('Invalid format: %s' % format)
     
 def investigator_download(request, id):
     investigator = models.Investigator.objects.get(id=id)    

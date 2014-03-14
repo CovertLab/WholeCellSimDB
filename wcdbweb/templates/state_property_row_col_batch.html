@@ -11,22 +11,30 @@ Created: 2014-03-10
 {% load static %}
 {% load template_extras %}
 
-{% block head_title %}{{ block.super }} :: State :: {{state_name}} :: {{property_name}} :: {{row_name}}{% endblock %}
+{% block head_title %}
+{{ block.super }}
+ &rsaquo; Simulation batches
+ &rsaquo; {{batch.name}}
+ &rsaquo; {{state_name}}
+ &rsaquo; {{property_name}}
+{% if row_name != '' %} &rsaquo; {{row_name}}{% endif %}
+{% if col_name != '' %} &rsaquo; {{col_name}}{% endif %}
+{% endblock %}
 
 {% block content %}
 
 <div>
 <h1>
-<a href="{% url wcdbweb.views.list_simulation_batches %}">Simulation batches</a> :: 
-<a href="{% url wcdbweb.views.simulation_batch id=batch.id %}">{{batch.name}}</a> :: 
-<a href="{% url wcdbweb.views.state state_name=state_name %}">{{state_name}}</a> :: 
-<a href="{% url wcdbweb.views.state_property state_name=state_name property_name=property_name %}">{{property_name}}</a> :: 
-<a href="{% url wcdbweb.views.state_property_row state_name=state_name property_name=property_name row_name=row_name %}">{{row_name}}</a> :: 
-{{col_name}}
+<a href="{% url wcdbweb.views.list_simulation_batches %}">Simulation batches</a>
+ &rsaquo; <a href="{% url wcdbweb.views.simulation_batch id=batch.id %}">{{batch.name}}</a>
+ &rsaquo; <a href="{% url wcdbweb.views.state state_name=state_name %}">{{state_name}}</a>
+ &rsaquo; <a href="{% url wcdbweb.views.state_property state_name=state_name property_name=property_name %}">{{property_name}}</a>
+{% if row_name != '' %} &rsaquo; <a href="{% url wcdbweb.views.state_property_row state_name=state_name property_name=property_name row_name=row_name %}">{{row_name}}</a>{% endif %}
+{% if col_name != '' %} &rsaquo; {{col_name}}{% endif %}
 </h1>
 
 <h2>Metadata</h2>
-<script>
+<script language="javascript" type="text/javascript">
 var meta = [
     {label: 'Simulation batch: '},
     {label: 'Organism: '},
@@ -49,6 +57,107 @@ $(function() {
 
 <h2>Data</h2>
 
+<div class="plot-container"></div>
+<script language="javascript" type="text/javascript">
+var options = {
+    series: {
+        lines: { show: true },
+        points: { show: true },
+    },
+    xaxis: {
+        show: true,
+        position: 'bottom',
+        font: {size: 8, lineHeight: 10, family: 'PT Sans,sans-serif', style: 'normal', weight: 'normal', variant: 'normal', color: '#000000'},
+        min: 0,
+        max: {{x_axis.max}} / 3600,
+        axisLabel: 'Time (h)',
+        axisLabelColour: '#000000',
+        axisLabelFontFamily: 'PT Sans,sans-serif',
+        axisLabelFontSizePixels: 12,
+        axisLabelUseCanvas: true,
+        labelHeight: 20,
+        color: '#efefef',
+    },
+    yaxis: { 
+        show: true,
+        position: 'left',
+        font: {size: 8, lineHeight: 10, family: 'PT Sans,sans-serif', style: 'normal', weight: 'normal', variant: 'normal', color: '#000000'},
+        axisLabel: '{{y_axis.title|capfirst}}',
+        axisLabelColour: '#000000',
+        axisLabelFontFamily: 'PT Sans,sans-serif',
+        axisLabelFontSizePixels: 12,
+        axisLabelUseCanvas: true,        
+        labelWidth: 25,
+        color: '#efefef',
+    },
+    tooltip: true,
+    tooltipOpts: {
+        content: function (series, x, y) {return 'Simulation-' + series + ' | Time: ' + x.toFixed(2) + ' h | {{y_axis.label|capfirst}}: ' + y + '{% if y_axis.units != None %} {{y_axis.units}}{% endif %}';}
+    },
+    grid: {
+        hoverable: true,        
+    },
+    legend: {
+        show: true,
+        sorted: false,
+        position: 'ne',
+        labelFormatter: function(label, series) {return 'Simulation-' + label;},
+    },
+    zoom: {
+        interactive: true
+    },
+    pan: {
+        interactive: true
+    },
+};
+var plotContainer = $(".plot-container");
+var plot = $.plot(plotContainer, [], options);
+
+$("<div class='status'>Loading data ...</div>")
+    .appendTo(plotContainer);
+
+$("<div class='error'>Error loading data. Please try again.</div>")
+    .appendTo(plotContainer)
+    .hide();
+
+var setData = function(data) {
+    plotContainer.find('.status').fadeOut(1000);
+    
+    var downsample_step = data.labels.downsample_step;
+    
+    var series = [];
+    for (var i = 0; i < data.data.length; i++) {
+        timePoints = [];
+        for (j = 0; j < Math.min(data.data[i].length, data.labels.simulation_lengths[i] / downsample_step); j++) {
+            timePoints.push([(j+1) * downsample_step / 3600, data.data[i][j]]);
+        }
+        series.push({
+            data: timePoints,
+            label: data.labels.simulation_batch_indices[i]
+            });
+    }
+    plot.setData(series);
+    plot.draw();
+}
+
+var alertFailure = function () {
+    plotContainer.find('.status').fadeOut(1000);
+    plotContainer.find('.error').fadeIn(1000);
+}
+
+$.ajax('{% url wcdbweb.views.state_property_row_col_batch_download state_name=state_name property_name=property_name row_name=row_name col_name=col_name batch_id=batch.id %}?format=json')
+    .done(setData)
+    .fail(alertFailure);
+ 
+</script>
+
 </div>
 
+{% endblock %}
+
+
+{% block action_icons %}
+<a href="{% url wcdbweb.views.state_property_row_col_batch_download state_name=state_name property_name=property_name row_name=row_name col_name=col_name batch_id=batch.id %}"><img src="{% get_static_prefix %}img/hdf.png" alt="HDF5" title="HDF5"/></a>
+<a href="{% url wcdbweb.views.state_property_row_col_batch_download state_name=state_name property_name=property_name row_name=row_name col_name=col_name batch_id=batch.id %}"><img src="{% get_static_prefix %}img/json.png" alt="JSON" title="JSON"/></a>
+{{ block.super }}
 {% endblock %}

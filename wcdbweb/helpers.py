@@ -4,10 +4,13 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
+from django.utils import simplejson
 from haystack.models import SearchResult
 from WholeCellDB import settings
 import datetime
+import h5py
 import os
+import sys
 import tempfile
 import zipfile
 
@@ -73,7 +76,7 @@ def download_batches(batches, filename):
     if not os.path.isdir(settings.ROOT_DIR):
         os.mkdir(settings.TMP_DIR)
     
-    file = tempfile.TemporaryFile(dir=settings.TMP_DIR)
+    file = tempfile.TemporaryFile(dir=settings.TMP_DIR, suffix='.zip')
     zip = zipfile.ZipFile(file, 'w')
     for batch in batches:
         for simulation in batch.simulations.all():
@@ -88,4 +91,41 @@ def download_batches(batches, filename):
     response['Content-Disposition'] = "attachment; filename=%s.zip" % slugify(filename)
     response['Content-Length'] = file.tell()
     file.seek(0)
+    return response
+    
+def render_hdf5_response(numpy_data, labels, pathname, filename = 'data'):
+    tmp_filedescriptor, tmp_filename = tempfile.mkstemp(dir=settings.TMP_DIR, suffix='.h5')
+    tmp_file = os.fdopen(tmp_filedescriptor,'w')
+    tmp_file.close()
+    
+    tmp_file = h5py.File(tmp_filename, 'w-')
+    dset = tmp_file.create_dataset(pathname, 
+         data = numpy_data,
+         compression = "gzip",
+         compression_opts = 4,
+         chunks = True)
+    dset.attr.create('labels', numpy.array(labels))
+    tmp_file.flush()
+    tmp_file.close()
+    
+    tmp_file = open(tmp_filename, 'rb')
+    tmp_file.seek(0,2)    
+    fileWrapper = FileWrapper(tmp_file)
+    response = HttpResponse(
+        fileWrapper,
+        mimetype = "application/x-hdf",
+        content_type = "application/x-hdf"
+        )
+    response['Content-Disposition'] = "attachment; filename=%s.h5" % slugify(filename)
+    response['Content-Length'] = tmp_file.tell()
+    tmp_file.seek(0)
+    return response
+    
+def render_json_response(data, filename = 'data'):
+    response = HttpResponse(
+        simplejson.dumps(data, indent=2, ensure_ascii=False, encoding='utf-8'),
+        mimetype = "application/json; charset=UTF-8",
+        content_type = "application/json; charset=UTF-8")
+    response['Content-Disposition'] = "attachment; filename=%s.json" % slugify(filename)
+    
     return response
