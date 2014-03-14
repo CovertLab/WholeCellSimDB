@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 from django.db import models
+from django.db.models import Max
 from django.db.models.query import QuerySet
 from django.contrib.auth.models import User
+from helpers import is_sorted
+from WholeCellDB.settings import HDF5_ROOT
 import ast
 import h5py
+import numpy
 import os
 import re
 import sys
-from WholeCellDB.settings import HDF5_ROOT
 
 property_tag = property
 
@@ -163,36 +166,42 @@ class Property(models.Model):
     
     def get_dataset_slice(self, rowLabels = None, colLabels = None, simulations = None):
         if simulations is None:
-            simulations = self.state.simulation_batch.simulations
-        if isinstance(simulations, Simulation):
+            simulations = self.state.simulation_batch.simulations.all()
+            length = simulations.aggregate(Max('length'))['length__max']
+        elif isinstance(simulations, Simulation):
+            length = simulations.length
             simulations = [simulations]
+        else:
+            length = simulations[0].length
             
         sim0 = self.state.simulation_batch.simulations.all()[0]
-        dataset0 = sim0.property_values.get(property__id=self.id).dataset
+        pv0 = sim0.property_values.get(property__id=self.id)
 
-        shape = dataset0.shape
+        shape = list(pv0.shape)
         
         if rowLabels is None:
             nRows = shape[0]
-        elif isinstance(rowLabels, (QuerySet, list)):
+        elif isinstance(rowLabels, (QuerySet, list, tuple)):
             nRows = len(rowLabels)
         else:
             nRows = 1
             
         if colLabels is None:
             nCols = shape[0]
-        elif isinstance(colLabels, (QuerySet, list)):
+        elif isinstance(colLabels, (QuerySet, list, tuple)):
             nCols = len(colLabels)
         else:
             nCols = 1
         
         shape[0] = nRows
         shape[1] = nCols
-        shape[dataset0.ndim] = len(simulations)
-        returnVal = numpy.empty(shape, dtype = dataset0.dtype)
+        shape[2] = length
+        shape.append(len(simulations))
+        returnVal = numpy.empty(shape, dtype = 'float64')
+        returnVal.fill(numpy.NaN)
             
         for idx, sim in enumerate(simulations):
-            returnVal[..., idx] = sim.property_values.get(property=self).get_dataset_slice(rowLabels, colLabels)
+            returnVal[:, :, :sim.length, idx] = sim.property_values.get(property=self).get_dataset_slice(rowLabels, colLabels)
             
         return returnVal
     
@@ -314,27 +323,66 @@ class PropertyValue(models.Model):
             return False
             
     def get_dataset_slice(self, rowLabels = None, colLabels = None):
-        rowIndices = None
-        colIndices = None
-        if rowLabels is not None:
-            if isinstance(rowLabels, (QuerySet, list)):
+        if rowLabels is None and colLabels is None:
+            returnVal = numpy.empty(self.shape, dtype = self.dtype)
+            self.dataset.read_direct(returnVal)
+        elif colLabels is None:
+            if isinstance(rowLabels, (QuerySet, list, tuple)):
                 rowIndices = [x.index for x in rowLabels]
             else:
                 rowIndices = [rowLabels.index]
-        if colLabels is not None:
-            if isinstance(colLabels, (QuerySet, list)):
+                
+            shape = list(self.shape)
+            shape[0] = len(rowIndices)
+            returnVal = numpy.empty(shape, dtype = self.dtype)
+            
+            if is_sorted(rowIndices, key=lambda a, b: a < b):
+                self.dataset.read_direct(returnVal, numpy.s_[rowIndices, ...])
+            else:
+                for new_rowIndex, old_rowIndex in enumerate(rowIndices):
+                    self.dataset.read_direct(returnVal, numpy.s_[old_rowIndex, ...], numpy.s_[new_rowIndex, ...])
+        elif rowLabels is None:
+            if isinstance(colLabels, (QuerySet, list, tuple)):
                 colIndices = [x.index for x in colLabels]
             else:
                 colIndices = [colLabels.index]
-    
-        if rowIndices is not None and colIndices is not None:        
-            return self.dataset[rowIndices, colIndices, ...]
-        elif rowIndices is not None:
-            return self.dataset[rowIndices, :, ...]
-        elif colIndices is not None:
-            return self.dataset[:, colIndices, ...]
+                
+            shape = list(self.shape)
+            shape[1] = len(colIndices)
+            returnVal = numpy.empty(shape, dtype = self.dtype)
+            
+            if is_sorted(colIndices, key=lambda a, b: a < b):
+                self.dataset.read_direct(returnVal, numpy.s_[:, colIndices, ...])
+            else:
+                for new_colIndex, old_colIndex in enumerate(colIndices):
+                    self.dataset.read_direct(returnVal, numpy.s_[:, old_colIndex, ...], numpy.s_[:, new_colIndex, ...])
         else:
-            return self.dataset
+            if isinstance(rowLabels, (QuerySet, list, tuple)):
+                rowIndices = [x.index for x in rowLabels]
+            else:
+                rowIndices = [rowLabels.index]
+            if isinstance(colLabels, (QuerySet, list, tuple)):
+                colIndices = [x.index for x in colLabels]
+            else:
+                colIndices = [colLabels.index]
+                
+            shape = list(self.shape)
+            shape[0] = len(rowIndices)
+            shape[1] = len(colIndices)
+            returnVal = numpy.empty(shape, dtype = self.dtype)
+            
+            if is_sorted(colIndices, key=lambda a, b: a < b):
+                for new_rowIndex, old_rowIndex in enumerate(rowIndices):
+                    self.dataset.read_direct(returnVal, numpy.s_[old_rowIndex, colIndices, ...], numpy.s_[new_rowIndex, ...])
+            elif is_sorted(rowIndices, key=lambda a, b: a < b):
+                for new_colIndex, old_colIndex in enumerate(colIndices):
+                    self.dataset.read_direct(returnVal, numpy.s_[rowIndices, old_colIndex, ...], numpy.s_[:, new_colIndex, ...])
+            else:
+                for new_rowIndex, old_rowIndex in enumerate(rowIndices):
+                    for new_colIndex, old_colIndex in enumerate(colIndices):
+                        self.dataset.read_direct(returnVal, numpy.s_[old_rowIndex, old_colIndex, ...], numpy.s_[new_rowIndex, new_colIndex, ...])
+                
+        return returnVal
 
     # Unicode
     def __unicode__(self):
@@ -431,7 +479,7 @@ class Simulation(models.Model):
 
     @property_tag
     def h5file(self):
-        """ The H5Py File object for the Simulation HDF5 file """        
+        """ The H5Py File object for the Simulation HDF5 file """
         return h5py.File(self.file_path, self._file_permissions)
 
     def lock_file(self):

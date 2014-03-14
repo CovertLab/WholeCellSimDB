@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from django.db.models import Count
+from itertools import tee, izip
 
 def get_option_dict(batch):
     options = OrderedDict()
@@ -68,3 +69,11 @@ def get_parameter_dict(batch):
             parameters['states'][s.name] = tmp
     
     return parameters
+
+def pairwise(iterable):
+    a, b = tee(iterable)
+    next(b, None)
+    return izip(a, b)
+
+def is_sorted(iterable, key=lambda a, b: a <= b):
+    return all(key(a, b) for a, b in pairwise(iterable))

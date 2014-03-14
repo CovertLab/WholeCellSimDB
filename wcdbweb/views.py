@@ -446,7 +446,6 @@ def state_property_download(request, state_name, property_name):
 def state_property_row_download(request, state_name, property_name, row_name):
     pass
     
-#todo
 def state_property_row_col_batch_download(request, state_name, property_name, row_name, col_name, batch_id):
     if row_name is None:
         row_name = ''
@@ -454,15 +453,14 @@ def state_property_row_col_batch_download(request, state_name, property_name, ro
         col_name = ''
         
     format = request.GET.get('format', 'hdf5')
-    downsample_step = 500
+    downsample_step = 1
     
     batch = models.SimulationBatch.objects.get(id=batch_id)
     prop = models.Property.objects.get(name=property_name, state__name=state_name, state__simulation_batch__id=batch_id)
     row = models.PropertyLabel.objects.get(dimension=0, name=row_name, property__name=property_name, property__state__name=state_name, property__state__simulation_batch__id=batch_id)
     col = models.PropertyLabel.objects.get(dimension=1, name=col_name, property__name=property_name, property__state__name=state_name, property__state__simulation_batch__id=batch_id)
     
-    data = numpy.random.rand(1, 1, 40000, 128)
-    #data = prop.get_dataset_slice(row, col)
+    data = prop.get_dataset_slice(row, col)
     data = numpy.transpose(data, (3, 2, 0, 1)).squeeze()
     data = data[:,::downsample_step]
     
@@ -488,9 +486,12 @@ def state_property_row_col_batch_download(request, state_name, property_name, ro
     if format == 'hdf5':
         return render_hdf5_response(data, labels, pathname = '%s/%s/%s-%s' % (state_name, property_name, row_name, col_name), filename = '%s-%s-%s-%s-%s' % (batch.name, state_name, property_name, row_name, col_name))
     elif format == 'json':
+        data = data.tolist()
+        for idx, length in enumerate(labels['simulation_lengths']):
+            data[idx] = data[idx][:length/downsample_step]
         return render_json_response({
             'labels': labels,
-            'data': data.tolist()
+            'data': data
             })
     else:
         raise ValidationError('Invalid format: %s' % format)
