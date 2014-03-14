@@ -7,8 +7,10 @@ from django.template.defaultfilters import slugify
 from django.utils import simplejson
 from haystack.models import SearchResult
 from WholeCellDB import settings
+import bson
 import datetime
 import h5py
+import umsgpack
 import os
 import sys
 import tempfile
@@ -122,11 +124,31 @@ def render_hdf5_response(numpy_data, labels, pathname, filename = 'data'):
     tmp_file.seek(0)
     return response
     
-def render_json_response(data, filename = 'data'):
+def render_json_response(data, filename = 'data', indent = None):
     response = HttpResponse(
-        simplejson.dumps(data, indent=2, ensure_ascii=False, encoding='utf-8'),
+        simplejson.dumps(data, indent=indent, ensure_ascii=False, encoding='utf-8'),
         mimetype = "application/json; charset=UTF-8",
         content_type = "application/json; charset=UTF-8")
     response['Content-Disposition'] = "attachment; filename=%s.json" % slugify(filename)
     
     return response
+    
+def render_bson_response(data, filename = 'data'):
+    response = HttpResponse(
+        bson.dumps(data),
+        mimetype = "application/bson",
+        content_type = "application/bson")
+    response['Content-Disposition'] = "attachment; filename=%s.bson" % slugify(filename)
+    
+    return response
+
+def render_msgpack_response(data, filename = 'data'):
+    umsgpack.compatibility = True
+    response = HttpResponse(
+        umsgpack.dumps(data),
+        mimetype = "application/x-msgpack",
+        content_type = "application/x-msgpack")
+    response['Content-Disposition'] = "attachment; filename=%s.msgpack" % slugify(filename)
+    
+    return response    
+    

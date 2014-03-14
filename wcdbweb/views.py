@@ -6,11 +6,11 @@ from haystack.query import SearchQuerySet
 from helpers import render_template
 from wcdb import models
 from wcdb.helpers import get_option_dict, get_parameter_dict
-from wcdbweb.helpers import render_json_response, render_hdf5_response
 from WholeCellDB import settings
 import copy
 import forms
 import helpers
+import math
 import numpy
 
 ###################
@@ -453,7 +453,6 @@ def state_property_row_col_batch_download(request, state_name, property_name, ro
         col_name = ''
         
     format = request.GET.get('format', 'hdf5')
-    downsample_step = 1
     
     batch = models.SimulationBatch.objects.get(id=batch_id)
     prop = models.Property.objects.get(name=property_name, state__name=state_name, state__simulation_batch__id=batch_id)
@@ -461,8 +460,7 @@ def state_property_row_col_batch_download(request, state_name, property_name, ro
     col = models.PropertyLabel.objects.get(dimension=1, name=col_name, property__name=property_name, property__state__name=state_name, property__state__simulation_batch__id=batch_id)
     
     data = prop.get_dataset_slice(row, col)
-    data = numpy.transpose(data, (3, 2, 0, 1)).squeeze()
-    data = data[:,::downsample_step]
+    data = numpy.transpose(data, (3, 2, 0, 1)).squeeze()    
     
     if row_name is None:
         row_name = ''
@@ -480,19 +478,44 @@ def state_property_row_col_batch_download(request, state_name, property_name, ro
         'col': col_name,        
         'data_units': prop.units,
         'time_units': 's',
-        'downsample_step': downsample_step,
+        'downsample_step': 1,
         }
     
     if format == 'hdf5':
-        return render_hdf5_response(data, labels, pathname = '%s/%s/%s-%s' % (state_name, property_name, row_name, col_name), filename = '%s-%s-%s-%s-%s' % (batch.name, state_name, property_name, row_name, col_name))
-    elif format == 'json':
+        return helpers.render_hdf5_response(data, labels, pathname = '%s/%s/%s-%s' % (state_name, property_name, row_name, col_name), filename = '%s-%s-%s-%s-%s' % (batch.name, state_name, property_name, row_name, col_name))
+    elif format in ['json', 'bson', 'msgpack']:
+        max_datapoints = 5e5
+        n_datapoints = batch.simulations.count() * batch.simulations.aggregate(Max('length'))['length__max']        
+        if n_datapoints <= max_datapoints:
+            downsample_step = 1
+        else:
+            tmp = n_datapoints / max_datapoints
+            downsample_step_10 = math.pow(10, math.ceil(math.log10(tmp)))
+            downsample_step_5 = 5 * math.pow(10, math.ceil(math.log10(tmp/5)))
+            downsample_step_2 = 2 * math.pow(10, math.ceil(math.log10(tmp/2)))
+        
+            if math.fabs(downsample_step_10 - tmp) < math.fabs(downsample_step_5 - tmp) and math.fabs(downsample_step_10 - tmp) < math.fabs(downsample_step_2 - tmp):
+                downsample_step = downsample_step_10
+            elif math.fabs(downsample_step_5 - tmp) < math.fabs(downsample_step_2 - tmp):
+                downsample_step = downsample_step_5
+            else:
+                downsample_step = downsample_step_2
+            
+            downsample_step = int(downsample_step)
+        
+        labels['downsample_step'] = downsample_step        
+        data = data[:,::downsample_step]
+        
         data = data.tolist()
         for idx, length in enumerate(labels['simulation_lengths']):
             data[idx] = data[idx][:length/downsample_step]
-        return render_json_response({
-            'labels': labels,
-            'data': data
-            })
+        tmp = {'labels': labels, 'data': data}
+        if format == 'json':
+            return helpers.render_json_response(tmp, indent=2)
+        elif format == 'bson':
+            return helpers.render_bson_response(tmp)
+        else:
+            return helpers.render_msgpack_response(tmp)
     else:
         raise ValidationError('Invalid format: %s' % format)
     
