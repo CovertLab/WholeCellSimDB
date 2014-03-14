@@ -2,6 +2,7 @@ from django.core.exceptions import ValidationError
 from django.core.servers.basehttp import FileWrapper
 from django.db.models import Avg, Count, Min, Max
 from django.http import HttpResponse
+from django.template.defaultfilters import slugify
 from haystack.query import SearchQuerySet
 from helpers import render_template
 from wcdb import models
@@ -9,9 +10,12 @@ from wcdb.helpers import get_option_dict, get_parameter_dict
 from WholeCellDB import settings
 import copy
 import forms
+import h5py
 import helpers
 import math
 import numpy
+import os
+import tempfile
 
 ###################
 ### landing page
@@ -438,9 +442,46 @@ def simulation_download(request, id):
 def state_download(request, state_name):
     pass
 
-#todo
 def state_property_download(request, state_name, property_name):
-    pass
+    tmp_filedescriptor, tmp_filename = tempfile.mkstemp(dir=settings.TMP_DIR, suffix='.h5')
+    tmp_file = os.fdopen(tmp_filedescriptor,'w')
+    tmp_file.close()
+    
+    tmp_file = h5py.File(tmp_filename, 'w')
+    group = tmp_file.create_group('states/%s/%s' % (state_name, property_name))
+    
+    batches = models.SimulationBatch.objects.filter(states__name=state_name, states__properties__name=property_name)
+    for batch in batches:
+        prop = models.Property.objects.get(state__name=state_name, name=property_name, state__simulation_batch__id=batch.id)
+        for pv in prop.values.all():
+            dset = group.create_dataset('%s/%s/%d' % (batch.organism.name, batch.name, pv.simulation.batch_index),
+                data = pv.dataset,
+                compression = "gzip",
+                compression_opts = 4,
+                chunks = True)
+        
+            dset.parent.attrs['simulation_length'] = pv.simulation.length
+            dset.parent.attrs['data_units'] = prop.units
+            dset.parent.attrs['time_units'] = 's'
+            dset.parent.attrs['downsample_step'] = 1
+            
+            tmp_file.flush()
+    
+    tmp_file.close()
+        
+    tmp_file = open(tmp_filename, 'rb')
+    tmp_file.seek(0, 2)
+    fileWrapper = FileWrapper(tmp_file)
+    response = HttpResponse(
+        fileWrapper,
+        mimetype = "application/x-hdf",
+        content_type = "application/x-hdf"
+        )
+    response['Content-Disposition'] = "attachment; filename=%s-%s.h5" % (slugify(state_name), slugify(property_name))
+    response['Content-Length'] = tmp_file.tell()
+    tmp_file.seek(0)
+    os.remove(tmp_filename)
+    return response
     
 #todo
 def state_property_row_download(request, state_name, property_name, row_name):
@@ -459,8 +500,7 @@ def state_property_row_col_batch_download(request, state_name, property_name, ro
     row = models.PropertyLabel.objects.get(dimension=0, name=row_name, property__name=property_name, property__state__name=state_name, property__state__simulation_batch__id=batch_id)
     col = models.PropertyLabel.objects.get(dimension=1, name=col_name, property__name=property_name, property__state__name=state_name, property__state__simulation_batch__id=batch_id)
     
-    data = prop.get_dataset_slice(row, col)
-    data = numpy.transpose(data, (3, 2, 0, 1)).squeeze()    
+    data = prop.get_dataset_slice(row, col)    
     
     if row_name is None:
         row_name = ''
@@ -503,7 +543,8 @@ def state_property_row_col_batch_download(request, state_name, property_name, ro
             
             downsample_step = int(downsample_step)
         
-        attrs['downsample_step'] = downsample_step        
+        attrs['downsample_step'] = downsample_step
+        data = numpy.transpose(data, (3, 2, 0, 1)).squeeze()
         data = data[:,::downsample_step]
         
         data = data.tolist()
