@@ -107,7 +107,7 @@ units_labels.states.Rna.weightFractionTRNA.units = 'fraction';
 units_labels.states.Rna.minTRnaCnt.units = 'molecules';
 
 units_labels.states.RNAPolymerase.stateExpectations.units = '%';
-units_labels.states.RNAPolymerase.stateExpectations.labels = {{'actively transcribing' 'promoter bound' 'non-specifically bound' 'free'} {}};
+units_labels.states.RNAPolymerase.stateExpectations.labels = {{'actively transcribing' 'promoter bound' 'non-specifically bound' 'free'} {''}};
 
 units_labels.states.Time.cellCycleLength.units = 's';
 units_labels.states.Time.cytokinesisDuration.units = 's';
