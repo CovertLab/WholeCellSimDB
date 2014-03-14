@@ -438,9 +438,35 @@ def simulation_download(request, id):
     file.seek(0)
     return response
 
-#todo
 def state_download(request, state_name):
-    pass
+    tmp_file = helpers.create_temp_hdf5_file()
+    tmp_filename = tmp_file.filename
+    group = tmp_file.create_group('states/%s' % state_name)
+    
+    batches = models.SimulationBatch.objects.filter(states__name=state_name)
+    for batch in batches:
+        state = batch.states.get(name=state_name)
+        for prop in state.properties.all():
+            for pv in prop.values.all():
+                if pv.shape is None:
+                    continue
+                    
+                dset = group.create_dataset('%s/%s/%s/%d' % (prop.name, batch.organism.name, batch.name, pv.simulation.batch_index),
+                    data = pv.dataset,
+                    compression = "gzip",
+                    compression_opts = 4,
+                    chunks = True)
+            
+                dset.attrs['simulation_length'] = pv.simulation.length
+                dset.attrs['data_units'] = prop.units
+                dset.attrs['time_units'] = 's'
+                dset.attrs['downsample_step'] = 1
+                
+                tmp_file.flush()
+    
+    tmp_file.close()
+    
+    return helpers.render_tempfile_response(tmp_filename, state_name, 'h5', 'application/x-hdf')
 
 def state_property_download(request, state_name, property_name):
     tmp_file = helpers.create_temp_hdf5_file()
@@ -451,6 +477,9 @@ def state_property_download(request, state_name, property_name):
     for batch in batches:
         prop = models.Property.objects.get(state__name=state_name, name=property_name, state__simulation_batch__id=batch.id)
         for pv in prop.values.all():
+            if pv.shape is None:
+                continue
+                
             dset = group.create_dataset('%s/%s/%d' % (batch.organism.name, batch.name, pv.simulation.batch_index),
                 data = pv.dataset,
                 compression = "gzip",
@@ -478,6 +507,9 @@ def state_property_row_download(request, state_name, property_name, row_name):
         prop = models.Property.objects.get(state__name=state_name, name=property_name, state__simulation_batch__id=batch.id)
         row = prop.labels.get(name=row_name)
         for pv in prop.values.all():
+            if pv.shape is None:
+                continue
+                    
             shape = list(pv.shape)
             shape[0] = 1
             
