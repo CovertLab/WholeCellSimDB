@@ -75,6 +75,13 @@ def get_investigator_list_with_stats(qs):
             
     return investigators
     
+def create_temp_hdf5_file():
+    tmp_filedescriptor, tmp_filename = tempfile.mkstemp(dir=settings.TMP_DIR, suffix='.h5')
+    tmp_file = os.fdopen(tmp_filedescriptor,'w')
+    tmp_file.close()
+    
+    return h5py.File(tmp_filename, 'w')
+    
 def download_batches(batches, filename):
     if not os.path.isdir(settings.ROOT_DIR):
         os.mkdir(settings.TMP_DIR)
@@ -97,11 +104,8 @@ def download_batches(batches, filename):
     return response
     
 def render_hdf5_response(numpy_data, attrs, pathname, filename = 'data'):
-    tmp_filedescriptor, tmp_filename = tempfile.mkstemp(dir=settings.TMP_DIR, suffix='.h5')
-    tmp_file = os.fdopen(tmp_filedescriptor,'w')
-    tmp_file.close()
-    
-    tmp_file = h5py.File(tmp_filename, 'w')
+    tmp_file = create_temp_hdf5_file()
+    tmp_filename = tmp_file.filename
     
     dset = tmp_file.create_dataset(pathname, 
          data = numpy_data,
@@ -113,19 +117,7 @@ def render_hdf5_response(numpy_data, attrs, pathname, filename = 'data'):
     tmp_file.flush()
     tmp_file.close()
         
-    tmp_file = open(tmp_filename, 'rb')
-    tmp_file.seek(0, 2)
-    fileWrapper = FileWrapper(tmp_file)
-    response = HttpResponse(
-        fileWrapper,
-        mimetype = "application/x-hdf",
-        content_type = "application/x-hdf"
-        )
-    response['Content-Disposition'] = "attachment; filename=%s.h5" % slugify(filename)
-    response['Content-Length'] = tmp_file.tell()
-    tmp_file.seek(0)
-    os.remove(tmp_filename)
-    return response
+    return render_tempfile_response(tmp_filename, filename, 'h5', 'application/x-hdf')    
     
 def render_json_response(data, filename = 'data', indent = None):
     response = HttpResponse(
@@ -155,3 +147,17 @@ def render_msgpack_response(data, filename = 'data'):
     
     return response    
     
+def render_tempfile_response(tmp_filename, filename, extension, mimetype):
+    tmp_file = open(tmp_filename, 'rb')
+    tmp_file.seek(0, 2)
+    fileWrapper = FileWrapper(tmp_file)
+    response = HttpResponse(
+        fileWrapper,
+        mimetype = mimetype,
+        content_type = mimetype
+        )
+    response['Content-Disposition'] = "attachment; filename=%s.%s" % (slugify(filename), extension)
+    response['Content-Length'] = tmp_file.tell()
+    tmp_file.seek(0)
+    os.remove(tmp_filename)
+    return response

@@ -443,11 +443,8 @@ def state_download(request, state_name):
     pass
 
 def state_property_download(request, state_name, property_name):
-    tmp_filedescriptor, tmp_filename = tempfile.mkstemp(dir=settings.TMP_DIR, suffix='.h5')
-    tmp_file = os.fdopen(tmp_filedescriptor,'w')
-    tmp_file.close()
-    
-    tmp_file = h5py.File(tmp_filename, 'w')
+    tmp_file = helpers.create_temp_hdf5_file()
+    tmp_filename = tmp_file.filename
     group = tmp_file.create_group('states/%s/%s' % (state_name, property_name))
     
     batches = models.SimulationBatch.objects.filter(states__name=state_name, states__properties__name=property_name)
@@ -468,20 +465,8 @@ def state_property_download(request, state_name, property_name):
             tmp_file.flush()
     
     tmp_file.close()
-        
-    tmp_file = open(tmp_filename, 'rb')
-    tmp_file.seek(0, 2)
-    fileWrapper = FileWrapper(tmp_file)
-    response = HttpResponse(
-        fileWrapper,
-        mimetype = "application/x-hdf",
-        content_type = "application/x-hdf"
-        )
-    response['Content-Disposition'] = "attachment; filename=%s-%s.h5" % (slugify(state_name), slugify(property_name))
-    response['Content-Length'] = tmp_file.tell()
-    tmp_file.seek(0)
-    os.remove(tmp_filename)
-    return response
+    
+    return helpers.render_tempfile_response(tmp_filename, '%s-%s' % (state_name, property_name), 'h5', 'application/x-hdf')
     
 #todo
 def state_property_row_download(request, state_name, property_name, row_name):
