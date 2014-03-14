@@ -883,8 +883,9 @@ select.error {border-color:red;}
     left:340px;
     background:rgba(255, 0, 0, 0.2);
     }
-
 .legendLabel{font-size: 10px;}
+
+.plot-info {width:100%; text-align:right;}
 
 /****************
  * tutorial

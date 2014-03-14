@@ -58,6 +58,7 @@ $(function() {
 <h2>Data</h2>
 
 <div class="plot-container"></div>
+<div class="plot-info"><span class="message"></span></div>
 <script language="javascript" type="text/javascript">
 var options = {
     series: {
@@ -138,6 +139,13 @@ var setData = function(data) {
     }
     plot.setData(series);
     plot.draw();
+    
+    $('.plot-info > .message')
+        .html('<span><b>Info</b><br/><i>Downsampling: ' + downsample_step + ' s</i></span>')
+        .css('backgroundColor', 'rgba(255, 0, 0, 0.5)')    
+        .animate({
+            backgroundColor: jQuery.Color('#FF0000').transition('transparent', 1)
+            }, 2500 );
 }
 
 var alertFailure = function () {
