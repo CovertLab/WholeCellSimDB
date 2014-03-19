@@ -27,19 +27,19 @@ def index(request):
         'n_in_silico_organism': models.Organism.objects.all().count(),
         'n_simulation_batch': models.SimulationBatch.objects.all().count(), 
         'n_simulation': models.Simulation.objects.all().count(), 
-        'n_process': models.Process.objects.values('name').annotate(count=Count('name')).count(),
-        'n_state': models.State.objects.values('name').annotate(count=Count('name')).count(),
+        'n_process': models.Process.objects.values('name').distinct().count(),
+        'n_state': models.State.objects.values('name').distinct().count(),
         'n_property': models.Property.objects
             .values('name', 'state__name')
-            .annotate(Count('name'), Count('state__name'))
+            .distinct()
             .count(),
         'n_parameter': models.Parameter.objects
             .values('name', 'process__name', 'state__name')
-            .annotate(Count('name'), Count('process__name'), Count('state__name'))
+            .distinct()
             .count(),
         'n_option': models.Option.objects
             .values('name', 'process__name', 'state__name')
-            .annotate(Count('name'), Count('process__name'), Count('state__name'))
+            .distinct()
             .count(),
         'n_investigator': models.Investigator.objects.all().count(),        
     }
@@ -66,7 +66,7 @@ def index(request):
 ### slicing
 ###################
 def list_investigators(request):
-    investigators = helpers.get_investigator_list_with_stats(models.Investigator.objects.all())
+    investigators = helpers.get_investigator_list_with_stats(models.Investigator.objects.all().order_by('user__last_name', 'user__first_name'))
 
     return render_template('list_investigators.html', request, data = {
         'investigators': investigators
@@ -74,15 +74,14 @@ def list_investigators(request):
     
 def investigator(request, id):
     investigator = models.Investigator.objects.get(id=id)
-        
-    #organisms = models.Organism.objects.all().filter(simulation_batches__investigator__id=id)
+    
     tmp = {}
-    for batch in investigator.simulation_batches.all().annotate(n_simulations = Count('simulations')):
+    for batch in investigator.simulation_batches.all().annotate(n_simulation = Count('simulations')):
         if not tmp.has_key(batch.organism.id):
-            tmp[batch.organism.id] = {'id': batch.organism.id, 'name': batch.organism.name, 'versions': [], 'n_simulation_batches': 0, 'n_simulatons': 0}
+            tmp[batch.organism.id] = {'id': batch.organism.id, 'name': batch.organism.name, 'versions': [], 'n_simulation_batch': 0, 'n_simulation': 0}
         tmp[batch.organism.id]['versions'].append(batch.organism_version)
-        tmp[batch.organism.id]['n_simulation_batches'] += 1
-        tmp[batch.organism.id]['n_simulatons'] += batch.n_simulations
+        tmp[batch.organism.id]['n_simulation_batch'] += 1
+        tmp[batch.organism.id]['n_simulation'] += batch.n_simulation
         
     organisms = []
     for id, tmp2 in tmp.iteritems():
@@ -90,17 +89,20 @@ def investigator(request, id):
             'id': tmp2['id'],
             'name': tmp2['name'],
             'n_versions': len(set(tmp2['versions'])),
-            'n_simulation_batches': tmp2['n_simulation_batches'],
-            'n_simulatons': tmp2['n_simulatons']
+            'n_simulation_batch': tmp2['n_simulation_batch'],
+            'n_simulation': tmp2['n_simulation']
             })
+            
+    organisms = sorted(organisms, key=lambda organism: organism['name'])
     
     return render_template('investigator.html', request, data = {
         'investigator': investigator,
-        'organisms': organisms
+        'organisms': organisms,
+        'simulation_batches': investigator.simulation_batches.order_by('organism__name', 'organism_version', 'name')
         })
     
 def list_organisms(request):
-    organisms = helpers.get_organism_list_with_stats(models.Organism.objects.all())
+    organisms = helpers.get_organism_list_with_stats(models.Organism.objects.all().order_by('name'))
             
     return render_template('list_organisms.html', request, data = {
         'organisms': organisms
@@ -108,26 +110,16 @@ def list_organisms(request):
     
 def organism(request, id):
     organism = models.Organism.objects.get(id=id)
-    investigators = {}
-    for batch in organism.simulation_batches.all():
-        if not investigators.has_key(batch.investigator.id):
-            investigators[batch.investigator.id] = {
-                'id': batch.investigator.id,
-                'full_name': batch.investigator.user.get_full_name(),
-                'affiliation': batch.investigator.affiliation,
-                'n_simulation_batch': 0,
-                'n_simulation': 0
-                }
-        investigators[batch.investigator.id]['n_simulation_batch'] += 1
-        investigators[batch.investigator.id]['n_simulation'] += batch.simulations.count()            
-    
+    investigators = models.Investigator.objects.filter(simulation_batches__organism__id=id).order_by('user__last_name', 'user__first_name').distinct()
+     
     return render_template('organism.html', request, data = {
         'organism': organism,
-        'investigators': investigators,
+        'simulation_batches': organism.simulation_batches.order_by('organism_version', 'name'),
+        'investigators': helpers.get_investigator_list_with_stats(investigators),
         })
     
 def list_simulation_batches(request):    
-    batches = helpers.get_simulation_batch_list_with_stats(models.SimulationBatch.objects.all())
+    batches = helpers.get_simulation_batch_list_with_stats(models.SimulationBatch.objects.order_by('organism__name', 'organism_version', 'name'))
     
     return render_template('list_simulation_batches.html', request, data = {
         'batches': batches
@@ -144,7 +136,7 @@ def simulation_batch(request, id):
     })
     
 def list_simulations(request):    
-    simulations = models.Simulation.objects.all()
+    simulations = models.Simulation.objects.all().order_by('batch__organism__name', 'batch__organism_version', 'batch__name', 'batch_index')
     return render_template('list_simulations.html', request, data = {
         'simulations': simulations
     })
@@ -178,8 +170,8 @@ def simulation(request, id):
 def list_options(request):
     options = models.Option.objects.all()
     
-    organisms = models.Organism.objects.all()
-    simulation_batches = models.SimulationBatch.objects.order_by('organism__name', 'name')    
+    organisms = models.Organism.objects.all().order_by('name')
+    simulation_batches = models.SimulationBatch.objects.order_by('organism__name', 'organism_version', 'name')
     simulation_batch_ids = [x[0] for x in simulation_batches.values_list('id')]
     
     options = {
@@ -217,8 +209,8 @@ def option(request, option_name, process_name=None, state_name=None):
     })
     
 def list_parameters(request):
-    organisms = models.Organism.objects.all()
-    simulation_batches = models.SimulationBatch.objects.order_by('organism__name', 'name')    
+    organisms = models.Organism.objects.all().order_by('name')
+    simulation_batches = models.SimulationBatch.objects.order_by('organism__name', 'name')
     simulation_batch_ids = [x[0] for x in simulation_batches.values_list('id')]
     
     parameters = {
@@ -256,7 +248,7 @@ def parameter(request, parameter_name, process_name=None, state_name=None):
     })
     
 def list_processes(request):
-    organisms = models.Organism.objects.all()
+    organisms = models.Organism.objects.all().order_by('name')
     simulation_batches = models.SimulationBatch.objects.order_by('organism__name', 'name')
     simulation_batch_ids = [x[0] for x in simulation_batches.values_list('id')]
     processes =  models.Process.objects \
@@ -295,7 +287,7 @@ def process(request, process_name):
     })
     
 def list_states(request):
-    organisms = models.Organism.objects.all()
+    organisms = models.Organism.objects.all().order_by('name')
     simulation_batches = models.SimulationBatch.objects.order_by('organism__name', 'name')
     simulation_batch_ids = [x[0] for x in simulation_batches.values_list('id')]
     state_properties =  models.Property.objects \
@@ -347,10 +339,10 @@ def state_property(request, state_name, property_name):
     
     labels = models.PropertyLabel.objects \
         .filter(property__name=property_name, property__state__name=state_name)
-    dimension_values = [x['dimension'] for x in labels.values('dimension').annotate(Count('dimension'))]
+    dimension_values = set([x['dimension'] for x in labels.values('dimension')])
     
     is_labeled = labels.exclude(name='').count() > 0
-    show_slice_links = 0 in dimension_values and 1 in dimension_values        
+    show_slice_links = 0 in dimension_values and 1 in dimension_values
     
     label_values = labels \
         .values('dimension', 'name', 'property__state__simulation_batch__id', 'property__state__simulation_batch__name') \
@@ -369,9 +361,10 @@ def state_property(request, state_name, property_name):
 def state_property_row(request, state_name, property_name, row_name):
     cols = models.PropertyLabel.objects \
         .filter(dimension=1, property__name=property_name, property__state__name=state_name, property__labels__name=row_name, property__labels__dimension=0) \
-        .annotate(Count('name')) \
+        .values('name') \
+        .distinct() \
         .order_by('name')
-    col_names = [col.name for col in cols]
+    col_names = [col['name'] for col in cols]
         
     cols_batches_organisms = models.PropertyLabel.objects \
         .filter(dimension=1, property__name=property_name, property__state__name=state_name, property__labels__name=row_name, property__labels__dimension=0) \
@@ -381,7 +374,7 @@ def state_property_row(request, state_name, property_name, row_name):
     tmp = models.PropertyValue.objects \
         .filter(property__name=property_name, property__state__name=state_name) \
         .values('simulation__batch__id', 'simulation__batch__name') \
-        .annotate(Count('simulation__batch__id'))
+        .distinct()
     property_value_batches = {x['simulation__batch__id']: x['simulation__batch__name'] for x in tmp}
     
     return render_template('state_property_row.html', request, data = {
@@ -671,7 +664,7 @@ def download(request):
             templateFile = 'download.html', 
             data = {
                 'form': form,
-                'organisms': models.Organism.objects.all()
+                'organisms': models.Organism.objects.all().order_by('name')
                 }
             )
     else:
@@ -1028,13 +1021,16 @@ def search_advanced(request):
         batches = search_advanced_processes(batches, process_forms)
         batches = search_advanced_states(batches, state_forms)
         
+        #take unique
+        batches = batches.distinct().order_by('organism__name', 'organism_version', 'name')
+        
         #exit if data requested in hdf5 format
         if form.cleaned_data['result_format'] == 'hdf5':
             return helpers.download_batches(batches, 'WholeCellDB-advanced-search')
             
         #get related organisms and investigators
-        organisms = models.Organism.objects.filter(simulation_batches__id__in=batches.values_list('id'))
-        investigators = models.Investigator.objects.filter(simulation_batches__id__in=batches.values_list('id'))
+        organisms = models.Organism.objects.filter(simulation_batches__id__in=batches.values_list('id')).distinct().order_by('name')        
+        investigators = models.Investigator.objects.filter(simulation_batches__id__in=batches.values_list('id')).distinct().order_by('user__last_name', 'user__first_name')
     
         #calculate stats for results table
         organisms = helpers.get_organism_list_with_stats(organisms)

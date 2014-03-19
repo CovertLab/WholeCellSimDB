@@ -65,7 +65,7 @@ select.error {border-color:red;}
  * header 
  ****************/
 #header {
-	z-index: 2;
+	z-index: 100000;
 	position:fixed;
 	left:0px;
 	top:0px;
@@ -213,7 +213,7 @@ select.error {border-color:red;}
  * footer 
  ****************/
 #footer {
-	z-index: 3;
+	z-index: 100001;
 	position:fixed;
 	left:0px;
 	bottom:0px;
@@ -942,7 +942,7 @@ select.error {border-color:red;}
 #content #tutorial ul li img{
     display:none;
     position:fixed;
-    z-index:10;
+    z-index:100010;
 }
 
 #content #tutorial ul li:hover{

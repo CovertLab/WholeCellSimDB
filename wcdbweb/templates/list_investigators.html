@@ -37,7 +37,7 @@ Created: 2013-09-13
             <td><a href="{% url wcdbweb.views.investigator id=investigator.id %}">{{ investigator.full_name }}</a></td>
             <td>{{ investigator.affiliation }}</td>
             <td>{{ investigator.n_organism }}</td>
-            <td>{{ investigator.n_simulation_batches }}</td>
+            <td>{{ investigator.n_simulation_batch }}</td>
             <td>{{ investigator.n_simulation }}</td>
             <td><a href="{% url wcdbweb.views.investigator_download id=investigator.id %}">HDF5</a></td>
         </tr>

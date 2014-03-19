@@ -9,7 +9,7 @@ Created: 2014-03-07
 {% load static %}
 
 <h2>Organisms</h2>
-<table class="table search_organisms">
+<table class="table list_organisms">
     <thead>
         <tr>
             <th colspan="3">Metadata</th>
@@ -104,7 +104,7 @@ Created: 2014-03-07
             <td><a href="{% url wcdbweb.views.investigator id=investigator.id %}">{{ investigator.full_name }}</a></td>
             <td>{{ investigator.affiliation }}</td>
             <td>{{ investigator.n_organism }}</td>
-            <td>{{ investigator.n_simulation_batches }}</td>
+            <td>{{ investigator.n_simulation_batch }}</td>
             <td>{{ investigator.n_simulation }}</td>
             <td><a href="{% url wcdbweb.views.investigator_download id=investigator.id %}">HDF5</a></td>
         </tr>

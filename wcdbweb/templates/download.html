@@ -47,7 +47,7 @@ Created: 2014-03-06
         {% for organism in organisms %}
             <tbody class="organism">
                 <tr><th><input class="organism-{{ organism.id }}" type="checkbox" onchange="javascript:toggleOrganism(this.checked, {{ organism.id }});" /></th><th><a href="{% url wcdbweb.views.organism id=organism.id %}">{{ organism.name }}</a></th></tr>
-            {% for batch in organism.simulation_batches.all %}            
+            {% for batch in organism.simulation_batches.all|order_by:'name' %}            
                 <tr>
                     <td><input class="batch-organism-{{ organism.id }}" type="checkbox" id="{{ form.simulation_batches.html_name }}" name="{{ form.simulation_batches.html_name }}" value="{{ batch.id }}" onchange="javascript:toggleBatch(this.checked, {{ organism.id }})" /></td>
                     <td><a href="{% url wcdbweb.views.simulation_batch id=batch.id %}">{{ batch.name }}</a> ({{ batch.simulations.count }})</td>

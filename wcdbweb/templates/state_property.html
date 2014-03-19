@@ -41,6 +41,8 @@ Created: 2014-03-10
     
     {% if is_labeled %}
         {% regroup labels by dimension as dimensions %}
+        {% regroup dimensions.0.list by name as dimension0_labels %}
+        
         {% for dimension in dimensions %}
             {% regroup dimension.list by name as dimension_labels %}
             {% if dimension_labels|length > 1 or dimension_labels.0.grouper != '' %}
@@ -61,7 +63,7 @@ Created: 2014-03-10
         <td class="level1">
             {% if show_slice_links and dimension.grouper == 0 %}
                 <a href="{% url wcdbweb.views.state_property_row state_name=state_name property_name=property_name row_name=label.grouper %}">{{label.grouper}}</a>
-            {% elif show_slice_links and dimension.grouper > 0 and dimensions.0.list|length == 1 and dimensions.0.list.0.name == '' %}
+            {% elif show_slice_links and dimension.grouper > 0 and dimension0_labels|length == 1 and dimension0_labels.0.grouper == '' %}
                 <a href="{% url wcdbweb.views.state_property_row state_name=state_name property_name=property_name row_name='' %}">{{label.grouper}}</a>
             {% else %}
                 {{label.grouper}}

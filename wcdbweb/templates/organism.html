@@ -34,7 +34,7 @@ Created: 2013-09-16
         </tr>
     </thead>
     <tbody>
-        {% for batch in organism.simulation_batches.all %}
+        {% for batch in simulation_batches %}
         <tr>
             <td>{{ batch.organism_version }}</td>
             <td><a href="{% url wcdbweb.views.simulation_batch id=batch.id %}">{{ batch.name }}</a></td>
@@ -58,9 +58,9 @@ Created: 2013-09-16
         </tr>
     </thead>
     <tbody>
-        {% for id, investigator in investigators.iteritems %}
+        {% for investigator in investigators %}
         <tr>
-            <td><a href="{% url wcdbweb.views.investigator id=id %}">{{ investigator.full_name }}</a></td>
+            <td><a href="{% url wcdbweb.views.investigator id=investigator.id %}">{{ investigator.full_name }}</a></td>
             <td>{{ investigator.affiliation }}</td>
             <td>{{ investigator.n_simulation_batch }}</td>
             <td>{{ investigator.n_simulation }}</td>

@@ -34,8 +34,8 @@ def get_organism_list_with_stats(qs):
         organisms.append({
             'id': organism.id,
             'name': organism.name,
-            'n_version': batches.values('organism_version').annotate(Count('organism_version')).count(),
-            'n_investigator': batches.values('investigator').annotate(Count('investigator')).count(),
+            'n_version': batches.values('organism_version').distinct().count(),
+            'n_investigator': batches.values('investigator').distinct().count(),
             'n_simulation_batch': batches.count(),
             'n_simulation': sum([batch.simulations.count() for batch in batches]),
         })
@@ -52,6 +52,7 @@ def get_simulation_batch_list_with_stats(qs):
             'date': batch.date,
             'investigator': batch.investigator,
             'organism': batch.organism,
+            'organism_version': batch.organism_version,
             'simulations': batch.simulations,
             'length_avg': batch.simulations.all().aggregate(Avg('length'))['length__avg']
             })
@@ -68,8 +69,8 @@ def get_investigator_list_with_stats(qs):
             'id': investigator.id,
             'full_name': investigator.user.get_full_name,
             'affiliation': investigator.affiliation,
-            'n_organism': batches.values('organism').annotate(Count('organism')).count(),
-            'n_simulation_batches': batches.count(),
+            'n_organism': batches.values('organism').distinct().count(),
+            'n_simulation_batch': batches.count(),
             'n_simulation': sum([batch.simulations.count() for batch in batches]),
             })
             
