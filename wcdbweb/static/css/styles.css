@@ -627,6 +627,17 @@ select.error {border-color:red;}
 }
 #content div table.list_simulation_batch__simulations tr th, #content div table.list_simulation_batch__simulations tr td{padding-right: 3px; padding-left: 3px;}
 
+/* simulation */
+#content div .data-series {}
+#content div .data-series .twocolumns .left {float:left; width:585px;}
+#content div .data-series .twocolumns .right {float:left; width:200px; padding-left:15px;}
+#content div .data-series .data-series-table {width:100%; height:100%px;}
+#content div .data-series .data-series-table .jqx-grid-column-header {font-weight:bold; background: #d6edff;}
+#content div .data-series .data-series-table .jqx-grid-column-header, 
+#content div .data-series .data-series-table .jqx-widget-content, 
+#content div .data-series .data-series-table .jqx-grid-table {font-size:inherit;}
+#content div .data-series .data-series-plot {margin:10px 0 0 0px; text-align:center;}
+
 /* option */
 #content div table.option {width:100%;}
 #content div table.option {border-top:1px solid #3d80b3; border-bottom:1px solid #3d80b3;}

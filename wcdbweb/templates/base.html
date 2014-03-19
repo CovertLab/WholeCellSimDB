@@ -27,6 +27,7 @@ Created: 2013-09-13
 	
 	<!-- style -->
 	<link rel="stylesheet" type="text/css" media="all" href="{% get_static_prefix %}css/jquery-ui-1.8.23.custom.css" />
+	<link rel="stylesheet" type="text/css" media="all" href="{% get_static_prefix %}css/jqx.base.css" />
 	<link rel="stylesheet" type="text/css" media="all" href="{% get_static_prefix %}css/jqtree.css" />
 	<link rel="stylesheet" type="text/css" media="all" href="{% get_static_prefix %}css/PTSans.min.css" />
 	<link rel="stylesheet" type="text/css" media="all" href="{% get_static_prefix %}css/styles.css" />	
@@ -35,20 +36,29 @@ Created: 2013-09-13
 	<!-- favicon -->
 	<link rel="icon" type="image/png" href="{% get_static_prefix %}favicon.ico">
 	
-	<!-- javascript -->
+	<!-- javascript libraries -->
 	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/jquery-1.8.0.min.js"></script>
 	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/jquery-ui-1.8.23.custom.min.js"></script>
-	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/jquery.color.min.js"></script>    
+	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/jqxcore.js"></script>
+	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/jqxdata.js"></script>
+	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/jqxbuttons.js"></script>
+	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/jqxscrollbar.js"></script>
+	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/jqxdatatable.js"></script>    
+	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/jqxtreegrid.js"></script>
+    <script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/jqxlistbox.js"></script>
+    <script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/jqxcheckbox.js"></script>
+	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/jquery.color.min.js"></script>
+	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/jquery.download.js"></script>
 	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/tree.jquery.js"></script>
 	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/flot/jquery.flot.min.js"></script>
 	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/flot/jquery.flot.axislabels.min.js"></script>
-    <script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/flot/jquery.flot.navigate.min.js"></script>
-    <script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/flot/jquery.flot.tooltip.min.js"></script>
+	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/flot/jquery.flot.navigate.min.js"></script>
+	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/flot/jquery.flot.tooltip.min.js"></script>
 	<!-[if lte IE 8]>
 	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/flot/excanvas.min.js"></script>
 	<![endif]->
-    <script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/msgpack.min.js"></script>    
-    <script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/bson.min.js"></script>
+	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/msgpack.min.js"></script>    
+	<script language="javascript" type="text/javascript" src="{% get_static_prefix %}js/bson.min.js"></script>
 	
 	<!-- google analytics -->
 	<script language="javascript" type="text/javascript">
