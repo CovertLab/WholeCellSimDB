@@ -7,6 +7,7 @@ TEMPLATE_DEBUG = DEBUG
 
 ROOT_URL = 'http://wholecelldb.stanford.edu'
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
+HDF5_ROOT = os.path.join(ROOT_DIR, '..', 'wcdb', 'data')
 TMP_DIR = os.path.join(ROOT_DIR, '..', 'tmp')
 
 ADMINS = (
@@ -111,8 +112,6 @@ ROOT_URLCONF = 'WholeCellDB.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'WholeCellDB.wsgi.application'
-
-HDF5_ROOT = "/home/projects/WholeCellDB/wcdb/data"
 
 TEMPLATE_DIRS = (    
     os.path.join(ROOT_DIR, '..', 'wcdbweb', 'templates'),

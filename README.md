@@ -3,123 +3,60 @@
 <a name="table_of_contents"/>
 
 1. [About](#about)
-2. [Requirements](#requirements)
-    1. [Mimimum requirements](#requirements_minimum)
-    2. [Additional requirments for production servers](#requirements_production)
-3. [Getting started](#starting)
-4. [Integrating WholeCellDB with Whole-cell models](#integrating)
-5. [Need help?](#help)
-6. [Implementation](#implementation)
-7. [Development team](#team)
+2. [User's guide: browsing and searching simulations](#users)
+3. [Developer's guide: Installing your own WholeCellDB server and storing simulations](#developers)
+4. [Need help?](#help)
+5. [Implementation](#implementation)
+6. [Development team](#team)
+7. [Citing WholeCellDB](#citing)
 8. [License](#license)
 
 
 <a name="about"/>
 ## About
-WholeCellDB is a hybrid SQL/HDF database for storing and retrieving whole-cell model predictions. WholeCellDB is implemented in Python using the Django framework.
+WholeCellDB is a database of whole-cell model simulations designed to make it easy for researchers to explore and analyze whole-cell model predictions including predicted:
+* Metabolite concentrations,
+* DNA, RNA and protein expression,
+* DNA-bound protein positions,
+* DNA modification positions, and
+* Ribome positions.
 
 See [wholecell.stanford.edu](http://wholecell.stanford.edu) for additional information about whole-cell models.
 
-<a name="requirements"/>
-## Requirements
+<a name="users"/>
+## User's guide: browsing and searching simulations
+See the online [user's guide](http://wholecelldb.stanford.edu/help).
 
-<a name="requirements_minimum"/>
-### Mimimum requirements
-* python 2.7
-* Django 1.5
-* hdf5
-* hdf5-devel
-* python-numpy
-* python-h5py
+<a name="developers"/>
+## Developer's guide: Installing your own WholeCellDB server and storing simulations
+See the online [developers's guide](http://wholecelldb.stanford.edu/help) for installation instructions including a list of required packages and instructions for integreating WholeCellDB with whole-cell models.
 
-<a name="requirements_production"/>
-### Additional requirments for production servers
-* apache
-* mod_wsgi
-* mysql
-
-<a name="starting"/>
-## Getting started
-
-1. Setup your database in the `DATABASES` dict in `WholeCellDB/settings.py`. For more information on how you can do this, see the [django tutorial](https://docs.djangoproject.com/en/1.5/intro/tutorial01/#database-setup).
-    * To use SQLite set the `ENGINE` property to `django.db.backends.sqlite3` and set the `NAME` property to the path to the database file
-    * To use MySQL (1) create a new user and database and (2) set the `ENGINE` property to `django.db.backends.mysql` and set the `HOST`, `PORT`, `NAME`, `USER`, and `PASSWORD` properties
-2. Create a directory to save the HDF5 data, e.g. `/path/to/my/hdf5/location`
-3. Edit the value of `HDF5_ROOT` in `WholeCellDB/settings.py` to indicate the location you wish to save the HDF5 data.
-
-        HDF5 = "/path/to/my/hdf5/location"
-4. Run `python manage.py syncdb` to create the models. 
-5. run `python manage.py rebuild_index` to create the haystack indices. 
-6. Set permissions for haystack search indices
-        sudo chown -R apache: wcdbsearch/indexes
-        sudo chmod ug+rw wcdbsearch/indexes
-6. Configure your web server
-    * Run `python manage.py runserver` to start the development server, or
-    * Add the following to your Apache configuration (`/etc/httpd/conf.d/WholeCellDB.conf and restart
-7. Navigate to the WholeCellDB website using your webserver
-    * Development server: [http://localhost:8000](http://localhost:8000)
-    * Production server:
-
-            LoadModule wsgi_module modules/mod_wsgi.so
-            
-            WSGIDaemonProcess default processes=2 threads=25
-            WSGIDaemonProcess wholecelldb:1 threads=1
-            WSGIDaemonProcess wholecelldb:2 threads=1
-            WSGIDaemonProcess wholecellkbeco:1 threads=25
-            SetEnv PROCESS_GROUP default
-            WSGIProcessGroup %{ENV:PROCESS_GROUP}
-            WSGISocketPrefix /var/run/wsgi
-            
-            Alias /projects/WholeCellDB/static /home/projects/WholeCellDB/wcdbweb/static
-            Alias /projects/WholeCellDB /home/projects/WholeCellDB/WholeCellDB/wsgi.py
-            <Directory /home/projects/WholeCellDB/WholeCellDB>
-                WSGIApplicationGroup %{RESOURCE}
-                WSGIRestrictProcess wholecelldb:1 wholecelldb:2
-                SetEnv PROCESS_GROUP wholecelldb:1
-                AddHandler wsgi-script .py
-                Options ExecCGI
-                Order allow,deny
-                Allow from all
-            </Directory>
-
-<a name="integrating"/>
-## Integrating WholeCellDB with whole-cell models
-Use the following code to import the WholeCellDB packages into Python:
-
-    import sys
-
-    # Add the project to your path.
-    sys.path.append('/path/to/WholeCellDB/project')
-
-    # Setup the environment using the projects settings.
-    from WholeCellDB import settings
-    from django.core.management import setup_environ
-    setup_environ(settings)
-
-    # Import the models
-    from wcdb.models import Simulation, Property
-    
 <a name="help"/>
 ## Need help?
 Please contact the development team at [wholecelldb@lists.stanford.edu](mailto:wholecelldb@lists.stanford.edu).
 
 <a name="implementation"/>
 ## Implementation
-*Briefly describe implementation.*
+WholeCellDB is a hybrid SQL/HDF database implemented in [Python](http://www.python.org/). The [Django](https://www.djangoproject.com/) framework was used to construct a [MySQL](http://www.mysql.org) database containing simulation metadata as well as links to HDF files containing the simulation predictions. The [H5py](http://www.h5py.org/) package was used to read and write HDF files. Full text search over the simulation metadata was implemented using [Xapian](http://xapian.org/) and [Haystack](http://haystacksearch.org/). The web interface was run using [Apache](http://httpd.apache.org/) and [mod_wsgi](https://code.google.com/p/modwsgi/). The web interface was developed using [flot](http://www.flotcharts.org/), [Google Fonts](https://www.google.com/fonts), [jQuery](http://jquery.com/), [jqTree](http://mbraak.github.io/jqTree), [jQWidgets](http://www.jqwidgets.com/), and [FamFamFam Silk icons](http://www.famfamfam.com/lab/icons/silk/).
 
 <a name="team"/>
 ## Development team
-WholeCellDB was developed by researchers at the University of Prince Edward Island and Stanford University.
-
+WholeCellDB was developed by researchers at Mount Sinai School of Medicine, Stanford University, and the University of Prince Edward Island.
+* [Jonathan Karr](http://research.mssm.edu/karr), Mount Sinai School of Medicine
 * [Nolan Phillips](http://ca.linkedin.com/pub/nolan-phillips/68/935/702), University of Prince Edward Island
-* [Jonathan Karr](http://www.stanford.edu/~jkarr), Stanford University
 * [Markus Covert](http://covertlab.stanford.edu), Stanford University
 * [Yingwei Wang](http://www.csit.upei.ca/~ywang/), University of Prince Edward Island
+
+<a name="citing"/>
+## Citing WholeCellDB
+Please see the following for more information or to cite WholeCellDB:
+* Karr JR et al. WholeCellDB: hybrid HDF/SQL database for whole-cell model predictions. (In preparation).
+* Karr JR, Sanghvi JC, Macklin DN, Gutschow MV, Jacobs JM, Bolival B, Assad-Garcia N, Glass JI, Covert MW. A Whole-Cell Computational Model Predicts Phenotype from Genotype. *Cell* **150**, 389-401 (2012). [Cell](http://www.cell.com/abstract/S0092-8674(12)00776-3) | [PubMed](http://www.ncbi.nlm.nih.gov/pubmed/22817898)
 
 <a name="license"/>
 ## The MIT License (MIT)
 
-Copyright &copy; 2013 Nolan Philips, Jonathan Karr, Markus Covert, Yingwei Wang
+Copyright &copy; 2013-2014 Jonathan Karr, Nolan Philips, Markus Covert, Yingwei Wang
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
