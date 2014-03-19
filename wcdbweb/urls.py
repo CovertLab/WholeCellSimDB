@@ -58,6 +58,10 @@ urlpatterns += patterns('wcdbweb.views',
     url(r'^state/(?P<state_name>[0-9A-Za-z_\-]+)/property/(?P<property_name>[0-9A-Za-z_\-]+)/*$', 'state_property'),
     url(r'^state/(?P<state_name>[0-9A-Za-z_\-]+)/*$', 'state'),
     
+    #list/get data series
+    url(r'^list_data_series/*$', 'list_data_series'),
+    url(r'^get_data_series/*$', 'get_data_series'),
+    
     #downloads    
     url(r'^organism/(?P<id>[0-9]+)/download/*$', 'organism_download'),    
     url(r'^simulation_batch/(?P<id>[0-9]+)/download/*$', 'simulation_batch_download'),

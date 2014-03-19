@@ -42,9 +42,315 @@ $(function() {
 </script>
 <div id="meta-tree" style="margin-top:-6px"></div>
 
+<h2>Select data</h2>
+<div class="data-series">
+    <div class="twocolumns">
+        <div class="left">
+            <div class="data-series-table"></div>
+        </div>
+        <div class="right">
+            <div class="data-series-list"></div>
+            <div class="data-series-plot">
+                <input type="submit" value="Remove" onclick="javascript: removeDataSeries();"/>
+                <input type="submit" value="Plot" onclick="javascript: loadDataSeries();"/>
+            </div>
+        </div>
+        <div style="clear:both;"></div>
+    </div>    
+</div>
+
+<script language="javascript" type="text/javascript">
+$(".data-series-table").jqxTreeGrid({
+    width: '100%',
+    height: 400,
+    altRows: true,
+    virtualModeCreateRecords: function(expandedRecord, done)
+    {
+        var params = {
+            organism: {{simulation.batch.organism.id}},
+            simulation_batch: {{simulation.batch.id}},
+            simulation: {{simulation.id}},
+            state: expandedRecord && expandedRecord['state'] ? expandedRecord.state : null,
+            property: expandedRecord && expandedRecord['property'] ? expandedRecord.property : null,
+            row: expandedRecord && expandedRecord['row'] ? expandedRecord.row : null,
+            col: expandedRecord && expandedRecord['col'] ? expandedRecord.col : null,
+            };
+        
+        var update = function (childRecords) {
+            var source =
+            {
+                dataType: "array",
+                dataFields: [
+                    { name: "id", type: "string" },
+                    { name: "parentid", type: "string" },                    
+                    { name: "organism", type: "int" },
+                    { name: "simulation_batch", type: "int" },
+                    { name: "simulation", type: "int" },
+                    { name: "state", type: "int" },
+                    { name: "property", type: "int" },
+                    { name: "row", type: "int" },
+                    { name: "col", type: "int" },                    
+                    { name: "isleaf", type: "bool" },                    
+                    { name: "label", type: "string" },
+                    { name: "units", type: "string" },
+                    { name: "data_valid", type: "bool" },
+                ],
+                localData: childRecords,
+                id: 'id'
+            }
+            var dataAdapter = new $.jqx.dataAdapter(source, {
+                loadComplete: function () {
+                    done(dataAdapter.records);
+                }
+            });
+            dataAdapter.dataBind();
+        };
+        
+        $.ajax({
+            method: 'get',
+            url: '{% url wcdbweb.views.list_data_series %}',
+            data: params,
+           }).done(update)
+            .fail(function() {done(false); });           
+    },
+    virtualModeRecordCreating: function(record)
+    {
+        record.leaf = record.isleaf;
+    },
+    columns: [
+      {text: 'State/property', dataField: 'label', width: 400},
+      {text: 'Units', dataField: 'units'},
+    ],
+    checkboxes: function (rowKey, dataRow) {
+        return dataRow && dataRow.isleaf && dataRow.data_valid;
+    }
+});
+
+$('.data-series-table').on('rowCheck', function (event) {
+    var args = event.args;
+    
+    var row = args.row;
+    var key = args.key;
+    
+    var label = '';
+    var node = row;
+    for (var i = 0; i <= row.level; i++){        
+        label = node['label'] + '-' + label;
+        if  (node['parent']) {
+            node = node.parent;
+        }
+    }    
+    label = label.substr(0, label.length-1);
+    
+    var list = $(".data-series-list");
+    list.jqxListBox('addItem', {'label': label, value: key});
+});
+
+$(".data-series-list").jqxListBox({
+    width: '100%',
+    height: 400,
+    })
+</script>
+
+
+<h2>Visualize</h2>
+
+<div class="plot-container"></div>
+<script language="javascript" type="text/javascript">
+var options = {
+    series: {
+        lines: { show: true },
+        points: { show: false },
+    },
+    xaxis: {
+        show: true,
+        position: 'bottom',
+        font: {size: 8, lineHeight: 10, family: 'PT Sans,sans-serif', style: 'normal', weight: 'normal', variant: 'normal', color: '#000000'},
+        min: 0,
+        max: {{x_axis.max}} / 3600,
+        axisLabel: 'Time (h)',
+        axisLabelColour: '#000000',
+        axisLabelFontFamily: 'PT Sans,sans-serif',
+        axisLabelFontSizePixels: 12,
+        axisLabelUseCanvas: true,
+        labelHeight: 20,
+        color: '#efefef',
+    },
+    yaxis: { 
+        show: true,
+        position: 'left',
+        font: {size: 8, lineHeight: 10, family: 'PT Sans,sans-serif', style: 'normal', weight: 'normal', variant: 'normal', color: '#000000'},
+        axisLabel: '{{y_axis.title|capfirst}}',
+        axisLabelColour: '#000000',
+        axisLabelFontFamily: 'PT Sans,sans-serif',
+        axisLabelFontSizePixels: 12,
+        axisLabelUseCanvas: true,        
+        labelWidth: 25,
+        color: '#efefef',
+    },
+    tooltip: true,
+    tooltipOpts: {
+        content: function (series, x, y) {return series + ' | Time: ' + x.toFixed(2) + ' h | {{y_axis.label|capfirst}}: ' + y + '{% if y_axis.units != None %} {{y_axis.units}}{% endif %}';}
+    },
+    grid: {
+        hoverable: true,        
+    },
+    legend: {
+        show: true,
+        sorted: false,
+        position: 'nw',
+        labelFormatter: function(label, series) {return label;},
+    },
+    zoom: {
+        interactive: true
+    },
+    pan: {
+        interactive: true
+    },
+};
+var plotContainer = $(".plot-container");
+var plot = $.plot(plotContainer, [], options);
+
+$("<div class='status'>Loading data ...</div>")
+    .appendTo(plotContainer)
+    .hide();
+
+$("<div class='error'>Error loading data. Please try again.</div>")
+    .appendTo(plotContainer)
+    .hide();
+    
+$(
+    "<div class='info'>" +
+        "<span class='content'>"+
+            "<span class='title'>Info</span><br/>" +
+            "<span class='details'>Downsampling: </span>" +
+        "</span>" + 
+   "</div>"
+    ).appendTo(plotContainer);
+
+var setData = function(data) {
+    plotContainer.find('.status').fadeOut(1000);
+    
+    if (data.length > 0) {
+        var downsample_step = data[0].attrs.downsample_step;
+    } else {
+        var downsample_step = '';
+    }
+    
+    var series = [];
+    for (var i = 0; i < data.length; i++) {
+        timePoints = [];
+        for (j = 0; j < data[i].data.length; j++) {
+            timePoints.push([(j * downsample_step + 1)/ 3600, data[i].data[j]]);
+        }
+        
+        var attrs = data[i].attrs;
+        series.push({
+            data: timePoints,
+            label: attrs.state + '-' + attrs.property + (attrs.row ? '-' + attrs.row : '') + (attrs.col ? '-' + attrs.col : '')
+            });
+    }
+    plot.setData(series);
+    plot.draw();
+    
+    plotContainer.find('.info > .content > .details').html('Downsampling: ' + downsample_step + ' s');
+    plotContainer.find('.info > .content')
+        .css('backgroundColor', 'rgba(255, 0, 0, 0.5)')    
+        .animate({
+            backgroundColor: jQuery.Color('#FF0000').transition('transparent', 1)
+            }, 2500 );
+}
+
+var alertFailure = function () {
+    plotContainer.find('.status').fadeOut(1000);
+    plotContainer.find('.error').fadeIn(1000);
+}
+
+function removeDataSeries () {
+    var list = $(".data-series-list");
+    var item = list.jqxListBox('getSelectedItem');
+    
+    if (item) {
+        var table = $(".data-series-table");
+        table.jqxTreeGrid('uncheckRow', item.value);
+        
+        list.jqxListBox('removeItem', item);
+    }
+}
+
+function loadDataSeries() {
+    plotContainer.find('.error').hide();    
+    plotContainer.find('.status').fadeIn(1000);
+    
+    var selected_property_ids = getSelectedDataSeries();
+    if (!selected_property_ids) {
+        return;
+    }
+        
+    $.ajax({
+        url: '{% url wcdbweb.views.get_data_series %}',
+        type: 'POST',
+        data: {
+            'format': 'json',
+            'data_series': JSON.stringify(selected_property_ids)
+            },
+        }).done(setData)
+        .fail(alertFailure);
+}
+
+function downloadDataSeries(format) {
+    var selected_property_ids = getSelectedDataSeries();
+    if (!selected_property_ids) {
+        return;
+    }
+    
+    $.download('{% url wcdbweb.views.get_data_series %}', {format: format, data_series: JSON.stringify(selected_property_ids)}, 'post');
+}
+
+function getSelectedDataSeries() {
+ var table = $('.data-series-table');
+    var selected_properties = table.find('.jqx-checkbox-check-checked');
+    
+    if (selected_properties.length > 10) {
+        form.find('.error').html('Plotting is limited to at most 10 data series. Please unselect at least ' + (selected_properties.length - 10) + ' data series.');
+        
+        $('html, body').animate({
+            scrollTop: form.find('.error').offset().top
+        }, 2000);
+        
+        return;
+    }
+    
+    
+    var selected_property_ids = [];
+    for (var i = 0; i < selected_properties.length; i++) {
+    
+        var row = $(selected_properties[i]).parents('[role="row"]');
+        var rowDataKey = row.attr('data-key');
+        var rowId = row.attr('id');
+        
+        var tmp = rowDataKey.split('.');
+        selected_property_ids.push({
+            organism: parseInt(tmp[0]),
+            simulation_batch: parseInt(tmp[1]),
+            simulation: parseInt(tmp[2]),
+            state: parseInt(tmp[3]),
+            property: parseInt(tmp[4]),
+            row: tmp.length >= 6 ? tmp[5] : '',
+            col: tmp.length >= 7 ? tmp[6] : '',
+            });
+    }
+    
+    return selected_property_ids;
+}
+</script>
+
 {% endblock %}
 
 {% block action_icons %}
-<a href="{% url wcdbweb.views.simulation_download id=simulation.id %}"><img src="{% get_static_prefix %}img/hdf.png" alt="HDF5" title="HDF5"/></a>
+<a href="javascript:downloadDataSeries('hdf5');"><img src="{% get_static_prefix %}img/hdf.png" alt="HDF5" title="HDF5"/></a>
+<a href="javascript:downloadDataSeries('json');"><img src="{% get_static_prefix %}img/json.png" alt="JSON" title="JSON"/></a>
+<a href="javascript:downloadDataSeries('bson');"><img src="{% get_static_prefix %}img/bson.png" alt="BSON" title="BSON"/></a>
+<a href="javascript:downloadDataSeries('msgpack');"><img src="{% get_static_prefix %}img/msgpack.png" alt="MessagePack" title="MessagePack"/></a>
 {{ block.super }}
 {% endblock %}

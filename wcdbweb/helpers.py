@@ -103,25 +103,9 @@ def download_batches(batches, filename):
     file.seek(0)
     return response
     
-def render_hdf5_response(numpy_data, attrs, pathname, filename = 'data'):
-    tmp_file = create_temp_hdf5_file()
-    tmp_filename = tmp_file.filename
-    
-    dset = tmp_file.create_dataset(pathname, 
-         data = numpy_data,
-         compression = "gzip",
-         compression_opts = 4,
-         chunks = True)
-    for key, val in attrs.iteritems():
-        dset.attrs[key] = val
-    tmp_file.flush()
-    tmp_file.close()
-        
-    return render_tempfile_response(tmp_filename, filename, 'h5', 'application/x-hdf')    
-    
 def render_json_response(data, filename = 'data', indent = None):
     response = HttpResponse(
-        simplejson.dumps(data, indent=indent, ensure_ascii=False, encoding='utf-8'),
+        simplejson.dumps(data, indent=2, ensure_ascii=False, encoding='utf-8'),
         mimetype = "application/json; charset=UTF-8",
         content_type = "application/json; charset=UTF-8")
     response['Content-Disposition'] = "attachment; filename=%s.json" % slugify(filename)
@@ -129,6 +113,9 @@ def render_json_response(data, filename = 'data', indent = None):
     return response
     
 def render_bson_response(data, filename = 'data'):
+    if not isinstance(data, dict):
+        data = {'data': data}
+    
     response = HttpResponse(
         bson.dumps(data),
         mimetype = "application/bson",

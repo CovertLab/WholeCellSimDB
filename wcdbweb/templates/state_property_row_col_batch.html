@@ -133,17 +133,22 @@ $(
 var setData = function(data) {
     plotContainer.find('.status').fadeOut(1000);
     
-    var downsample_step = data.attrs.downsample_step;
+    if (data.length > 0) {
+        var downsample_step = data[0].attrs.downsample_step;
+    } else {
+        var downsample_step = '';
+    }
+        
     
     var series = [];
-    for (var i = 0; i < data.data.length; i++) {
+    for (var i = 0; i < data.length; i++) {
         timePoints = [];
-        for (j = 0; j < Math.min(data.data[i].length, data.attrs.simulation_lengths[i] / downsample_step); j++) {
-            timePoints.push([(j+1) * downsample_step / 3600, data.data[i][j]]);
+        for (j = 0; j < data[i].data.length; j++) {
+            timePoints.push([(j * downsample_step + 1) / 3600, data[i].data[j]]);
         }
         series.push({
             data: timePoints,
-            label: data.attrs.simulation_batch_indices[i]
+            label: data[i].attrs.simulation_batch_index
             });
     }
     plot.setData(series);

@@ -3,6 +3,8 @@ from django.core.servers.basehttp import FileWrapper
 from django.db.models import Avg, Count, Min, Max
 from django.http import HttpResponse
 from django.template.defaultfilters import slugify
+from django.utils import simplejson
+from django.views.decorators.csrf import csrf_protect
 from haystack.query import SearchQuerySet
 from helpers import render_template
 from wcdb import models
@@ -134,11 +136,24 @@ def list_simulations(request):
     
 #TODO
 def simulation(request, id):
-    simulation = models.Simulation.objects.get(id=id)    
+    simulation = models.Simulation.objects.get(id=id)
     batch = simulation.batch
+    
+    x_axis = {
+        'max': simulation.length,
+        }
+
+    y_axis = {
+        'label': 'Value',
+        'title': 'Value',
+        'units': None,
+        }
+        
     return render_template('simulation.html', request, data = {
         'simulation': simulation,
         'batch': batch,
+        'x_axis': x_axis,
+        'y_axis': y_axis,
     })
 
 def list_options(request):
@@ -370,7 +385,7 @@ def state_property_row_col_batch(request, state_name, property_name, batch_id, r
     property = state.properties.get(name=property_name)
     
     x_axis = {
-        'max': max([pv.shape[2] for pv in property.values.all()]),
+        'max': batch.simulations.aggregate(Max('length'))['length__max'],
         }
 
     if property.units:
@@ -396,10 +411,239 @@ def state_property_row_col_batch(request, state_name, property_name, batch_id, r
         'y_axis': y_axis
     })
     
+########################
+### list/get data series
+########################
+def list_data_series(request):
+    organism_id = request.GET.get('organism', '')
+    if organism_id == '':
+        data = []
+        for organism in models.Organism.objects.all():
+            data.append({
+                'id':'%d' % organism.id, 
+                'parentid': '0', 
+                'organism': organism.id,
+                'isleaf': False,
+                'label': organism.name, 
+                'units': '',
+                })
+        return helpers.render_json_response(data)
+    organism = models.Organism.objects.get(id=int(float(organism_id)))
+        
+    simulation_batch_id = request.GET.get('simulation_batch', '')
+    if simulation_batch_id == '':
+        data = []
+        for simulation_batch in organism.simulation_batches.all():
+            data.append({
+                'id':'%d.%d' % (organism.id, simulation_batch.id), 
+                'parentid': '%d' % organism.id, 
+                'organism': organism.id,
+                'simulation_batch': simulation_batch.id,
+                'isleaf': False,
+                'label': simulation_batch.name, 
+                'units': '', 
+                })
+        return helpers.render_json_response(data)
+    simulation_batch = models.SimulationBatch.objects.get(id=int(float(simulation_batch_id)))
+        
+    simulation_id = request.GET.get('simulation', '')
+    if simulation_id == '':
+        data = []
+        for simulation in simulation_batch.simulations.all():
+            data.append({
+                'id':'%d.%d.%d' % (organism.id, simulation_batch.id, simulation.id), 
+                'parentid': '%d.%d' % (organism.id, simulation_batch.id), 
+                'organism': organism.id,
+                'simulation_batch': simulation_batch.id,
+                'simulation': simulation.id,
+                'isleaf': False,
+                'label': simulation.batch_index, 
+                'units': ''
+                })
+        return helpers.render_json_response(data)
+    simulation = models.Simulation.objects.get(id=int(float(simulation_id)))
+        
+    state_id = request.GET.get('state', '')
+    if state_id == '':
+        data = []
+        for state in simulation_batch.states.all():
+            data.append({
+                'id':'%d.%d.%d.%d' % (organism.id, simulation_batch.id, simulation.id, state.id), 
+                'parentid': '%d.%d.%d' % (organism.id, simulation_batch.id, simulation.id), 
+                'organism': organism.id,
+                'simulation_batch': simulation_batch.id,
+                'simulation': simulation.id,
+                'state': state.id,
+                'isleaf': False,
+                'label': state.name, 
+                'units': ''
+                })
+        return helpers.render_json_response(data)
+    state = models.State.objects.get(id=int(float(state_id)))
+        
+    property_id = request.GET.get('property', '')
+    if property_id == '':
+        data = []
+        for property in state.properties.all():
+            data.append({
+                'id':'%d.%d.%d.%d.%d' % (organism.id, simulation_batch.id, simulation.id, state.id, property.id), 
+                'parentid': '%d.%d.%d.%d' % (organism.id, simulation_batch.id, simulation.id, state.id), 
+                'organism': organism.id,
+                'simulation_batch': simulation_batch.id,
+                'simulation': simulation.id,
+                'state': state.id,
+                'property': property.id,
+                'isleaf': property.labels.filter(name__isnull=False).exclude(name='').count() == 0,
+                'label': property.name, 
+                'units': property.units if property.units is not None else '',
+                'data_valid': \
+                    property.values.get(simulation__id=simulation.id).dtype is not None and \
+                    property.labels.filter(dimension=0, name__isnull=False).count() > 0 and \
+                    property.labels.filter(dimension=1, name__isnull=False).count() > 0,
+                })
+        return helpers.render_json_response(data)
+    property = models.Property.objects.select_related('labels').get(id=int(float(property_id)))
+    
+    data_valid = \
+        property.values.get(simulation__id=simulation.id).dtype is not None and \
+        property.labels.filter(dimension=0, name__isnull=False).count() > 0 and \
+        property.labels.filter(dimension=1, name__isnull=False).count() > 0
+        
+    row_id = request.GET.get('row', '')
+    col_id = request.GET.get('col', '')
+    if row_id == '' and col_id == '':
+        if property.labels.filter(dimension=0).exclude(name='').count() > 0:
+            
+            data = []
+            isleaf = property.labels.filter(dimension=1, name__isnull=False).exclude(name='').count() == 0
+            for row in property.labels.filter(dimension=0).exclude(name='').all():
+                data.append({
+                    'id':'%d.%d.%d.%d.%d.%d' % (organism.id, simulation_batch.id, simulation.id, state.id, property.id, row.id), 
+                    'parentid': '%d.%d.%d.%d.%d' % (organism.id, simulation_batch.id, simulation.id, state.id, property.id), 
+                    'organism': organism.id,
+                    'simulation_batch': simulation_batch.id,
+                    'simulation': simulation.id,
+                    'state': state.id,
+                    'property': property.id,
+                    'row': row.id,
+                    'isleaf': isleaf,
+                    'label': row.name, 
+                    'units': property.units if property.units is not None else '',
+                    'data_valid': data_valid,
+                    })
+            return helpers.render_json_response(data) 
+
+    if row_id == '':
+        rows = property.labels.filter(dimension=0)
+        if rows.count() > 0:
+            row_id = '%d' % rows[0].id
+    
+    if col_id == '':
+        data = []
+        for col in property.labels.filter(dimension=1).exclude(name='').all():
+            data.append({
+                'id':'%d.%d.%d.%d.%d.%s.%d' % (organism.id, simulation_batch.id, simulation.id, state.id, property.id, row_id, col.id), 
+                'parentid': '%d.%d.%d.%d.%d.%s' % (organism.id, simulation_batch.id, simulation.id, state.id, property.id, row_id), 
+                'organism': organism.id,
+                'simulation_batch': simulation_batch.id,
+                'simulation': simulation.id,
+                'state': state.id,
+                'property': property.id,
+                'row': row_id,
+                'isleaf': True,
+                'label': col.name, 
+                'units': property.units if property.units is not None else '',
+                'data_valid': data_valid,
+                })
+        return helpers.render_json_response(data)
+        
+    col = models.PropertyLabel.objects.get(id=int(float(col_id)))
+    raise Exception('Cannot dig deeper into hierarchy')
+    
+def get_data_series(request):
+    format = request.POST.get('format', 'hdf5')
+    if format not in ['hdf5', 'json', 'bson', 'msgpack']:
+        raise Exception('Invalid format')
+    
+    data_series_requests = simplejson.loads(request.POST.get('data_series'))
+    if len(data_series_requests) > 100:
+        raise Exception('Queries are limited to 100 data series')
+        
+    if format == 'hdf5':
+        data_series = helpers.create_temp_hdf5_file()        
+        data_series_filename = data_series.filename
+    else:
+        data_series = []
+            
+    for data_series_request in data_series_requests:
+        property_value = models.PropertyValue.objects.get(simulation__id=data_series_request['simulation'], property__id=data_series_request['property'])
+        property = property_value.property
+        state = property.state
+        batch = state.simulation_batch
+        organism = batch.organism
+        simulation = property_value.simulation
+        
+        if 'row' in data_series_request and data_series_request['row']:
+            row = models.PropertyLabel.objects.get(id=data_series_request['row'])
+        else:
+            row = None
+            
+        if 'col' in data_series_request and data_series_request['col']:
+            col = models.PropertyLabel.objects.get(id=data_series_request['col'])
+        else:
+            col = None
+            
+        data = property_value.get_dataset_slice(row, col)
+        
+        if format == 'hdf5':
+            dset = data_series.create_dataset('%s/%s/%d/%s/%s%s%s' % (organism.name, batch.name, simulation.batch_index, state.name, property.name, '/%s' % row.name if row is not None else '', '/%s' % col.name if col is not None else ''),
+                data = data,
+                compression = "gzip",
+                compression_opts = 4,
+                chunks = True)
+            dset.attrs['simulation_length'] = simulation.length
+            dset.attrs['data_units'] = property.units
+            dset.attrs['time_units'] = 's'
+            dset.attrs['downsample_step'] = 1
+            
+            data_series.flush()
+        else:
+            attrs = {
+                'organism': organism.name,
+                'simulation_batch': batch.name,
+                'simulation_batch_index': simulation.batch_index,
+                'simulation_length': simulation.length,
+                'state': state.name,
+                'property': property.name,
+                'data_units': property.units,
+                'time_units': 's',
+                'downsample_step': 1,
+                }
+            
+            if row is not None:
+                attrs['row'] = row.name
+            if col is not None:
+                attrs['col'] = col.name
+            
+            data_series.append({
+                'data': numpy.transpose(data, (2, 0, 1)).squeeze().tolist(),
+                'attrs': attrs
+                })
+   
+    if format == 'hdf5':
+        data_series.close()
+        return helpers.render_tempfile_response(data_series_filename, 'WholeCellDB', 'h5', 'application/x-hdf')
+    elif format == 'json':
+        return helpers.render_json_response(data_series)
+    elif format == 'bson':
+        return helpers.render_bson_response(data_series)
+    elif format == 'msgpack':
+        return helpers.render_msgpack_response(data_series)
    
 ###################
 ### downloading
 ###################
+@csrf_protect
 def download(request):
     form = forms.DownloadForm(request.POST)
     if not form.is_valid():        
@@ -412,7 +656,7 @@ def download(request):
                 }
             )
     else:
-        batches = models.SimulationBatches.objects.filter(id__in=form.cleaned_data['simulation_batches'])
+        batches = models.SimulationBatch.objects.filter(id__in=form.cleaned_data['simulation_batches'])
         return helpers.download_batches(batches, 'WholeCellDB')        
 
 def organism_download(request, id):
@@ -441,7 +685,6 @@ def simulation_download(request, id):
 def state_download(request, state_name):
     tmp_file = helpers.create_temp_hdf5_file()
     tmp_filename = tmp_file.filename
-    group = tmp_file.create_group('states/%s' % state_name)
     
     batches = models.SimulationBatch.objects.filter(states__name=state_name)
     for batch in batches:
@@ -451,7 +694,7 @@ def state_download(request, state_name):
                 if pv.shape is None:
                     continue
                     
-                dset = group.create_dataset('%s/%s/%s/%d' % (prop.name, batch.organism.name, batch.name, pv.simulation.batch_index),
+                dset = tmp_file.create_dataset('%s/%s/%d/%s/%s' % (batch.organism.name, batch.name, pv.simulation.batch_index, state.name, prop.name),
                     data = pv.dataset,
                     compression = "gzip",
                     compression_opts = 4,
@@ -471,7 +714,6 @@ def state_download(request, state_name):
 def state_property_download(request, state_name, property_name):
     tmp_file = helpers.create_temp_hdf5_file()
     tmp_filename = tmp_file.filename
-    group = tmp_file.create_group('states/%s/%s' % (state_name, property_name))
     
     batches = models.SimulationBatch.objects.filter(states__name=state_name, states__properties__name=property_name)
     for batch in batches:
@@ -480,7 +722,7 @@ def state_property_download(request, state_name, property_name):
             if pv.shape is None:
                 continue
                 
-            dset = group.create_dataset('%s/%s/%d' % (batch.organism.name, batch.name, pv.simulation.batch_index),
+            dset = tmp_file.create_dataset('%s/%s/%d/%s/%s' % (batch.organism.name, batch.name, pv.simulation.batch_index, state_name, prop.name),
                 data = pv.dataset,
                 compression = "gzip",
                 compression_opts = 4,
@@ -500,7 +742,6 @@ def state_property_download(request, state_name, property_name):
 def state_property_row_download(request, state_name, property_name, row_name):
     tmp_file = helpers.create_temp_hdf5_file()
     tmp_filename = tmp_file.filename
-    group = tmp_file.create_group('states/%s/%s/%s' % (state_name, property_name, row_name))
     
     batches = models.SimulationBatch.objects.filter(states__name=state_name, states__properties__name=property_name)
     for batch in batches:
@@ -513,7 +754,7 @@ def state_property_row_download(request, state_name, property_name, row_name):
             shape = list(pv.shape)
             shape[0] = 1
             
-            dset = group.create_dataset('%s/%s/%d' % (batch.organism.name, batch.name, pv.simulation.batch_index),
+            dset = tmp_file.create_dataset('%s/%s/%d/%s/%s%s' % (batch.organism.name, batch.name, pv.simulation.batch_index, state_name, property_name, '/%s' % row_name if row_name else ''),
                 data = pv.dataset[row.index, ...],
                 shape = shape,
                 compression = "gzip",
@@ -544,29 +785,30 @@ def state_property_row_col_batch_download(request, state_name, property_name, ro
     row = models.PropertyLabel.objects.get(dimension=0, name=row_name, property__name=property_name, property__state__name=state_name, property__state__simulation_batch__id=batch_id)
     col = models.PropertyLabel.objects.get(dimension=1, name=col_name, property__name=property_name, property__state__name=state_name, property__state__simulation_batch__id=batch_id)
     
-    data = prop.get_dataset_slice(row, col)    
-    
-    if row_name is None:
-        row_name = ''
-    if col_name is None:
-        col_name = ''
-    
-    attrs = {
-        'organism': batch.organism.name,
-        'simulation_batch': batch.name,
-        'simulation_batch_indices': [sim.batch_index for sim in batch.simulations.all()],
-        'simulation_lengths': [pv.shape[2] for pv in prop.values.all()],
-        'state': state_name,
-        'property': property_name,
-        'row': row_name,
-        'col': col_name,        
-        'data_units': prop.units,
-        'time_units': 's',
-        'downsample_step': 1,
-        }
-    
     if format == 'hdf5':
-        return helpers.render_hdf5_response(data, attrs, pathname = 'states/%s/%s/%s/%s/%s' % (state_name, property_name, row_name, col_name, batch.name), filename = '%s-%s-%s-%s-%s' % (batch.name, state_name, property_name, row_name, col_name))
+        tmp_file = helpers.create_temp_hdf5_file()
+        tmp_filename = tmp_file.filename
+        
+        for pv in prop.values.all():
+            sim = pv.simulation
+            pathname = '%s/%s/%d/%s/%s%s%s' % (batch.organism.name, batch.name, sim.batch_index, state_name, property_name, '/%s' % row_name if row_name else '', '/%s' % col_name if col_name else '', )
+            dset = tmp_file.create_dataset(pathname, 
+                data = pv.get_dataset_slice(row, col),
+                compression = "gzip",
+                compression_opts = 4,
+                chunks = True)
+                
+            dset.attrs['simulation_length'] = sim.length
+            dset.attrs['data_units'] = prop.units
+            dset.attrs['time_units'] = 's'
+            dset.attrs['downsample_step'] = 1
+            
+            tmp_file.flush()
+            
+        tmp_file.close()
+        
+        filename = '%s-%s-%s-%s%s%s' % (batch.organism.name, batch.name, state_name, property_name, '-%s' % row_name if row_name else '', '-%s' % col_name if col_name else '')
+        return helpers.render_tempfile_response(tmp_filename, filename, 'h5', 'application/x-hdf')
     elif format in ['json', 'bson', 'msgpack']:
         max_datapoints = 5e5
         n_datapoints = batch.simulations.count() * batch.simulations.aggregate(Max('length'))['length__max']        
@@ -586,21 +828,34 @@ def state_property_row_col_batch_download(request, state_name, property_name, ro
                 downsample_step = downsample_step_2
             
             downsample_step = int(downsample_step)
-        
-        attrs['downsample_step'] = downsample_step
-        data = numpy.transpose(data, (3, 2, 0, 1)).squeeze()
-        data = data[:,::downsample_step]
-        
-        data = data.tolist()
-        for idx, length in enumerate(attrs['simulation_lengths']):
-            data[idx] = data[idx][:length/downsample_step]
-        tmp = {'attrs': attrs, 'data': data}
+            
+        data = []
+        for pv in prop.values.all():
+            sim = pv.simulation
+
+            tmp = numpy.transpose(pv.get_dataset_slice(row, col)[:,:,::downsample_step], (2, 0, 1)).squeeze()
+            data.append({
+                'data': tmp.tolist(),
+                'attrs': {
+                    'organism': batch.organism.name,
+                    'simulation_batch': batch.name,
+                    'simulation_batch_index': sim.batch_index,
+                    'state': state_name,
+                    'property': property_name,
+                    'row': row_name,
+                    'col': col_name,                    
+                    'simulation_length': sim.length,
+                    'data_units': prop.units,
+                    'time_units': 's',
+                    'downsample_step': downsample_step
+                    },
+                })        
         if format == 'json':
-            return helpers.render_json_response(tmp, indent=2)
+            return helpers.render_json_response(data)
         elif format == 'bson':
-            return helpers.render_bson_response(tmp)
+            return helpers.render_bson_response(data)
         else:
-            return helpers.render_msgpack_response(tmp)
+            return helpers.render_msgpack_response(data)
     else:
         raise ValidationError('Invalid format: %s' % format)
     
@@ -650,6 +905,7 @@ def search_basic_google(request, query):
         'engine': 'google',
         })
 
+@csrf_protect
 def search_advanced(request):
     valid = request.method == "POST"
     
