@@ -629,14 +629,20 @@ select.error {border-color:red;}
 
 /* simulation */
 #content div .data-series {}
-#content div .data-series .twocolumns .left {float:left; width:585px;}
-#content div .data-series .twocolumns .right {float:left; width:200px; padding-left:15px;}
+#content div .data-series .twocolumns .left {float:left; width:551px;}
+#content div .data-series .twocolumns .right {float:left; width:230px; padding-left:15px; padding-right:4px;}
+#content div .data-series .jqx-widget-content ,
+#content div .data-series .jqx-widget {font-size:12px; font-family:PT Sans,sans-serif;}
 #content div .data-series .data-series-table {width:100%; height:100%px;}
 #content div .data-series .data-series-table .jqx-grid-column-header {font-weight:bold; background: #d6edff;}
-#content div .data-series .data-series-table .jqx-grid-column-header, 
-#content div .data-series .data-series-table .jqx-widget-content, 
-#content div .data-series .data-series-table .jqx-grid-table {font-size:inherit;}
+#content div .data-series .data-series-table .jqx-grid-table {font-size:12px; font-family:PT Sans,sans-serif;}
+#content div .data-series .data-series-table .jqx-cell {min-height: 17px; padding: 1px 3px;}
+#content div .data-series .data-series-table .jqx-grid-cell {margin:0px;}
+#content div .data-series .data-series-table .jqx-tree-grid-title {margin-top:0px;}
+#content div .data-series .data-series-table .jqx-tree-grid-collapse-button, #content div .data-series .data-series-table .jqx-tree-grid-expand-button {margin-top:0px;}
+#content div .data-series .data-series-table .jqx-tree-grid-checkbox{ width:12px; height:12px;}
 #content div .data-series .data-series-plot {margin:10px 0 0 0px; text-align:center;}
+
 
 /* option */
 #content div table.option {width:100%;}
@@ -875,7 +881,7 @@ select.error {border-color:red;}
 /****************
  * plots 
  ****************/
-.plot-container {width:100%; height:400px;}
+.plot-container {width:850px; height:300px; position:relative; left:-44px;}
 .plot-container .error, .plot-container .status {
     position:absolute;
     top:170px;
