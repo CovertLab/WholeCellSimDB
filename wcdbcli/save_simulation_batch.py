@@ -25,6 +25,8 @@ def main():
         opts['first_sim_idx'] = int(float(sys.argv[4]))
     if len(sys.argv) >= 6:
         opts['max_num_simulations'] = int(float(sys.argv[5]))
+    if len(sys.argv) >= 7:
+        opts['expand_sparse_mat'] = bool(float(sys.argv[6]))
     
     save_simulation_batch(
         organism_name = sys.argv[1], 

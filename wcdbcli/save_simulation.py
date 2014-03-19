@@ -17,11 +17,16 @@ setup_environ(settings)
 from helpers import save_simulation
 
 def main():
+    opts = {}
+    if len(sys.argv) >= 6:
+        opts['expand_sparse_mat'] = bool(float(sys.argv[5]))
+
     save_simulation(
         organism_name = sys.argv[1],
         batch_name = sys.argv[2],
         sim_dir = sys.argv[3],        
-        batch_index = int(float(sys.argv[4])))
+        batch_index = int(float(sys.argv[4])),
+        **opts)
     
 if __name__=="__main__":
     main()

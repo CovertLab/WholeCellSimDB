@@ -11,7 +11,7 @@ from subprocess import call
 from wcdb.models import SimulationBatch, Simulation
 from WholeCellDB import settings
 
-def save_simulation_batch(organism_name, batch_name, batch_dir, first_sim_idx = None, max_num_simulations = None):
+def save_simulation_batch(organism_name, batch_name, batch_dir, first_sim_idx = None, max_num_simulations = None, expand_sparse_mat=True):
     if first_sim_idx is None:
         first_sim_idx = 1
     
@@ -63,9 +63,9 @@ def save_simulation_batch(organism_name, batch_name, batch_dir, first_sim_idx = 
     
     for sim_idx, sim_dir in enumerate(sim_dirs):
         print "Saving simulation %d of %d ... " % (sim_idx+1, len(sim_dirs))
-        save_simulation(organism_name, batch_name, sim_dir, sim_idx+1)
+        save_simulation(organism_name, batch_name, sim_dir, sim_idx+1, expand_sparse_mat)
 
-def save_simulation(organism_name, batch_name, sim_dir, batch_index):
+def save_simulation(organism_name, batch_name, sim_dir, batch_index, expand_sparse_mat=True):
     #get batch name, length
     md = scipy.io.loadmat(os.path.join(sim_dir, 'metadata.mat'))
     length = md['lengthSec'][0][0]
@@ -86,7 +86,7 @@ def save_simulation(organism_name, batch_name, sim_dir, batch_index):
                 sim.property_values \
                     .get(property = property) \
                     .set_data(data['data'])
-            elif 'None' in data and \
+            elif 'None' in data and expand_sparse_mat and \
                 isinstance(data['None'], scipy.io.matlab.mio5_params.MatlabOpaque) and \
                 data['None'].tolist()[0][2] == 'edu.stanford.covert.util.SparseMat':
                 
