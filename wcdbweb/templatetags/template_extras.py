@@ -3,23 +3,9 @@ from dateutil.tz import tzlocal
 from django import template
 from WholeCellDB import settings
 import datetime
-import math
 import os
 
 register = template.Library()
-
-@register.filter
-def columns(arr, n_cols):    
-    n_cols = int(float(n_cols))
-    
-    col_arr = []
-    idx = 0
-    for i in range(n_cols):
-        idx2 = int(math.ceil((i + 1.) * (len(arr) + 0.) / (n_cols + 0.)))
-        col_arr.append(arr[idx:idx2])
-        idx = idx2
-        
-    return col_arr
 
 @register.filter
 def order_by(qs, field):
