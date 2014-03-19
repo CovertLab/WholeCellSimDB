@@ -49,8 +49,8 @@ Created: 2013-09-13
 <li><p>Create a new database and a new user, and grant the new user priveleges to the new database:
     <pre>
 mysql &gt;&gt; create database wholecelldb;
-mysql &gt;&gt; create user 'wholecelldb'@'losthost' identified by '9KNYdUnQaSFSUDCa';
-mysql &gt;&gt; grant all privileges on wholecelldb.* to wholecelldb;
+mysql &gt;&gt; create user 'wholecelldb'@'localhost' identified by '9KNYdUnQaSFSUDCa';
+mysql &gt;&gt; grant all privileges on wholecelldb.* to 'wholecelldb'@'localhost';
 mysql &gt;&gt; flush privileges;
 </pre>
     </p></li>    
