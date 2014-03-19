@@ -22,62 +22,115 @@ Created: 2013-09-13
 <div>
 <a name="getting_started_developers"></a>
 <h1>Developer's guide: Installing your own WholeCellDB server and storing simulations</h1>
-<p>Fellow the steps below to install WholeCellDB on your own server, and save simulations to your own WholeCellDB server.</p>
+<p>Fellow the steps below to install WholeCellDB on your own server, and save simulations to your own WholeCellDB server. In addition, a fully configured version of WholeCellDB is available on the <a href="https://simtk.org/frs/outbound.php?fileid=3590">whole-cell virtual machine</a>.</p>
 
 <ol>
-<li><p><a href="http://github.com/CovertLab/WholeCellDB">Download the WholeCellDB package</a> from GitHub to <tt>/path/to/WholeCellDB/</tt>.</p></li>
+<li><p>Obtain <a href="http://github.com/CovertLab/WholeCellDB">WholeCellDB</a> from GitHub, and save to <tt>/path/to/WholeCellDB/</tt>.</p></li>
 <li><p>Install the required software packages:</p>
     <ul>    
     <li><p>apache</p></li>
-    <li><p>hdf5</p></li>
-    <li><p>hdf5-devel</p></li>
+    <li><p>gcc</p></li>
+    <li><p>libhdf5-dev</p></li>
     <li><p>mod_wsgi</p></li>
     <li><p>mysql</p></li>
-    <li><p>pip: bson, django-haystack, pytz, u-msgpack-python</p></li>
     <li><p>python 2.7</p></li>
-    <li><p>python-django 1.5</p></li>
-    <li><p>python-numpy</p></li>
-    <li><p>python-h5py</p></li>
     <li><p>xapian</p></li>
     </ul></li>
-<li><p>Create a directory to store the simulations</p></li>
+<li><p>Install the required python packages:</p>
+    <ul>    
+    <li><p>bson</p></li>
+    <li><p>django</p></li>
+    <li><p>django-haystack</p></li>
+    <li><p>h5py</p></li>
+    <li><p>numpy</p></li>
+    <li><p>pytz</p></li>
+    <li><p>u-msgpack-python</p></li>
+    </ul></li>
+<li><p>Create a new database and a new user, and grant the new user priveleges to the new database:
+    <pre>
+mysql &gt;&gt; create database wholecelldb;
+mysql &gt;&gt; create user 'wholecelldb'@'losthost' identified by '9KNYdUnQaSFSUDCa';
+mysql &gt;&gt; grant all privileges on wholecelldb.* to wholecelldb;
+mysql &gt;&gt; flush privileges;
+</pre>
+    </p></li>    
+    
+<li><p>Create a directory to store the HDF5 simulation data, and grant permissions to the webserver daemon:
+    <pre>
+mkdir /path/to/WholeCellDB/wcdb/data
+sudo chown :www-data /path/to/WholeCellDB/wcdb/data
+sudo chmod ug+rw /path/to/WholeCellDB/wcdb/data
+</pre>
+    </p></li>
+<li><p>Create a temporary directory, and grant permissions to the webserver daemon:
+    <pre>
+mkdir /path/to/WholeCellDB/tmp
+sudo chown :www-data /path/to/WholeCellDB/tmp
+sudo chmod ug+rw /path/to/WholeCellDB/tmp
+</pre>
+    </p></li>
 <li><p>Edit the settings file <tt>/path/to/WholeCellDB/WholeCellDB/settings.py</tt></p>
     <ul>
-    <li><p>Edit the value of <tt>DATABASES</tt>. More information is available in the <a href="https://docs.djangoproject.com/en/1.5/intro/tutorial01/#database-setup">Django tutorial</a>.</p></li>
-    <li><p>Edit the value <tt>HDF5_ROOT</tt> to point to the folder where you wish to save the simulations.</p></li>
+    <li><p>Edit the root URL settings: <tt>ROOT_URL = 'http://domain/url/to/WholeCellDB'</tt></p></li>
+    <li><p>Edit the HDF5 data directory setting: <tt>HDF5_ROOT = '/path/to/WholeCellDB/wcdb/data'</tt></p></li>
+    <li><p>Edit the temporary directory setting: <tt>TMP_DIR = '/path/to/WholeCellDB/tmp'</tt></p></li>
+    <li><p>Edit the database settings. See the <a href="https://docs.djangoproject.com/en/1.5/intro/tutorial01/#database-setup">Django documentation</a> for more information.
+        <pre>
+DATABASES.default.NAME = 'wholecelldb'
+DATABASES.default.USER = 'wholecelldb'
+DATABASES.default.PASSWORD = '9KNYdUnQaSFSUDCa'
+DATABASES.default.HOST = ''
+</pre>
+    </p></li>    
     </ul></li>
-<li><p>Change to <tt>/path/to/WholeCellDB/</tt></p></li>
-<li><p>Run <tt>python manage.py syncdb</tt> to setup your database</p></li>
-<li><p>Setup your webserver:</p>
-    <ul>
-    <li><p>Development mode: run <tt>python manage.py runserver</tt></p></li>
-    <li><p>Production mode: add the following to your apache configuration file
-        <pre>LoadModule wsgi_module modules/mod_wsgi.so
-
+<li><p>Configure your apache webserver. Add the following to your apache configuration (e.g. <tt>/etc/apache2/sites-enabled/WholeCellDB</tt>):
+    <pre>
 WSGIDaemonProcess default processes=2 threads=25
 WSGIDaemonProcess wholecelldb:1 threads=1
 WSGIDaemonProcess wholecelldb:2 threads=1
-WSGIDaemonProcess wholecellkbeco:1 threads=25
 SetEnv PROCESS_GROUP default
 WSGIProcessGroup %{ENV:PROCESS_GROUP}
 WSGISocketPrefix /var/run/wsgi
 
-Alias /projects/WholeCellDB/static /home/projects/WholeCellDB/wcdbweb/static
-Alias /projects/WholeCellDB /home/projects/WholeCellDB/WholeCellDB/wsgi.py
-<Directory /home/projects/WholeCellDB/WholeCellDB>
+Alias /url/to/WholeCellDB/static /path/to/WholeCellDB/wcdbweb/static
+&lt;Location "/path/to/WholeCellDB/wcdbweb/static"&gt;
+    Order allow,deny
+    Allow from all
+&lt;/Location&gt;
+
+WSGIScriptAlias /url/to/WholeCellDB /path/to/WholeCellDB/WholeCellDB/wsgi.py
+&lt;Directory /path/to/WholeCellDB/WholeCellDB&gt;
     WSGIApplicationGroup %{RESOURCE}
     WSGIRestrictProcess wholecelldb:1 wholecelldb:2
     SetEnv PROCESS_GROUP wholecelldb:1
     AddHandler wsgi-script .py
+
     Options ExecCGI
     Order allow,deny
     Allow from all
-</Directory></pre></p></li>
-    </ul></li>
-<li><p>Load data</p>
+&lt;/Directory&gt;
+</pre></p></li>
+
+<li><p>Restart your webserver (e.g. <tt>sudo /etc/init.d/apache2 restart</tt>)</p></li>
+
+<li><p>Create database tables
+    <pre>
+cd /path/to/WholeCellDB
+python manage.py syncdb
+</pre>
+    </p></li>
+    
+<li><p>Load simulations into WholeCellDB
     <ul>
-    <li><p>From the command line, run <tt>wcdbcli/save_simulation_batch</tt> for each simulation batch</p></li>
-    <li><p>Alternatively, you can import the package into your Python application and use the Django models to store simulations
+    <li><p>Load simulations via the command line interface:
+    <pre>
+cd /path/to/WholeCellDB
+python wcdbcli/save_simulation_batch.py "&lt;organism-name&gt;" "&lt;batch-1-name&gt;" /path/to/simulation-batch-1
+python wcdbcli/save_simulation_batch.py "&lt;organism-name&gt;" "&lt;batch-2-name&gt;" /path/to/simulation-batch-2
+python wcdbcli/save_simulation_batch.py "&lt;organism-name&gt;" "&lt;batch-3-name&gt;" /path/to/simulation-batch-3
+</pre>
+    </p></li>
+    <li><p>Alternatively, you can import the package into your Python application and use python methods
     <pre>import sys
 
 # Add the project to your path.
@@ -89,13 +142,28 @@ from django.core.management import setup_environ
 setup_environ(settings)
 
 # Import the models
-from wcdb.models import Simulation, Property</pre></p></li>
-    </ul></li>
-<li><p>Navigate to the WholeCellDB web frontend:</p>
-    <ul>
-    <li><p>Development mode: <a href="http://localhost:8000">http://localhost:8000</a></p></li>
-    <li><p>Production mode: http://path/to/WholeCellDB</p></li>
-    </ul></li>
+from wcdb import models
+
+# Load simulation batches
+for batch in batches:
+    models.SimulationBatch.objects.create_simulation_batch(...)
+    
+    # Load individual simulations
+    for sim in batch.simulations:
+        models.Simulation.objects.create_simulation(...)        
+</pre></p></li>    
+    </ul></p></li>
+
+    
+<li><p>Build search indices and grant permissions to webserver daemon:
+    <pre>
+python manage.py rebuild_index
+sudo chown -R :www-data /path/to/WholeCellDB/wcdbsearch/indexes
+sudo chmod ug+rw /path/to/WholeCellDB/wcdbsearch/indexes
+</pre>
+    </p></li>
+    
+<li><p>Navigate to the WholeCellDB web frontend: <tt>http://domain/url/to/WholeCellDB</tt></p></li>
 </ol>
 </div>
 
