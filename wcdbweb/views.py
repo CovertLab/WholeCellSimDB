@@ -41,10 +41,25 @@ def index(request):
             .values('name', 'process__name', 'state__name')
             .annotate(Count('name'), Count('process__name'), Count('state__name'))
             .count(),
-        'n_investigator': models.Investigator.objects.all().count(),
+        'n_investigator': models.Investigator.objects.all().count(),        
     }
+    
+    batch = models.SimulationBatch.objects.all()[0]
+    state = batch.states.get(name='MetabolicReaction')
+    prop = state.properties.get(name='growth')
+    default_data_series = [{'organism': batch.organism, 'simulation_batch': batch, 'simulation': sim, 'state': state, 'property': prop, 'row': None, 'col': None} for sim in batch.simulations.all()]
+    
     return render_template('index.html', request, data = {
-            'summary': summary
+            'summary': summary,
+            'default_data_series': default_data_series,
+            'x_axis': {
+                'max': models.Simulation.objects.aggregate(Max('length'))['length__max'],
+                },
+            'y_axis': {
+                'label': 'Value',
+                'title': 'Value',
+                'units': None,
+                },
         })
         
 ###################
@@ -134,10 +149,13 @@ def list_simulations(request):
         'simulations': simulations
     })
     
-#TODO
 def simulation(request, id):
     simulation = models.Simulation.objects.get(id=id)
     batch = simulation.batch
+    
+    state = batch.states.get(name='MetabolicReaction')
+    prop = state.properties.get(name='growth')
+    default_data_series = {'state': state, 'property': prop, 'row': None, 'col': None}
     
     x_axis = {
         'max': simulation.length,
@@ -152,6 +170,7 @@ def simulation(request, id):
     return render_template('simulation.html', request, data = {
         'simulation': simulation,
         'batch': batch,
+        'default_data_series': default_data_series,
         'x_axis': x_axis,
         'y_axis': y_axis,
     })

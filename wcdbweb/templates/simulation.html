@@ -345,6 +345,37 @@ function getSelectedDataSeries() {
 }
 </script>
 
+<script language="javascript" type="text/javascript">
+function setupInitialPlots() {
+    plotContainer.find('.error').hide();    
+    plotContainer.find('.status').fadeIn(1000);
+    
+    var selected_property_ids = [
+        {
+            organism: {{simulation.batch.organism.id}},
+            simulation_batch: {{simulation.batch.id}},
+            simulation: {{simulation.id}},
+            state: {{default_data_series.state.id}},
+            property: {{default_data_series.property.id}},
+            row: {% if default_data_series.row %}{{default_data_series.row.id}}{% else %}''{% endif %},
+            col: {% if default_data_series.col %}{{default_data_series.col.id}}{% else %}''{% endif %},
+        },
+    ];
+    
+    $.ajax({
+        url: '{% url wcdbweb.views.get_data_series %}',
+        type: 'POST',
+        data: {
+            'format': 'json',
+            'data_series': JSON.stringify(selected_property_ids)
+            },
+        }).done(setData)
+        .fail(alertFailure);
+}
+
+setupInitialPlots();
+</script>
+
 {% endblock %}
 
 {% block action_icons %}
