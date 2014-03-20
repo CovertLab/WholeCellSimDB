@@ -52,3 +52,4 @@ SampleData/
 .htaccess
 *.asv
 tmp/
+wcdbweb/static/doc

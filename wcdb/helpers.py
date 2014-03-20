@@ -75,5 +75,7 @@ def pairwise(iterable):
     next(b, None)
     return izip(a, b)
 
-def is_sorted(iterable, key=lambda a, b: a <= b):
+def is_sorted(iterable, key=None):
+    if key is None:
+        key = lambda a, b: a <= b
     return all(key(a, b) for a, b in pairwise(iterable))

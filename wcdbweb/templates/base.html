@@ -128,10 +128,11 @@ Created: 2013-09-13
 				</ul></li>
 			<li class="spacer"/>
 			<li><a href="#">Help</a>
-				<ul>
+				<ul>                
 				<li><a href="{% url wcdbweb.views.tutorial %}">Tutorial</a></li>
 				<li><a href="{% url wcdbweb.views.help %}">Help</a></li>
 				<li><a href="{% url wcdbweb.views.about %}">About</a></li>
+				<li><a href="{% get_static_prefix %}doc">Source code docs</a></li>
 				<li><a href="{% url wcdbweb.views.about %}#contact">Contact</a></li>
 				</ul></li>
 		</ul>
