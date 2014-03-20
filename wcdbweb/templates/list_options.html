@@ -42,7 +42,7 @@ Created: 2014-03-10
         {% regroup options.Global by name as options_global %}
         {% for option in options_global %}
         <tr>
-            <td class="level1"><a href="{% url wcdbweb.views.option option_name=option.grouper %}">{{option.grouper}}</a>{% if not option.list.0.units == None %} ({{option.list.0.units}}){% endif %}</td>            
+            <td class="level1"><a href="{% url wcdbweb.views.option option_name=option.grouper %}">{{option.grouper}}</a>{% if option.list.0.units %} ({{option.list.0.units}}){% endif %}</td>            
             {% regroup_by option.list by 'simulation_batch__id' simulation_batch_ids as batches %}
             {% for batch in batches %}
             <td class="level1">{% if batch.list|length > 1 %}[{%for val in batch.list%}{{val.value}}{%if not forloop.last%}, {%endif%}{%endfor%}]{% else %}{{batch.list.0.value}}{% endif %}</td>
@@ -64,7 +64,7 @@ Created: 2014-03-10
             {% regroup process.list by name as process_options %}
             {% for option in process_options %}
         <tr>
-            <td class="level2"><a href="{% url wcdbweb.views.option process_name=process.grouper option_name=option.grouper %}">{{option.grouper}}</a>{% if not option.list.0.units == None %} ({{option.list.0.units}}){% endif %}</td>
+            <td class="level2"><a href="{% url wcdbweb.views.option process_name=process.grouper option_name=option.grouper %}">{{option.grouper}}</a>{% if option.list.0.units %} ({{option.list.0.units}}){% endif %}</td>
                 {% regroup_by option.list by 'simulation_batch__id' simulation_batch_ids as batches %}
                 {% for batch in batches %}
             <td>{% if batch.list|length > 1 %}[{%for val in batch.list%}{{val.value}}{%if not forloop.last%}, {%endif%}{%endfor%}]{% else %}{{batch.list.0.value}}{% endif %}</td>
@@ -86,7 +86,7 @@ Created: 2014-03-10
             {% regroup state.list by name as state_options %}
             {% for option in state_options %}
         <tr>
-            <td class="level2"><a href="{% url wcdbweb.views.option state_name=state.grouper option_name=option.grouper %}">{{option.grouper}}</a>{% if not option.list.0.units == None %} ({{option.list.0.units}}){% endif %}</td>
+            <td class="level2"><a href="{% url wcdbweb.views.option state_name=state.grouper option_name=option.grouper %}">{{option.grouper}}</a>{% if option.list.0.units %} ({{option.list.0.units}}){% endif %}</td>
                 {% regroup_by option.list by 'simulation_batch__id' simulation_batch_ids as batches %}
                 {% for batch in batches %}
             <td>{% if batch.list|length > 1 %}[{%for val in batch.list%}{{val.value}}{%if not forloop.last%}, {%endif%}{%endfor%}]{% else %}{{batch.list.0.value}}{% endif %}</td>

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Max
 from django.db.models.query import QuerySet
@@ -6,10 +7,13 @@ from django.contrib.auth.models import User
 from helpers import is_sorted
 from WholeCellDB.settings import HDF5_ROOT
 import ast
+import dateutil.parser
+import dateutil.tz
 import h5py
 import numpy
 import os
 import re
+import shutil
 import sys
 
 property_tag = property
@@ -218,22 +222,6 @@ class Property(models.Model):
         ordering = ['name']
         get_latest_by = 'state__simulation_batch__date'
 
-""" Properties """
-class PropertyValueManager(models.Manager):
-    def create_property_value(self, simulation, property):
-        """ 
-        Creates a new StatePropertyValue and the associated dataset. 
-
-        Arguments
-            name            | type
-            ----------------------------------
-            simulation      | wcdb.models.Simulation
-            property        | wcdb.models.Property 
-            shape           | Tuple of Ints
-            dtype           | Numpy.dtype
-        """
-        return self.create(simulation=simulation, property=property)
-
 class PropertyValue(models.Model):
     """
     Property value
@@ -246,13 +234,13 @@ class PropertyValue(models.Model):
     # Number of indices filled in in the time dimension.
     _filled = models.IntegerField(default=0) 
 
-    objects = PropertyValueManager()
-    
     @property_tag
     def path(self):
         """ The path to the dataset within the simulation h5 file """
-        return "/".join([self.property.state.name,
-                         self.property.name])
+        return "/".join(['states',
+                        self.property.state.name,
+                         self.property.name,
+                         'data'])
  
     @property_tag
     def dataset(self):
@@ -415,22 +403,50 @@ class PropertyLabel(models.Model):
 
 
 class SimulationManager(models.Manager):
-    def create_simulation(self, batch, batch_index = 1, length = None):        
-        simulation = batch.simulations.create(
-             batch_index = batch_index,
-             length = length)
-
-        f = simulation.h5file
+    def create_simulation(self, h5filename): 
+        #open source h5 file
+        h5file = h5py.File(h5filename, 'r')
+        md = h5file.attrs
         
-        for state in batch.states.all():
-            g = f.create_group('/states/' + state.name)
+        # get simulation batch
+        batch = SimulationBatch.objects.get(organism__name = md['batch__organism__name'], name = md['batch__name'])
+        
+        #verify h5file
+        if 'states' not in h5file:
+            raise ValidationError('Invalid h5 file: file must contain group "states"')
             
+        group = h5file['states']
+        for state in batch.states.all():
+            if state.name not in group:
+                raise ValidationError('Invalid h5 file: file must contain group "states/%s"' % state.name)
+                
+            sub_group = group[state.name]
             for property in state.properties.all():
-                pv = PropertyValue.objects.create_property_value(simulation, property)
+                if property.name not in sub_group:
+                    raise ValidationError('Invalid h5 file: file must contain group "states/%s/%s"' % (state.name, property.name))
+        
+        #create simulation
+        simulation = batch.simulations.create(
+             batch_index = md['batch_index'],
+             length = md['length'])
+             
+        #create property values
+        for state in batch.states.all():
+            for property in state.properties.all():
+                group = h5file['states/%s/%s' % (state.name, property.name)]
+                if 'data' in group:
+                    dset = group['data']
+                    pv = PropertyValue.objects.create(simulation=simulation, property=property, shape=dset.shape, dtype=dset.dtype.name)
+                else:
+                    pv = PropertyValue.objects.create(simulation=simulation, property=property, shape=None, dtype=None)
                 pv.save()
+                
+        #close source h5 file
+        h5file.close()
 
-        f.flush()
-        f.close() 
+        #copy h5 file
+        shutil.copyfile(h5filename, simulation.file_path)
+        simulation.lock_file()
 
         return simulation
 
@@ -503,146 +519,142 @@ class Simulation(models.Model):
         app_label = 'wcdb'
         
 class SimulationBatchManager(models.Manager):
-    def create_simulation_batch(self, 
-                          organism_name,
-                          organism_version,
-                          name="", 
-                          description="", 
-                          investigator_first="",
-                          investigator_last="",
-                          investigator_affiliation="",
-                          investigator_email="",
-                          ip='0.0.0.0',
-                          date=None,
-                          processes = [],
-                          states = {}, 
-                          options = {},
-                          parameters = {}):
-
-        organism = Organism.objects.get_or_create(name = organism_name)[0]
+    def create_simulation_batch(self, md):
+        #get/create organism
+        organism = Organism.objects.get_or_create(name = md.attrs['batch__organism__name'])[0]
         organism.save()
         
+        #get/create investigator
         user = User.objects.get_or_create(
-                first_name = investigator_first,
-                last_name = investigator_last,
-                email = investigator_email
+                first_name = md.attrs['batch__investigator__user__first_name'],
+                last_name = md.attrs['batch__investigator__user__last_name'],
+                email = md.attrs['batch__investigator__user__email']
                 )[0]
         user.save()
         try:
             investigator = user.investigator
-            investigator.affiliation = investigator_affiliation
+            investigator.affiliation = md.attrs['batch__investigator__affiliation']
         except Investigator.DoesNotExist:
             investigator = Investigator(
                user = user, 
-               affiliation = investigator_affiliation
+               affiliation = md.attrs['batch__investigator__affiliation']
                )
         investigator.save()
         
+        #create batch
         batch = organism.simulation_batches.create(
-            name = name,
-            description = description,
-            organism_version = organism_version,
+            name = md.attrs['batch__name'],
+            description = md.attrs['batch__description'],
+            organism_version = md.attrs['batch__organism_version'],
             investigator = investigator,
-            ip = ip,
-            date = date)
+            ip = md.attrs['batch__ip'],
+            date = dateutil.parser.parse(md.attrs['batch__date']).replace(tzinfo=dateutil.tz.tzlocal()),
+            )
         batch.save()
         
         #processes
-        for name in processes:
+        for name in md['processes'].keys():
             process = batch.processes.create(name=name)
             process.save()
         
         #states
-        for state_name, props in states.iteritems():
+        for state_name, props in md['states'].iteritems():
             state = batch.states.create(name=state_name)
             state.save()
             
             for prop_name, units_labels in props.iteritems():
-                property = state.properties.create(name=prop_name, units=units_labels['units'])
+                property = state.properties.create(name=prop_name, units=units_labels['units'].value)
                 property.save()
                 
-                for dimension, dimension_labels in enumerate(units_labels['labels'] or []):
+                for dimension, dimension_labels in units_labels['labels'].iteritems():
+                    dimension_labels = dimension_labels.value.tolist()
                     for index, label_name in enumerate(dimension_labels):
                         label = property.labels.create(name=label_name, dimension=dimension, index=index)
                         label.save()
                 
         #options
-        for prop_name, val in options.iteritems():
+        for prop_name, val in md['options'].iteritems():
             if prop_name == 'processes' or prop_name == 'states':
                 continue
-            units = val['units']
-            value = val['value']
-            if isinstance(value, list):
-                for index in range(len(value)):
-                    option = batch.options.create(name = prop_name, units = units, value = value[index], index = index)
+            units = val.attrs['units']
+            value = val.value
+            if isinstance(value, numpy.ndarray):
+                for index, index_value in enumerate(value):
+                    option = batch.options.create(name = prop_name, units = units, value = index_value, index = index)
+                    option.save()
             else:
                 option = batch.options.create(name = prop_name, units = units, value = value)
-            option.save()
+                option.save()
         
-        for process_name, props in options['processes'].iteritems():
+        for process_name, props in md['options']['processes'].iteritems():
             process = batch.processes.get(name = process_name)
             
             for prop_name, val in props.iteritems():
-                units = val['units']
-                value = val['value']
-                if isinstance(value, list):
-                    for index in range(len(value)):
-                        option = batch.options.create(process = process, name = prop_name, units = units, value = value[index], index = index)
+                units = val.attrs['units']
+                value = val.value
+                if isinstance(value, numpy.ndarray):  
+                    for index, index_value in enumerate(value):
+                        option = batch.options.create(process = process, name = prop_name, units = units, value = index_value, index = index)
+                        option.save()
                 else:
                     option = batch.options.create(process = process, name = prop_name, units = units, value = value)
-                option.save()
+                    option.save()
         
-        for state_name, props in options['states'].iteritems():
+        for state_name, props in md['options']['states'].iteritems():
             state = batch.states.get(name = state_name)
             
             for prop_name, val in props.iteritems():
-                units = val['units']
-                value = val['value']
-                if isinstance(value, list):
-                    for index in range(len(value)):
-                        option = batch.options.create(state = state, name = prop_name, units = units, value = value[index], index = index)
+                units = val.attrs['units']
+                value = val.value
+                if isinstance(value, numpy.ndarray):  
+                    for index, index_value in enumerate(value):
+                        option = batch.options.create(state = state, name = prop_name, units = units, value = index_value, index = index)
+                        option.save()
                 else:
                     option = batch.options.create(state = state, name = prop_name, units = units, value = value)
-                option.save()
+                    option.save()
         
         #parameters
-        for prop_name, val in parameters.iteritems():
+        for prop_name, val in md['parameters'].iteritems():
             if prop_name == 'processes' or prop_name == 'states':
                 continue
-            units = val['units']
-            value = val['value']
-            if isinstance(value, list):
-                for index in range(len(value)):
-                    parameter = batch.parameters.create(name = prop_name, units = units, value = value[index], index = index)
+            units = val.attrs['units']
+            value = val.value
+            if isinstance(value, numpy.ndarray):  
+                for index, index_value in enumerate(value):
+                    parameter = batch.parameters.create(name = prop_name, units = units, value = index_value, index = index)
+                    parameter.save()
             else:
                 parameter = batch.parameters.create(name = prop_name, units = units, value = value)
-            parameter.save()
+                parameter.save()
         
-        for process_name, props in parameters['processes'].iteritems():
+        for process_name, props in md['parameters']['processes'].iteritems():
             process = batch.processes.get(name = process_name)
             
             for prop_name, val in props.iteritems():  
-                units = val['units']
-                value = val['value']
-                if isinstance(value, list):
-                    for index in range(len(value)):
-                        parameter = batch.parameters.create(process = process, name = prop_name, units = units, value = value[index], index = index)
+                units = val.attrs['units']
+                value = val.value
+                if isinstance(value, numpy.ndarray):  
+                    for index, index_value in enumerate(value):
+                        parameter = batch.parameters.create(process = process, name = prop_name, units = units, value = index_value, index = index)
+                        parameter.save()
                 else:
                     parameter = batch.parameters.create(process = process, name = prop_name, units = units, value = value)
-                parameter.save()
+                    parameter.save()
         
-        for state_name, props in parameters['states'].iteritems():
+        for state_name, props in md['parameters']['states'].iteritems():
             state = batch.states.get(name = state_name)
             
             for prop_name, val in props.iteritems():
-                units = val['units']
-                value = val['value']
-                if isinstance(value, list):
-                    for index in range(len(value)):
-                        parameter = batch.parameters.create(state = state, name = prop_name, units = units, value = value[index], index = index)
+                units = val.attrs['units']
+                value = val.value
+                if isinstance(value, numpy.ndarray):  
+                    for index, index_value in enumerate(value):
+                        parameter = batch.parameters.create(state = state, name = prop_name, units = units, value = index_value, index = index)
+                        parameter.save()
                 else:
                     parameter = batch.parameters.create(state = state, name = prop_name, units = units, value = value)
-                parameter.save()
+                    parameter.save()
         
         return batch
         

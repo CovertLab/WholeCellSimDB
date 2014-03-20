@@ -1,9 +1,6 @@
 '''
 >> python wcdbcli/save_simulation.py \
-    "Mycoplasma genitalium" \
-    "2011_10_19_02_53_45"
-    "/home/projects/WholeCell/simulation/output/runSimulation/2011_10_19_02_53_45/1" \
-    "1"
+    "/home/projects/WholeCell/simulation/output/runSimulation/2011_10_19_02_53_45/1" 
 '''
 
 import os
@@ -17,16 +14,7 @@ setup_environ(settings)
 from helpers import save_simulation
 
 def main():
-    opts = {}
-    if len(sys.argv) >= 6:
-        opts['expand_sparse_mat'] = bool(float(sys.argv[5]))
-
-    save_simulation(
-        organism_name = sys.argv[1],
-        batch_name = sys.argv[2],
-        sim_dir = sys.argv[3],        
-        batch_index = int(float(sys.argv[4])),
-        **opts)
+    save_simulation(sim_dir = sys.argv[1])
     
 if __name__=="__main__":
     main()

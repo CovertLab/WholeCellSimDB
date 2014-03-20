@@ -608,7 +608,7 @@ def get_data_series(request):
         data = property_value.get_dataset_slice(row, col)
         
         if format == 'hdf5':
-            dset = data_series.create_dataset('%s/%s/%d/%s/%s%s%s' % (organism.name, batch.name, simulation.batch_index, state.name, property.name, '/%s' % row.name if row is not None else '', '/%s' % col.name if col is not None else ''),
+            dset = data_series.create_dataset('%s/%s/%d/%s/%s%s%s/data' % (organism.name, batch.name, simulation.batch_index, state.name, property.name, '/%s' % row.name if row is not None else '', '/%s' % col.name if col is not None else ''),
                 data = data,
                 compression = "gzip",
                 compression_opts = 4,
@@ -706,7 +706,7 @@ def state_download(request, state_name):
                 if pv.shape is None:
                     continue
                     
-                dset = tmp_file.create_dataset('%s/%s/%d/%s/%s' % (batch.organism.name, batch.name, pv.simulation.batch_index, state.name, prop.name),
+                dset = tmp_file.create_dataset('%s/%s/%d/%s/%s/data' % (batch.organism.name, batch.name, pv.simulation.batch_index, state.name, prop.name),
                     data = pv.dataset,
                     compression = "gzip",
                     compression_opts = 4,
@@ -734,7 +734,7 @@ def state_property_download(request, state_name, property_name):
             if pv.shape is None:
                 continue
                 
-            dset = tmp_file.create_dataset('%s/%s/%d/%s/%s' % (batch.organism.name, batch.name, pv.simulation.batch_index, state_name, prop.name),
+            dset = tmp_file.create_dataset('%s/%s/%d/%s/%s/data' % (batch.organism.name, batch.name, pv.simulation.batch_index, state_name, prop.name),
                 data = pv.dataset,
                 compression = "gzip",
                 compression_opts = 4,
@@ -766,7 +766,7 @@ def state_property_row_download(request, state_name, property_name, row_name):
             shape = list(pv.shape)
             shape[0] = 1
             
-            dset = tmp_file.create_dataset('%s/%s/%d/%s/%s%s' % (batch.organism.name, batch.name, pv.simulation.batch_index, state_name, property_name, '/%s' % row_name if row_name else ''),
+            dset = tmp_file.create_dataset('%s/%s/%d/%s/%s%s/data' % (batch.organism.name, batch.name, pv.simulation.batch_index, state_name, property_name, '/%s' % row_name if row_name else ''),
                 data = pv.dataset[row.index, ...],
                 shape = shape,
                 compression = "gzip",
@@ -803,7 +803,7 @@ def state_property_row_col_batch_download(request, state_name, property_name, ro
         
         for pv in prop.values.all():
             sim = pv.simulation
-            pathname = '%s/%s/%d/%s/%s%s%s' % (batch.organism.name, batch.name, sim.batch_index, state_name, property_name, '/%s' % row_name if row_name else '', '/%s' % col_name if col_name else '', )
+            pathname = '%s/%s/%d/%s/%s%s%s/data' % (batch.organism.name, batch.name, sim.batch_index, state_name, property_name, '/%s' % row_name if row_name else '', '/%s' % col_name if col_name else '', )
             dset = tmp_file.create_dataset(pathname, 
                 data = pv.get_dataset_slice(row, col),
                 compression = "gzip",
