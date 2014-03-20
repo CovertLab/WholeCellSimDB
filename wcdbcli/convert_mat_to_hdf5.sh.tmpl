@@ -5,9 +5,9 @@
 
 #resources
 #PBS -l walltime=2:00:00
-#PBS -l nodes=1:ppn=4
-#PBS -l mem=5gb
-#PBS -l vmem=12gb
+#PBS -l nodes=1:ppn=8
+#PBS -l mem=12gb
+#PBS -l vmem=24gb
 
 #log
 #PBS -o <TMPL_VAR NAME=sim_dir>/convert_mat_to_hdf5.out.log
@@ -34,7 +34,7 @@ chmod -R 664 sim-data/data.h5
 cp sim-data/data.h5 <TMPL_VAR NAME=sim_dir>
 
 #cleanup
-rm -rf <TMPL_VAR NAME=nodeTmpDir>/$PBS_JOBID
+rm -rf <TMPL_VAR NAME=nodeTmpDir>/$PBS_JOBID/*
 rm -rf $MCR_CACHE_ROOT/*
 
 #resources
