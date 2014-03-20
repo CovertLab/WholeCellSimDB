@@ -34,6 +34,9 @@ Created: 2013-09-13
     <li><p>mod_wsgi</p></li>
     <li><p>mysql</p></li>
     <li><p>python 2.7</p></li>
+    <li><p>python-numpy</p></li>
+    <li><p>python-scipy</p></li>
+    <li><p>python-matplotlib</p></li>
     <li><p>xapian</p></li>
     </ul></li>
 <li><p>Install the required python packages:</p>
@@ -44,6 +47,7 @@ Created: 2013-09-13
     <li><p>h5py</p></li>
     <li><p>numpy</p></li>
     <li><p>pytz</p></li>
+    <li><p>scipy</p></li>
     <li><p>u-msgpack-python</p></li>
     </ul></li>
 <li><p>Create a new database and a new user, and grant the new user priveleges to the new database:
@@ -58,14 +62,14 @@ mysql &gt;&gt; flush privileges;
 <li><p>Create a directory to store the HDF5 simulation data, and grant permissions to the webserver daemon:
     <pre>
 mkdir /path/to/WholeCellDB/wcdb/data
-sudo chown :www-data /path/to/WholeCellDB/wcdb/data
+sudo chown :&lt;apache-user&gt;. /path/to/WholeCellDB/wcdb/data
 sudo chmod ug+rw /path/to/WholeCellDB/wcdb/data
 </pre>
     </p></li>
 <li><p>Create a temporary directory, and grant permissions to the webserver daemon:
     <pre>
 mkdir /path/to/WholeCellDB/tmp
-sudo chown :www-data /path/to/WholeCellDB/tmp
+sudo chown :&lt;apache-user&gt;. /path/to/WholeCellDB/tmp
 sudo chmod ug+rw /path/to/WholeCellDB/tmp
 </pre>
     </p></li>
@@ -158,7 +162,7 @@ for batch in batches:
 <li><p>Build search indices and grant permissions to webserver daemon:
     <pre>
 python manage.py rebuild_index
-sudo chown -R :www-data /path/to/WholeCellDB/wcdbsearch/indexes
+sudo chown -R :&lt;apache-user&gt;. /path/to/WholeCellDB/wcdbsearch/indexes
 sudo chmod ug+rw /path/to/WholeCellDB/wcdbsearch/indexes
 </pre>
     </p></li>
