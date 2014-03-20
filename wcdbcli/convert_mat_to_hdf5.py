@@ -14,22 +14,23 @@ import tempfile
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
 
 from WholeCellDB import settings
-from django.core.management import setup_environ
-setup_environ(settings)
 
 def main():
     organism = sys.argv[1]
     name = sys.argv[2]
     sim_dir = sys.argv[3]
     batch_index = int(float(sys.argv[4]))
-    path_to_mcr = sys.argv[5] if len(sys.argv) >= 6 else '/usr/local/bin/MATLAB/MATLAB_Compiler_Runtime/v80'
+    path_to_mcr = sys.argv[5] if len(sys.argv) >= 6 else '/usr/local/bin/MATLAB/MATLAB_Compiler_Runtime/v81'
     expand_sparse_mat = bool(float(sys.argv[6])) if len(sys.argv) >= 7 else True
+    tmp_dir = sys.argv[7] if len(sys.argv) >= 8 else settings.TMP_DIR
+    
+    excluded_properties = ['Metabolite/processAllocations', 'Metabolite/processRequirements', 'Metabolite/processUsages']
     
     #create h5 file
     h5file = h5py.File(os.path.join(sim_dir, 'data.h5'), 'w')
-
+    
     #load metadata
-    md = scipy.io.loadmat(os.path.join(sim_dir, 'metadata.mat'))    
+    md = scipy.io.loadmat(os.path.join(sim_dir, 'metadata.mat'))
     h5file.attrs['batch__organism__name'] = organism
     h5file.attrs['batch__organism_version'] = str(md['revision'][0][0])
     h5file.attrs['batch__name'] = name
@@ -51,8 +52,8 @@ def main():
             continue
         if isinstance(val['value'], dict):
             val['value'] = str(val['value'])
-        dset = group.create_dataset(prop_name, data=val['value'] or '')
-        dset.attrs['units'] = val['units'] or ''
+        dset = group.create_dataset(prop_name, data=str(val['value'] or ''))
+        dset.attrs['units'] = str(val['units'] or '')
     
     sub_group = group.create_group('processes')
     for process_name, props in options['processes'].iteritems():
@@ -60,18 +61,18 @@ def main():
         for prop_name, val in props.iteritems():
             if isinstance(val['value'], dict):
                 val['value'] = str(val['value'])
-            dset = sub_sub_group.create_dataset(prop_name, data=val['value'] or '')
-            dset.attrs['units'] = val['units'] or ''
-            
+            dset = sub_sub_group.create_dataset(prop_name, data=str(val['value'] or ''))
+            dset.attrs['units'] = str(val['units'] or '')
+    
     sub_group = group.create_group('states')
     for state_name, props in options['states'].iteritems():
         sub_sub_group = sub_group.create_group(state_name)
         for prop_name, val in props.iteritems():
             if isinstance(val['value'], dict):
                 val['value'] = str(val['value'])
-            dset = sub_sub_group.create_dataset(prop_name, data=val['value'] or '')
-            dset.attrs['units'] = val['units'] or ''
-            
+            dset = sub_sub_group.create_dataset(prop_name, data=str(val['value'] or ''))
+            dset.attrs['units'] = str(val['units'] or '')
+    
     #parameters
     parameters = load_parameters(sim_dir)
     group = h5file.create_group('parameters')
@@ -80,8 +81,8 @@ def main():
             continue
         if isinstance(val['value'], dict):
             val['value'] = str(val['value'])
-        dset = group.create_dataset(prop_name, data=val['value'] or '')
-        dset.attrs['units'] = val['units'] or ''
+        dset = group.create_dataset(prop_name, data=str(val['value'] or ''))
+        dset.attrs['units'] = str(val['units'] or '')
     
     sub_group = group.create_group('processes')
     for process_name, props in parameters['processes'].iteritems():
@@ -89,31 +90,34 @@ def main():
         for prop_name, val in props.iteritems():
             if isinstance(val['value'], dict):
                 val['value'] = str(val['value'])
-            dset = sub_sub_group.create_dataset(prop_name, data=val['value'] or '')
-            dset.attrs['units'] = val['units'] or ''
-            
+            dset = sub_sub_group.create_dataset(prop_name, data=str(val['value'] or ''))
+            dset.attrs['units'] = str(val['units'] or '')
+    
     sub_group = group.create_group('states')
     for state_name, props in parameters['states'].iteritems():
         sub_sub_group = sub_group.create_group(state_name)
         for prop_name, val in props.iteritems():
             if isinstance(val['value'], dict):
                 val['value'] = str(val['value'])
-            dset = sub_sub_group.create_dataset(prop_name, data=val['value'] or '')
-            dset.attrs['units'] = val['units'] or ''
-        
-    #states
+            dset = sub_sub_group.create_dataset(prop_name, data=str(val['value'] or ''))
+            dset.attrs['units'] = str(val['units'] or '')
+    
+    #processes
     group = h5file.create_group('processes')
     for process_name in parameters['processes'].keys():
         group.create_group(process_name)
-        
+    
     #flush
     h5file.flush()
     
     #load states
     states = load_states(sim_dir)
     
-    for state_name, props in states.iteritems():        
+    for state_name, props in states.iteritems():
+        sys.stdout.write('Saving %s ...' % state_name)
         for prop_name, units_labels in props.iteritems():
+            sys.stdout.write('  %s' % prop_name)
+            
             h5file.create_group('states/%s/%s' % (state_name, prop_name))
             
             filename = os.path.join(sim_dir, 'state-%s-%s.mat' % (state_name, prop_name))
@@ -129,19 +133,18 @@ def main():
             elif 'None' in mat_data and \
                 expand_sparse_mat and \
                 isinstance(mat_data['None'], scipy.io.matlab.mio5_params.MatlabOpaque) and \
-                mat_data['None'].tolist()[0][2] == 'edu.stanford.covert.util.SparseMat':
+                mat_data['None'].tolist()[0][2] == 'edu.stanford.covert.util.SparseMat' and \
+                ('%s/%s' % (state_name, prop_name)) not in excluded_properties:
                 
-                tmp_filedescriptor, tmp_filename = tempfile.mkstemp(dir=settings.TMP_DIR, suffix='.mat')
+                tmp_filedescriptor, tmp_filename = tempfile.mkstemp(dir=tmp_dir, suffix='.mat')
                 tmp_file = os.fdopen(tmp_filedescriptor, 'w')
                 tmp_file.close()
                 os.remove(tmp_filename)
                 tmp_filename_h5 = tmp_filename.replace('.mat', '.h5')
                 
-                matlab_cmd = "setWarnings(); setPath(); warning('on', 'MATLAB:save:sizeTooBigForMATFile'); in_filename='%s'; out_filename='%s'; out_filename_h5='%s'; try; in = load(in_filename); out.data = full(in.data); save(out_filename, '-struct', 'out'); [~, id] = lastwarn(); if strcmp(id, 'MATLAB:save:sizeTooBigForMATFile'); delete(out_filename); save(out_filename_h5, '-struct', 'out', '-v7.3'); end; end; exit;" % (filename, tmp_filename, tmp_filename_h5)
-                
-                subprocess.call('ssh covertlab-cluster "cd /home/projects/WholeCell/simulation; matlab -nodesktop -nosplash -r \\"%s\\" > /dev/null 2>&1"' % matlab_cmd, shell=True)
-                
-                #subprocess.call('run_expand_sparse_mat_executable.sh %s %s %s %s' % (path_to_mcr, filename, tmp_filename, tmp_filename_h5))
+                compiled_matlab_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'expand_sparse_mat', 'run_expand_sparse_mat.sh')
+                devnull = open('/dev/null', 'w')
+                subprocess.call([compiled_matlab_path, path_to_mcr, filename, tmp_filename, tmp_filename_h5], stdout=devnull, stderr=devnull)
                 
                 try:
                     if os.path.isfile(tmp_filename):
@@ -164,18 +167,18 @@ def main():
                                 chunks = True)
                         h5_data.close()
                     else:
-                        print '  Unable to load %s.%s' % (state_name, prop_name)
+                        sys.stdout.write('  Unable to load %s.%s' % (state_name, prop_name))
                 except:
-                    print '  Unable to load %s.%s' % (state_name, prop_name)
+                    sys.stdout.write('  Unable to load %s.%s' % (state_name, prop_name))
                     
                 if os.path.isfile(tmp_filename):
                     os.remove(tmp_filename)
                 if os.path.isfile(tmp_filename_h5):
-                    os.remove(tmp_filename_h5)        
+                    os.remove(tmp_filename_h5)
                 
             h5file.create_dataset(
                 'states/%s/%s/units' % (state_name, prop_name),
-                data = units_labels['units'] or '')
+                data = str(units_labels['units'] or ''))
                 
             h5file.create_group('states/%s/%s/labels' % (state_name, prop_name))
             for dim, dim_labels in enumerate(units_labels['labels'] or []):
@@ -190,8 +193,7 @@ def main():
     h5file.close()
     
 def load_options(sim_dir):
-    units_labels = loadmat(os.path.join(sim_dir, '..', 'units_labels.mat'))
-    
+    units_labels = loadmat(os.path.join(sim_dir, 'units_labels.mat'))
     option_vals = loadmat(os.path.join(sim_dir, 'options.mat'))
     
     options = {}
@@ -222,7 +224,7 @@ def load_options(sim_dir):
     return options
 
 def load_parameters(sim_dir):
-    units_labels = loadmat(os.path.join(sim_dir, '..', 'units_labels.mat'))
+    units_labels = loadmat(os.path.join(sim_dir, 'units_labels.mat'))
     parameter_vals = loadmat(os.path.join(sim_dir,  'parameters.mat'))
     
     parameters = {}
@@ -254,7 +256,7 @@ def load_parameters(sim_dir):
     return parameters
 
 def load_states(sim_dir):
-    units_labels = loadmat(os.path.join(sim_dir, '..', 'units_labels.mat'))
+    units_labels = loadmat(os.path.join(sim_dir, 'units_labels.mat'))
     
     states = {}
     for state_name, state in loadmat(os.path.join(sim_dir, 'state-0.mat'), False).iteritems():

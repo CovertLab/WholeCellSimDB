@@ -1,0 +1,45 @@
+#!/bin/sh
+
+#job
+#PBS -N convert_mat_to_hdf5-<TMPL_VAR NAME=batch_index>
+
+#resources
+#PBS -l walltime=2:00:00
+#PBS -l nodes=1:ppn=4
+#PBS -l mem=5gb
+#PBS -l vmem=12gb
+
+#log
+#PBS -o <TMPL_VAR NAME=sim_dir>/convert_mat_to_hdf5.out.log
+#PBS -e <TMPL_VAR NAME=sim_dir>/convert_mat_to_hdf5.err.log
+#PBS -W umask=002
+
+#staging
+#PBS -v TMPDIR=<TMPL_VAR NAME=nodeTmpDir>
+#PBS -W stagein=<TMPL_VAR NAME=nodeTmpDir>/$PBS_JOBID/@<TMPL_VAR NAME=storageServer>:<TMPL_VAR NAME=expand_sparse_mat>
+#PBS -W stagein=<TMPL_VAR NAME=nodeTmpDir>/$PBS_JOBID/sim-data/@<TMPL_VAR NAME=storageServer>:<TMPL_VAR NAME=sim_dir>
+
+#set environment
+export MATLAB_PREFDIR=/tmp/emptydir
+export MCR_CACHE_ROOT=/tmp/mcr_cache_$PBS_JOBID
+mkdir -p $MCR_CACHE_ROOT
+
+#job
+cd <TMPL_VAR NAME=nodeTmpDir>/$PBS_JOBID
+mkdir tmp
+`<TMPL_VAR NAME=cmd> "<TMPL_VAR NAME=organism>" "<TMPL_VAR NAME=batch_name>" sim-data <TMPL_VAR NAME=batch_index> <TMPL_VAR NAME=pathToRunTime> 1 tmp`
+
+#set permissions, store data
+chmod -R 664 sim-data/data.h5
+cp sim-data/data.h5 <TMPL_VAR NAME=sim_dir>
+
+#cleanup
+rm -rf <TMPL_VAR NAME=nodeTmpDir>/$PBS_JOBID
+rm -rf $MCR_CACHE_ROOT/*
+
+#resources
+echo ""
+echo "=============="
+echo "=== status ==="
+echo "=============="
+qstat -f $PBS_JOBID
