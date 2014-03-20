@@ -47,7 +47,17 @@ def index(request):
     batch = models.SimulationBatch.objects.all()[0]
     state = batch.states.get(name='MetabolicReaction')
     prop = state.properties.get(name='growth')
-    default_data_series = [{'organism': batch.organism, 'simulation_batch': batch, 'simulation': sim, 'state': state, 'property': prop, 'row': None, 'col': None} for sim in batch.simulations.all()]
+    default_data_series = []
+    for sim in batch.simulations.all()[:5]:
+        default_data_series.append({
+            'organism': batch.organism, 
+            'simulation_batch': batch, 
+            'simulation': sim, 
+            'state': state, 
+            'property': prop, 
+            'row': None, 
+            'col': None,
+            })
     
     return render_template('index.html', request, data = {
             'summary': summary,
