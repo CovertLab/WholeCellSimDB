@@ -140,9 +140,9 @@ def main():
             h5file.flush()
             
             if load_property_status:
-                sys.stdout.write('done\n' % prop_name)
+                sys.stdout.write('done\n')
             else:
-                sys.stdout.write('unable to load data\n' % prop_name)
+                sys.stdout.write('unable to load data\n')
             sys.stdout.flush()
     
     #save h5 file
