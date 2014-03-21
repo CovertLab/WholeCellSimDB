@@ -719,7 +719,7 @@ def state_download(request, state_name):
                     continue
                     
                 dset = tmp_file.create_dataset('%s/%s/%d/%s/%s/data' % (batch.organism.name, batch.name, pv.simulation.batch_index, state.name, prop.name),
-                    data = pv.dataset,
+                    data = pv.dataset.data,
                     compression = "gzip",
                     compression_opts = 4,
                     chunks = True)
@@ -747,7 +747,7 @@ def state_property_download(request, state_name, property_name):
                 continue
                 
             dset = tmp_file.create_dataset('%s/%s/%d/%s/%s/data' % (batch.organism.name, batch.name, pv.simulation.batch_index, state_name, prop.name),
-                data = pv.dataset,
+                data = pv.dataset.data,
                 compression = "gzip",
                 compression_opts = 4,
                 chunks = True)
