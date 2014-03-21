@@ -114,67 +114,17 @@ def main():
     states = load_states(sim_dir)
     
     for state_name, props in states.iteritems():
-        sys.stdout.write('Saving %s ...' % state_name)
+        sys.stdout.write('Saving %s ...\n' % state_name)
+        sys.stdout.flush()
+        
         for prop_name, units_labels in props.iteritems():
-            sys.stdout.write('  %s' % prop_name)
+            sys.stdout.write('  %s ... ' % prop_name)
+            sys.stdout.flush()
             
             h5file.create_group('states/%s/%s' % (state_name, prop_name))
             
             filename = os.path.join(sim_dir, 'state-%s-%s.mat' % (state_name, prop_name))
-            mat_data = scipy.io.loadmat(filename)
-            
-            if 'data' in mat_data:
-                dset = h5file.create_dataset(
-                    'states/%s/%s/data' % (state_name, prop_name),
-                    data = mat_data['data'],
-                    compression = "gzip",
-                    compression_opts = 4, 
-                    chunks = True)
-            elif 'None' in mat_data and \
-                expand_sparse_mat and \
-                isinstance(mat_data['None'], scipy.io.matlab.mio5_params.MatlabOpaque) and \
-                mat_data['None'].tolist()[0][2] == 'edu.stanford.covert.util.SparseMat' and \
-                ('%s/%s' % (state_name, prop_name)) not in excluded_properties:
-                
-                tmp_filedescriptor, tmp_filename = tempfile.mkstemp(dir=tmp_dir, suffix='.mat')
-                tmp_file = os.fdopen(tmp_filedescriptor, 'w')
-                tmp_file.close()
-                os.remove(tmp_filename)
-                tmp_filename_h5 = tmp_filename.replace('.mat', '.h5')
-                
-                compiled_matlab_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'expand_sparse_mat', 'run_expand_sparse_mat.sh')
-                devnull = open('/dev/null', 'w')
-                subprocess.call([compiled_matlab_path, path_to_mcr, filename, tmp_filename, tmp_filename_h5], stdout=devnull, stderr=devnull)
-                
-                try:
-                    if os.path.isfile(tmp_filename):
-                        mat_data = scipy.io.loadmat(tmp_filename)
-                        if 'data' in mat_data:
-                            dset = h5file.create_dataset(
-                                'states/%s/%s/data' % (state_name, prop_name),
-                                data = mat_data['data'],
-                                compression = "gzip",
-                                compression_opts = 4, 
-                                chunks = True)
-                    elif os.path.isfile(tmp_filename_h5):
-                        h5_data = h5py.File(tmp_filename_h5, 'r')
-                        if 'data' in h5_data:
-                            dset = h5file.create_dataset(
-                                'states/%s/%s/data' % (state_name, prop_name),
-                                data = h5_data['data'],
-                                compression = "gzip",
-                                compression_opts = 4, 
-                                chunks = True)
-                        h5_data.close()
-                    else:
-                        sys.stdout.write('  Unable to load %s.%s' % (state_name, prop_name))
-                except:
-                    sys.stdout.write('  Unable to load %s.%s' % (state_name, prop_name))
-                    
-                if os.path.isfile(tmp_filename):
-                    os.remove(tmp_filename)
-                if os.path.isfile(tmp_filename_h5):
-                    os.remove(tmp_filename_h5)
+            load_property_status = load_property(filename, h5file, state_name, prop_name, excluded_properties, expand_sparse_mat, tmp_dir, path_to_mcr)                
                 
             h5file.create_dataset(
                 'states/%s/%s/units' % (state_name, prop_name),
@@ -188,6 +138,12 @@ def main():
             
             #flush h5 file to disk
             h5file.flush()
+            
+            if load_property_status:
+                sys.stdout.write('done\n' % prop_name)
+            else:
+                sys.stdout.write('unable to load data\n' % prop_name)
+            sys.stdout.flush()
     
     #save h5 file
     h5file.close()
@@ -283,6 +239,70 @@ def load_states(sim_dir):
             states[state_name][prop_name] = {'units': units, 'labels': labels}
     
     return states
+    
+def load_property(filename, h5file, state_name, prop_name, excluded_properties, expand_sparse_mat, tmp_dir, path_to_mcr):
+    if not os.path.isfile(filename):
+        return False
+    
+    try:
+        mat_data = scipy.io.loadmat(filename)
+        
+        if 'data' in mat_data:
+            dset = h5file.create_dataset(
+                'states/%s/%s/data' % (state_name, prop_name),
+                data = mat_data['data'],
+                compression = "gzip",
+                compression_opts = 4, 
+                chunks = True)
+        elif 'None' in mat_data and \
+            expand_sparse_mat and \
+            isinstance(mat_data['None'], scipy.io.matlab.mio5_params.MatlabOpaque) and \
+            mat_data['None'].tolist()[0][2] == 'edu.stanford.covert.util.SparseMat' and \
+            ('%s/%s' % (state_name, prop_name)) not in excluded_properties:
+            
+            tmp_filedescriptor, tmp_filename = tempfile.mkstemp(dir=tmp_dir, suffix='.mat')
+            tmp_file = os.fdopen(tmp_filedescriptor, 'w')
+            tmp_file.close()
+            os.remove(tmp_filename)
+            tmp_filename_h5 = tmp_filename.replace('.mat', '.h5')
+            
+            compiled_matlab_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'expand_sparse_mat', 'run_expand_sparse_mat.sh')
+            devnull = open('/dev/null', 'w')
+            subprocess.call([compiled_matlab_path, path_to_mcr, filename, tmp_filename, tmp_filename_h5], stdout=devnull, stderr=devnull)
+            
+            try:
+                if os.path.isfile(tmp_filename):
+                    mat_data = scipy.io.loadmat(tmp_filename)
+                    if 'data' in mat_data:
+                        dset = h5file.create_dataset(
+                            'states/%s/%s/data' % (state_name, prop_name),
+                            data = mat_data['data'],
+                            compression = "gzip",
+                            compression_opts = 4, 
+                            chunks = True)
+                elif os.path.isfile(tmp_filename_h5):
+                    h5_data = h5py.File(tmp_filename_h5, 'r')
+                    if 'data' in h5_data:
+                        dset = h5file.create_dataset(
+                            'states/%s/%s/data' % (state_name, prop_name),
+                            data = h5_data['data'],
+                            compression = "gzip",
+                            compression_opts = 4, 
+                            chunks = True)
+                    h5_data.close()
+                else:
+                    return False
+            except:
+                return False
+                
+            if os.path.isfile(tmp_filename):
+                os.remove(tmp_filename)
+            if os.path.isfile(tmp_filename_h5):
+                os.remove(tmp_filename_h5)
+    except NotImplementedError:
+        return False
+        
+    return True
 
 def loadmat(filename, throw_error_on_unknown_data_format=True):
     data = scipy.io.loadmat(filename, struct_as_record=False)
