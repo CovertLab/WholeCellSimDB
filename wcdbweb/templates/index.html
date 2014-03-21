@@ -20,6 +20,8 @@ Created: 2013-09-13
 <li><p>Ribome positions.</p></li>
 </ul>
 
+<p>WholeCellDB provides a simple graphical interface to search and browse simulations, including all of the metadata needed to reproduce simulations. WholeCellDB also provides three plotting applets to enable researchers to preview simulations. Reseachers can download entire simulations and groups of simulations from WholeCellKB in <a href="http://www.hdfgroup.org/HDF5/">HDF5</a> format. In addition, researchers can obtain the simulation metadata needed to reproduce simulations in <a href="http://sed-ml.org/">SED-ML</a> format.</p>
+
 <p>WholeCellDB currently contains data from a single whole-cell model of the Gram-positive bacterium and human pathogen <i>Mycoplasma genitalium</i>.</p>
 </div>
 
@@ -75,13 +77,15 @@ Created: 2013-09-13
 
 <div>
 <h1>Getting started?</h1>
-<p>Please view the <a href="{% url wcdbweb.views.tutorial %}">tutorial</a> and <a href="{% url wcdbweb.views.help %}">help</a> pages for help getting started.</p>
+<p>Please use the "Browse" and "Search" menus at the top-left to browse and search simulations. In addition, please use the plotting tool below to preview simulations.</p>
+
+<p>Please view the <a href="{% url wcdbweb.views.tutorial %}">tutorial</a> and <a href="{% url wcdbweb.views.help %}">help</a> pages for further help, or contact us at <a href="mailto:wholecell[at]lists.stanford.edu">wholecell@lists.stanford.edu</a>.</p>
 </div>
 
 <div>
-<h1>Browse data</h1>
+<h1>Preview simulations</h1>
 
-<h2>1. Select data</h2>
+<h2>1. Select simulations and predicted phenotypes</h2>
 <div class="data-series">
     <div class="twocolumns">
         <div class="left">
@@ -200,7 +204,7 @@ $(".data-series-list").jqxListBox({
     })
 </script>
 
-<h2>2. Visualize</h2>
+<h2>2. Visualize selected phenotypes</h2>
 <div class="plot-container"></div>
 <script language="javascript" type="text/javascript">
 var options = {
@@ -286,7 +290,10 @@ var setData = function(data) {
     }
     
     var series = [];
+    var xaxisMax = 0;
     for (var i = 0; i < data.length; i++) {
+        xaxisMax = Math.max(xaxisMax, data[i].data.length);
+        
         timePoints = [];
         for (j = 0; j < data[i].data.length; j++) {
             timePoints.push([(j * downsample_step + 1)/ 3600, data[i].data[j]]);
@@ -305,6 +312,8 @@ var setData = function(data) {
             });
     }
     plot.setData(series);
+    plot.getOptions().xaxes[0].max = xaxisMax/3600;
+    plot.setupGrid();
     plot.draw();
     
     plotContainer.find('.info > .content > .details').html('Downsampling: ' + downsample_step + ' s');
