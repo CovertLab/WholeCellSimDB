@@ -75,7 +75,10 @@ Created: 2013-09-16
             <td><a href="{% url wcdbweb.views.simulation_batch id=batch.id %}">{{ batch.name }}</a></td>
             <td>{{ batch.simulations.all|length }}</td>
             <td>{{ batch.date|date:"M j, Y" }}</td>
-            <td><a href="{% url wcdbweb.views.simulation_batch_download id=batch.id %}">HDF5</a></td>
+            <td>
+                <a href="{% url wcdbweb.views.simulation_batch_download id=batch.id %}">HDF5</a> | 
+                <a href="{% url wcdbweb.views.simulation_batch_sedml id=batch.id %}">SED-ML</a>
+            </td>
         </tr>
         {% endfor %}
     </tbody>

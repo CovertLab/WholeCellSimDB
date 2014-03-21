@@ -2,6 +2,8 @@ from django.core.exceptions import ValidationError
 from django.core.servers.basehttp import FileWrapper
 from django.db.models import Avg, Count, Min, Max
 from django.http import HttpResponse
+from django.shortcuts import render_to_response
+from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django.utils import simplejson
 from django.views.decorators.csrf import csrf_protect
@@ -884,6 +886,43 @@ def state_property_row_col_batch_download(request, state_name, property_name, ro
 def investigator_download(request, id):
     investigator = models.Investigator.objects.get(id=id)    
     return helpers.download_batches(investigator.simulation_batches.all(), investigator.user.get_full_name())
+    
+### SED-ML    
+def simulation_batch_sedml(request, id):
+    batch = models.SimulationBatch.objects.get(id=id)
+
+    response = render_to_response('sedml.xml', 
+        {
+            'batch': batch,
+            'batch__lengthSec': batch.options.get(name='lengthSec', state__isnull=True, process__isnull=True).value,
+            'batch__options__seeds': batch.options.filter(name='seed'),
+            'simulation': None,
+            'model': {
+                'language': 'urn:sedml:language:matlab',
+                'source': 'http://covertlab.stanford.edu/svn/WholeCell/simulation/?p=%s' % batch.organism_version
+                }, 
+        }, context_instance = RequestContext(request), mimetype = 'application/xml')
+    #response['Content-Disposition'] = ("attachment; filename=simulation_batch-%d.sed-ml.xml" % batch.id)
+    return response
+   
+def simulation_sedml(request, id):
+    simulation = models.Simulation.objects.get(id=id)
+    batch = simulation.batch
+
+    response = render_to_response('sedml.xml', 
+        {
+            'batch': batch,
+            'batch__lengthSec': batch.options.get(name='lengthSec', state__isnull=True, process__isnull=True).value,
+            'batch__options__seeds': batch.options.filter(name='seed'),
+            'simulation': simulation,
+            'model': {
+                'language': 'urn:sedml:language:matlab',
+                'source': 'http://covertlab.stanford.edu/svn/WholeCell/simulation/?p=%s' % batch.organism_version
+                }, 
+        }, context_instance = RequestContext(request), mimetype = 'application/xml')
+    #response['Content-Disposition'] = ("attachment; filename=simulation-%d.sed-ml.xml" % simulation.id)
+    return response
+    
     
 ###################
 ### searching

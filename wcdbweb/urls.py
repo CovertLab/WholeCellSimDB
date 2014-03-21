@@ -75,6 +75,9 @@ urlpatterns += patterns('wcdbweb.views',
     url(r'^investigator/(?P<id>[0-9]+)/download/*$', 'investigator_download'),
     url(r'^download/*$', 'download'),
     
+    url(r'^simulation_batch/(?P<id>[0-9]+)/sedml/*$', 'simulation_batch_sedml'),
+    url(r'^simulation/(?P<id>[0-9]+)/sedml/*$', 'simulation_sedml'),
+    
     #search
     url(r'^search_basic/*$', 'search_basic'),
     url(r'^search_advanced/*$', 'search_advanced'),    

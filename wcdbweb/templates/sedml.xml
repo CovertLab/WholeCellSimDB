@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sedML
+    xmlns="http://sed-ml.org/sed-ml/level1/version2" level="1" version="2"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://sed-ml.org/sed-ml-L1-V2.xsd"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:math="http://www.w3.org/1998/Math/MathML"
+    >
+    <notes>
+        <xhtml:p>Name: {{batch.name}}</xhtml:p>
+        <xhtml:p>Desciption: {{batch.description|linebreaks}}</xhtml:p>
+        {% if simulation %}
+        <xhtml:p>Batch index: {{simulation.batch_index}}</xhtml:p>
+        {% endif %}
+    </notes>
+    
+    <listOfModels>
+        <model id="model" language="{{model.language}}" source="{{model.source}}">
+            <notes>
+                <xhtml:p>Organism: {{batch.organism.name}}</xhtml:p>
+                <xhtml:p>Version: {{batch.organism_version}}</xhtml:p>
+            </notes>
+            
+            <listOfChanges>
+                {% for option in batch.options.all %}
+                <changeAttribute target="{% if option.state %}states.{{option.state.name}}.{% elif option.process %}processes.{{option.process.name}}.{% endif %}{{option.name}}/@value[{{option.index}}]" newValue="{{option.value}}"/>
+                {% endfor %}
+                
+                {% for parameter in batch.parameters.all %}
+                <changeAttribute target="{% if parameter.state %}states.{{parameter.state.name}}.{% elif parameter.process %}processes.{{parameter.process.name}}.{% endif %}{{parameter.name}}/@value[{{parameter.index}}]" newValue="{{parameter.value}}"/>
+                {% endfor %}
+            </listOfChanges>
+        </model>
+    </listOfModels>
+    
+    <listOfSimulations>        
+        <uniformTimeCourse id="simulation" initialTime="0" outputStartTime="1" outputEndTime="{{batch__lengthSec}}" numberOfPoints="{{batch__lengthSec}}" >
+            <algorithm kisaoID="KISAO:0000037"/>
+        </uniformTimeCourse>
+    </listOfSimulations>
+
+    <listOfTasks>
+        <task id="run-simulation" name="run simulation" modelReference="model" simulationReference="simulation"/>
+        {% if not simulation %}
+        <repeatedTask id="run-simulation-batch" name="run batch of simulations" resetModel="true">
+            <listOfSubTasks>
+                <subTask task="run-simulation" />
+            </listOfSubTasks>
+        
+            <listofRanges>
+                <uniformRange id="seed-value" start="1" end="{{batch.simulations.count}}" numberOfPoints="{{batch.simulations.count}}" type="linear" />
+            </listofRanges>
+            
+            <listOfChanges>
+                {% for option in batch__options__seeds %}
+                <setValue modelReference="model" target="{% if option.state %}states.{{option.state.name}}.{% elif option.process %}processes.{{option.process.name}}.{% endif %}{{option.name}}/@value[{{option.index}}]" range="seed-value">
+                    <math:math>
+                        <ci>seed-value</ci>
+                    </math:math>
+                </setValue>
+                {% endfor %}
+            </listOfChanges>               
+        </repeatedTask>
+        {% endif %}
+    </listOfTasks>
+    
+    <listOfDataGenerators>
+        {% for state in batch.states.all %}
+            {% for property in state.properties.all %}
+        <dataGenerator id="generator-{{state.name}}.{{property.name}}" name="{{state.name}}.{{property.name}}" />
+            {% endfor %}
+        {% endfor %}
+    </listOfDataGenerators>
+    
+</sedML>

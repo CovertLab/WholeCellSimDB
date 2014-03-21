@@ -47,7 +47,10 @@ Created: 2014-03-06
             <td><a href="{% url wcdbweb.views.investigator id=b.investigator.id %}">{{ b.investigator.user.get_full_name }}</a></td>
             <td>{{ b.date|date:"M j, Y" }}</td>
             <td>{{ s.length }}</td>
-            <td><a href="{% url wcdbweb.views.simulation_download id=s.id %}">HDF5</a></td>
+            <td>
+                <a href="{% url wcdbweb.views.simulation_download id=s.id %}">HDF5</a> | 
+                <a href="{% url wcdbweb.views.simulation_sedml id=s.id %}">SED-ML</a>
+            </td>
         </tr>
         {% endwith %}
         {% endfor %}        

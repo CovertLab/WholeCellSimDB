@@ -148,7 +148,10 @@ $(function() {
         <tr>
             <td><a href="{% url wcdbweb.views.simulation id=sim.id %}">{{ sim.batch_index }}</a></td>
             <td>{{ sim.length }}</td>
-            <td><a href="{% url wcdbweb.views.simulation_download id=sim.id %}">HDF5</a></td>
+            <td>
+                <a href="{% url wcdbweb.views.simulation_download id=sim.id %}">HDF5</a> | 
+                <a href="{% url wcdbweb.views.simulation_sedml id=sim.id %}">SED-ML</a>
+            </td>
         </tr>
         {% endfor %}
     </tbody>
@@ -159,5 +162,6 @@ $(function() {
 
 {% block action_icons %}
 <a href="{% url wcdbweb.views.simulation_batch_download id=batch.id %}"><img src="{% get_static_prefix %}img/hdf.png" alt="HDF5" title="HDF5"/></a>
+<a href="{% url wcdbweb.views.simulation_batch_sedml id=batch.id %}"><img src="{% get_static_prefix %}img/sed-ml.png" alt="SED-ML" title="SED-ML"/></a>
 {{ block.super }}
 {% endblock %}
