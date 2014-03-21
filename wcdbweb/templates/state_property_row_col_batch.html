@@ -93,7 +93,7 @@ var options = {
     },
     tooltip: true,
     tooltipOpts: {
-        content: function (series, x, y) {return 'Simulation-' + series + ' | Time: ' + x.toFixed(2) + ' h | {{y_axis.label|capfirst}}: ' + y + '{% if y_axis.units != None %} {{y_axis.units}}{% endif %}';}
+        content: function (series, x, y) {return 'Simulation-' + series + ' | Time: ' + x.toFixed(2) + ' h | {{y_axis.label|capfirst}}: ' + y + '{% if y_axis.units %} {{y_axis.units}}{% endif %}';}
     },
     grid: {
         hoverable: true,        

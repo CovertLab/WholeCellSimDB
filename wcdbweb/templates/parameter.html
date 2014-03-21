@@ -14,8 +14,8 @@ Created: 2014-03-10
 {% block head_title %}
 {{ block.super }}
  &rsaquo; Parameter
-{% if not process_name == None %} &rsaquo; {{process_name}}{% endif %}
-{% if not state_name == None %} &rsaquo; {{state_name}}{% endif %}
+{% if process_name %} &rsaquo; {{process_name}}{% endif %}
+{% if state_name %} &rsaquo; {{state_name}}{% endif %}
  &rsaquo; {{parameter_name}}
  {% endblock %}
 
@@ -23,8 +23,8 @@ Created: 2014-03-10
 
 <div>
 <h1><a href="{% url wcdbweb.views.list_parameters %}">Parameter</a>
-{% if not process_name == None %} &rsaquo; <a href="{% url wcdbweb.views.process process_name=process_name %}">{{process_name}}</a>{% endif %}
-{% if not state_name == None %} &rsaquo; <a href="{% url wcdbweb.views.state state_name=state_name %}">{{state_name}}</a>{% endif %}
+{% if process_name %} &rsaquo; <a href="{% url wcdbweb.views.process process_name=process_name %}">{{process_name}}</a>{% endif %}
+{% if state_name %} &rsaquo; <a href="{% url wcdbweb.views.state state_name=state_name %}">{{state_name}}</a>{% endif %}
  &rsaquo; {{parameter_name}}</h1>
 
 <table class="parameter">

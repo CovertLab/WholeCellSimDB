@@ -183,7 +183,7 @@ def list_options(request):
     options = models.Option.objects.all()
     
     organisms = models.Organism.objects.all().order_by('name')
-    simulation_batches = models.SimulationBatch.objects.order_by('organism__name', 'organism_version', 'name')
+    simulation_batches = models.SimulationBatch.objects.order_by('organism__name', 'name')
     simulation_batch_ids = [x[0] for x in simulation_batches.values_list('id')]
     
     options = {
@@ -902,7 +902,7 @@ def simulation_batch_sedml(request, id):
                 'source': 'http://covertlab.stanford.edu/svn/WholeCell/simulation/?p=%s' % batch.organism_version
                 }, 
         }, context_instance = RequestContext(request), mimetype = 'application/xml')
-    #response['Content-Disposition'] = ("attachment; filename=simulation_batch-%d.sed-ml.xml" % batch.id)
+    response['Content-Disposition'] = ("attachment; filename=simulation_batch-%d.sed-ml.xml" % batch.id)
     return response
    
 def simulation_sedml(request, id):
@@ -920,7 +920,7 @@ def simulation_sedml(request, id):
                 'source': 'http://covertlab.stanford.edu/svn/WholeCell/simulation/?p=%s' % batch.organism_version
                 }, 
         }, context_instance = RequestContext(request), mimetype = 'application/xml')
-    #response['Content-Disposition'] = ("attachment; filename=simulation-%d.sed-ml.xml" % simulation.id)
+    response['Content-Disposition'] = ("attachment; filename=simulation-%d.sed-ml.xml" % simulation.id)
     return response
     
     
