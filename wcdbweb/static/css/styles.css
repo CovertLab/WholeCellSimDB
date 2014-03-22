@@ -315,6 +315,8 @@ select.error {border-color:red;}
     background-color: #dedede;
     border:1px solid #999;
     padding:6px;
+    margin-top:0px;
+    margin-bottom:12px;
 }
 
 #content div table.twocol, #content div table.threecol, #content div table.fourcol {
@@ -942,6 +944,24 @@ select.error {border-color:red;}
 }
 .plot-container .info .content .title {font-weight:bold;}
 .plot-container .info .content .details {font-style:italic;}
+
+/****************
+ * help
+ ****************/
+#content #help div.section{
+    margin-bottom:24px;
+}
+#content #help div.section h3{
+    margin-bottom:2px;
+    margin-top:12px;
+}
+
+#content #help ul.hdf-schema span {font-family: "Courier New", Courier, monospace; padding:0px 2px 0px 2px;}
+#content #help ul.hdf-schema span.group {background: rgba(255, 0, 0, .3);}
+#content #help ul.hdf-schema span.dataset {background: rgba(0, 0, 255, .3);}
+#content #help ul.hdf-schema span.value {background: rgba(0, 255, 255, .3);}
+#content #help ul.hdf-schema span.attrs {background: rgba(0, 255, 0, .3);}
+#content #help ul.hdf-schema span.attr {background: #dedede;}
 
 /****************
  * tutorial

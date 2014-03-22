@@ -46,7 +46,7 @@ def index(request):
         'n_investigator': models.Investigator.objects.all().count(),        
     }
     
-    batch = models.SimulationBatch.objects.all()[0]
+    batch = models.SimulationBatch.objects.get(id=1)
     state = batch.states.get(name='MetabolicReaction')
     prop = state.properties.get(name='growth')
     default_data_series = []
@@ -585,11 +585,11 @@ def list_data_series(request):
     raise Exception('Cannot dig deeper into hierarchy')
     
 def get_data_series(request):
-    format = request.POST.get('format', 'hdf5')
+    format = request.GET.get('format') or request.POST.get('format') or 'hdf5'
     if format not in ['hdf5', 'json', 'bson', 'msgpack']:
         raise Exception('Invalid format')
     
-    data_series_requests = simplejson.loads(request.POST.get('data_series'))
+    data_series_requests = simplejson.loads(request.GET.get('data_series') or request.POST.get('data_series'))
     if len(data_series_requests) > 100:
         raise Exception('Queries are limited to 100 data series')
         
@@ -1258,7 +1258,9 @@ def tutorial(request):
     return render_template('tutorial.html', request)
     
 def help(request):
-    return render_template('help.html', request)
+    return render_template('help.html', request, data = {
+        'growth_property': models.Property.objects.get(name='growth', state__name='MetabolicReaction', state__simulation_batch__id=1),
+    })
     
 def about(request):
     return render_template('about.html', request)

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% comment %}
-About page
+Help page
 
 Author: Jonathan Karr, jkarr@stanford.edu
 Affiliation: Covert Lab, Department of Bioengineering, Stanford University
@@ -10,18 +10,68 @@ Created: 2013-09-13
 
 {% load static %}
 
-{% block head_title %}{{ block.super }} &rsaquo; About{% endblock %}
+{% block head_title %}{{ block.super }} &rsaquo; Help{% endblock %}
 
 {% block content %}
-<div>
+<div id="help">
+<h1>Help</h1>
+
+<div class="section">
 <a name="getting_started_users"></a>
-<h1>User's guide: browsing and searching simulations</h1>
-<p>WholeCellDB is very easy to use. Use the "browse" menu at the top-left to start browsing WholeCellDB, including all of the available in silico organisms and simulation batches.</p>
+<h2>User's guide</h2>
+
+<h3>Browsing</h3>
+<p>WholeCellDB is very easy to use. Use the "Browse" menu at the top-left to browse the organisms and simulation batches available in WholeCellDB.</p>
+
+<h3>Searching</h3>
+<p>Three methods are available to search WholeCellDB:
+<ul class="inparagraph">
+<li>Basic full-text search: use the search box at the top-right of each page to search the organism, simulation batch, and investigator metadata.</li>
+<li>Google full-text search: use the search box at the top-right of each page to search the entire WholeCellDB site.</li>
+<li>Advanced structured search: use the "Search" menu at the top-left to access the <a href="{% url wcdbweb.views.search_advanced %}">advanced search form</a> which allows users to search simulation batches by metadata, option and parameter values, and by modeled processes and states</li>
+</ul>
+</p>
+
+<h3>Visualizing simulations</h3>
+<p>Three methods are available to visualize predicted phenotypes:
+<ul class="inparagraph">
+<li>The <a href="{% url wcdbweb.views.index %}">home page</a> provides a graphical interface to browse all of the predicted phenotypes across all available simulations, and select up to ten to plot.</li>
+<li>The simulation pages (e.g. <a href="{% url wcdbweb.views.simulation id=1 %}">simulation #1</a>) provide a graphical interface to browse all of the predicted phenotypes for a given simulation, and select up to ten to plot.</li>
+<li>The batch-state pages (e.g. <a href="{% url wcdbweb.views.state_property_row_col_batch state_name=growth_property.state.name property_name=growth_property.name batch_id=growth_property.state.simulation_batch.id %}">Wild-type set #1 growth</a>) plot the predicted phenotype across all simulations within a batch.</li>
+</li>
+</ul>
+</p>
+
+<h3>Exporting simulations</h3>
+<p>Three methods are available to export simulations from WholeCellDB:
+<ul class="inparagraph">
+<li>Users can use the <a href="{% url wcdbweb.views.download %}">download form</a> to download simulations for selected simulation batches in HDF5 format.</li>
+<li>Users can use the HDF5 icon at the bottom-right of most pages to export the simulation data described on each page. This allows uers to export entire organisms, simulation batches, and  simulations. This also allows users to export states and properties across all simulations in WholeCellDB.</li>
+<li>Users can use the <a href='{% url wcdbweb.views.get_data_series %}?format=json&data_series=[{"simulation":1,"property":{{growth_property.id}},"row":"","col":""}]'>get_data_series web service</a> to export the predicted phenotype of a particular rows/columns of a particular states of a particular simulations in HDF5,  JSON, BSON, or MessagePack format. The web service requires two query parameters:
+    <ul>
+    <li>format: string indicating desired export format: "hdf5", "json", "bson", or "msgpack"</li>
+    <li>data_series: JSON formatted array indicating desired simulations/states. Each element of the array must be a object containing four fields:
+        <ul>
+        <li>simulation: integer indicating id of desired simulation</li>
+        <li>property: integer indicating id of desired state property</li>
+        <li>row: integer indicating id of desired state property row</li>
+        <li>col: integer indicating id of desired state property column</li>        
+        </ul>
+        </li>
+        Simulation, property, row, and column ids can be obtained using the <a href="{% url wcdbweb.views.list_data_series %}">list_data_series web service</a>.
+    </ul>
+    </li>
+</ul>
+</p>
+
+<p>See <a href="simulation-file-format">below</a> for more information about the HDF5 schema used to export simulations.</p>
+
 </div>
 
-<div>
+<div class="section">
 <a name="getting_started_developers"></a>
-<h1>Developer's guide: Installing your own WholeCellDB server and storing simulations</h1>
+<h2>Developer's guide</h2>
+<h3>Installing your own WholeCellDB server and storing simulations</h3>
 <p>Fellow the steps below to install WholeCellDB on your own server, and save simulations to your own WholeCellDB server. In addition, a fully configured version of WholeCellDB is available on the <a href="https://simtk.org/frs/outbound.php?fileid=3590">whole-cell virtual machine</a>.</p>
 
 <ol>
@@ -124,42 +174,7 @@ cd /path/to/WholeCellDB
 python manage.py syncdb
 </pre>
     </p></li>
-    
-<li><p>Load simulations into WholeCellDB
-    <ul>
-    <li><p>Load simulations via the command line interface:
-    <pre>
-cd /path/to/WholeCellDB
-python wcdbcli/save_simulation_batch.py "&lt;organism-name&gt;" "&lt;batch-1-name&gt;" /path/to/simulation-batch-1
-python wcdbcli/save_simulation_batch.py "&lt;organism-name&gt;" "&lt;batch-2-name&gt;" /path/to/simulation-batch-2
-python wcdbcli/save_simulation_batch.py "&lt;organism-name&gt;" "&lt;batch-3-name&gt;" /path/to/simulation-batch-3
-</pre>
-    </p></li>
-    <li><p>Alternatively, you can import the package into your Python application and use python methods
-    <pre>import sys
 
-# Add the project to your path.
-sys.path.append('/path/to/WholeCellDB')
-
-# Setup the environment using the projects settings.
-from WholeCellDB import settings
-from django.core.management import setup_environ
-setup_environ(settings)
-
-# Import the models
-from wcdb import models
-
-# Load simulation batches
-for batch in batches:
-    models.SimulationBatch.objects.create_simulation_batch(...)
-    
-    # Load individual simulations
-    for sim in batch.simulations:
-        models.Simulation.objects.create_simulation(...)        
-</pre></p></li>    
-    </ul></p></li>
-
-    
 <li><p>Build search indices and grant permissions to webserver daemon:
     <pre>
 python manage.py rebuild_index
@@ -170,11 +185,515 @@ sudo chmod ug+rw /path/to/WholeCellDB/wcdbsearch/indexes
     
 <li><p>Navigate to the WholeCellDB web frontend: <tt>http://domain/url/to/WholeCellDB</tt></p></li>
 </ol>
+
+<h3>Storing simulations</h3>
+<p>Simulations can be imported into WholeCellDB via either the command line or programmatic (Python) interface. Simulations must be saved using the format described <a href="#simulation-file-format">below</a>.</p>
+
+<p>This code snippet illustrates how to load simulations via the command line interface:
+<pre>
+cd /path/to/WholeCellDB
+python wcdbcli/save_simulation_batch.py "&lt;organism-name&gt;" "&lt;batch-1-name&gt;" /path/to/simulation-batch-1
+python wcdbcli/save_simulation_batch.py "&lt;organism-name&gt;" "&lt;batch-2-name&gt;" /path/to/simulation-batch-2
+python wcdbcli/save_simulation_batch.py "&lt;organism-name&gt;" "&lt;batch-3-name&gt;" /path/to/simulation-batch-3
+</pre>
+</p>
+
+<p>This code snippet shows how to load simulations via the programmatic (Python) interface:
+<pre>import os
+import sys
+
+# Add the project to your path.
+sys.path.append('/path/to/WholeCellDB')
+
+# Import the models
+from wcdb import models
+
+#options
+path_to_simuation_batch = '/path/to/simulation-batch'
+n_simulations = 128
+
+# Load simulation batch
+models.SimulationBatch.objects.create_simulation_batch(os.path.join(path_to_simuation_batch, '1', 'data.h5'))
+    
+# Load individual simulations
+for idx in range(1, n_simulations + 1):
+    models.Simulation.objects.create_simulation(os.path.join(path_to_simuation_batch, '%d' % idx, 'data.h5'))
+</pre>
+</p>
+
+<a name="simulation-file-format" ></a>
+<h3>Simulation file format</h3>
+<p>WholeCellDB imports and exports simulations using the following format.</p>
+
+<p>First, simulations must be organized into batches. A batch is a set of simulations run using the same code, same options, and same parameter values. Individual simulations within a batch should differ only in their random number generator seeds. Batches must be stored as a folder, with subfolders for each simulation numbered sequentially starting from 1. Each simulation subfolder must contain a file "data.h5" containing the predicted phenotypes for each simulation.</p>
+
+<p>Second, each simulation (including its metadata and predicted phenotypes) must be stored using the <a href="http://www.hdfgroup.org/HDF5/">HDF5 format</a> using the following schema (red indicates HDF groups, blue indicates HDF datasets, cyan indicates HDF dataset values, green indicates HDF dataset attribute containers, grey indicates individual HDF dataset attributes). An example simulation is available <a href="{% url wcdbweb.views.simulation_download id=1 %}">here</a>.
+<ul class="hdf-schema">
+<li><span class="attrs">attrs</span>: 
+    <ul>    
+    <li><span class="attr">batch__investigator__user__first_name</span>: First name of researcher who ran simulation</li>
+    <li><span class="attr">batch__investigator__user__last_name</span>: Last name of researcher who ran simulation</li>
+    <li><span class="attr">batch__investigator__user__email</span>: Email address of researcher who ran simulation</li>
+    <li><span class="attr">batch__investigator__affiliation</span>: Affiliation of researcher who ran simulation</li>
+    <li><span class="attr">batch__organism__name</span>: Name of simulated organism</li>
+    <li><span class="attr">batch__organism_version</span>: Version of simulated organism (e.g. revision of code)</li>
+    <li><span class="attr">batch__name</span>: Name of simulation batch</li>
+    <li><span class="attr">batch__description</span>: Description of simulation batch</li>
+    <li><span class="attr">batch__ip</span>: IP address of machine which ran simulation</li>
+    <li><span class="attr">batch__date</span>: Date when simulation was ran (YYYY-MM-DD HH:MM:SS)</li>
+    </ul>
+</li>
+<li><span class="group">options</span>: group containing datasets for each global option, and sub-groups containing sub-sub-groups containing datasets for each state and process option
+    <ul>
+    <li><span class="dataset">global-option-1-name</span>:  dataset representing the first global option
+        <ul>
+        <li><span class="value">value</span>: Value of option</li>
+        <li><span class="attrs">attrs</span>
+            <ul>
+            <li><span class="attr">units</span>: Units of option</li>
+            </ul>
+            </li>
+        </ul>
+        </li>
+    <li><span class="dataset">global-option-2-name</span>: dataset representing the second global option
+        <ul>
+        <li><span class="value">value</span>: Value of option</li>
+        <li><span class="attrs">attrs</span>
+            <ul>
+            <li><span class="attr">units</span>: Units of option</li>
+            </ul>
+            </li>
+        </ul>
+        </li>
+    <li><span class="dataset">&hellip;</span></li>
+    <li><span class="group">states</span>: group containing sub-groups containing datasets for each state option
+        <ul>
+        <li><span class="group">state-1-name</span>: group containing datasets for each state option
+            <ul>
+            <li><span class="dataset">state-1-option-1</span>: dataset representing the first state's first option
+                <ul>
+                <li><span class="value">value</span>: Value of option</li>
+                <li><span class="attrs">attrs</span>
+                    <ul>
+                    <li><span class="attr">units</span>: Units of option</li>
+                    </ul>
+                    </li>
+                </ul>
+                </li>
+            <li><span class="dataset">state-1-option-2</span>: dataset representing the first state's second option
+                <ul>
+                <li><span class="value">value</span>: Value of option</li>
+                <li><span class="attrs">attrs</span>
+                    <ul>
+                    <li><span class="attr">units</span>: Units of option</li>
+                    </ul>
+                    </li>
+                </ul>
+                </li>
+            <li><span class="dataset">&hellip;</span></li>
+            </ul>
+            </li>
+        <li><span class="group">state-2-name</span>: group containing datasets for each state option
+            <ul>
+            <li><span class="dataset">state-2-option-1</span>: dataset representing the second state's first option
+                <ul>
+                <li><span class="value">value</span>: Value of option</li>
+                <li><span class="attrs">attrs</span>
+                    <ul>
+                    <li><span class="attr">units</span>: Units of option</li>
+                    </ul>
+                    </li>
+                </ul>
+                </li>
+            <li><span class="dataset">state-2-option-2</span>: dataset representing the second state's second option
+                <ul>
+                <li><span class="value">value</span>: Value of option</li>
+                <li><span class="attrs">attrs</span>
+                    <ul>
+                    <li><span class="attr">units</span>: Units of option</li>
+                    </ul>
+                    </li>
+                </ul>
+                </li>
+            <li><span class="dataset">&hellip;</span></li>
+            </ul>
+            </li>
+        <li><span class="group">&hellip;</span></li>
+        </ul>
+        </li>
+    <li><span class="group">processes</span>: group containing sub-groups containing datasets for process state 
+        <ul>
+        <li><span class="group">process-1-name</span>: group containing datasets for each process option
+            <ul>
+            <li><span class="dataset">process-1-option-1</span>: dataset representing the first process' first option
+                <ul>
+                <li><span class="value">value</span>: Value of option</li>
+                <li><span class="attrs">attrs</span>
+                    <ul>
+                    <li><span class="attr">units</span>: Units of option</li>
+                    </ul>
+                    </li>
+                </ul>
+                </li>
+            <li><span class="dataset">process-1-option-2</span>: dataset representing the first process' second option
+                <ul>
+                <li><span class="value">value</span>: Value of option</li>
+                <li><span class="attrs">attrs</span>
+                    <ul>
+                    <li><span class="attr">units</span>: Units of option</li>
+                    </ul>
+                    </li>
+                </ul>
+                </li>
+            <li><span class="dataset">&hellip;</span></li>
+            </ul>
+            </li>
+        <li><span class="group">process-2-name</span>: group containing datasets for each process option
+            <ul>
+            <li><span class="dataset">process-2-option-1</span>: dataset representing the second process' first option
+                <ul>
+                <li><span class="value">value</span>: Value of option</li>
+                <li><span class="attrs">attrs</span>
+                    <ul>
+                    <li><span class="attr">units</span>: Units of option</li>
+                    </ul>
+                    </li>
+                </ul>
+                </li>
+            <li><span class="dataset">process-2-option-2</span>: dataset representing the second process' second option
+                <ul>
+                <li><span class="value">value</span>: Value of option</li>
+                <li><span class="attrs">attrs</span>
+                    <ul>
+                    <li><span class="attr">units</span>: Units of option</li>
+                    </ul>
+                    </li>
+                </ul>
+                </li>
+            <li><span class="dataset">&hellip;</span></li>
+            </ul>
+            </li>
+        <li><span class="group">&hellip;</span></li>
+        </ul>
+        </li>
+    </ul>
+    </li>
+<li><span class="group">parameters</span>: group containing datasets for each global parameter, and sub-groups containing sub-sub-groups containing datasets for each state and process parameter
+    <ul>
+    <li><span class="dataset">global-parameter-1-name</span>:  dataset representing the first global parameter
+        <ul>
+        <li><span class="value">value</span>: Value of parameter</li>
+        <li><span class="attrs">attrs</span>
+            <ul>
+            <li><span class="attr">units</span>: Units of parameter</li>
+            </ul>
+            </li>
+        </ul>
+        </li>
+    <li><span class="dataset">global-parameter-2-name</span>: dataset representing the second global parameter
+        <ul>
+        <li><span class="value">value</span>: Value of parameter</li>
+        <li><span class="attrs">attrs</span>
+            <ul>
+            <li><span class="attr">units</span>: Units of parameter</li>
+            </ul>
+            </li>
+        </ul>
+        </li>
+    <li><span class="dataset">&hellip;</span></li>
+    <li><span class="group">states</span>: group containing sub-groups containing datasets for each state parameter
+        <ul>
+        <li><span class="group">state-1-name</span>: group containing datasets for each state parameter
+            <ul>
+            <li><span class="dataset">state-1-parameter-1</span>: dataset representing the first state's first parameter
+                <ul>
+                <li><span class="value">value</span>: Value of parameter</li>
+                <li><span class="attrs">attrs</span>
+                    <ul>
+                    <li><span class="attr">units</span>: Units of parameter</li>
+                    </ul>
+                    </li>
+                </ul>
+                </li>
+            <li><span class="dataset">state-1-parameter-2</span>: dataset representing the first state's second parameter
+                <ul>
+                <li><span class="value">value</span>: Value of parameter</li>
+                <li><span class="attrs">attrs</span>
+                    <ul>
+                    <li><span class="attr">units</span>: Units of parameter</li>
+                    </ul>
+                    </li>
+                </ul>
+                </li>
+            <li><span class="dataset">&hellip;</span></li>
+            </ul>
+            </li>
+        <li><span class="group">state-2-name</span>: group containing datasets for each state parameter
+            <ul>
+            <li><span class="dataset">state-2-parameter-1</span>: dataset representing the second state's first parameter
+                <ul>
+                <li><span class="value">value</span>: Value of parameter</li>
+                <li><span class="attrs">attrs</span>
+                    <ul>
+                    <li><span class="attr">units</span>: Units of parameter</li>
+                    </ul>
+                    </li>
+                </ul>
+                </li>
+            <li><span class="dataset">state-2-parameter-2</span>: dataset representing the second state's second parameter
+                <ul>
+                <li><span class="value">value</span>: Value of parameter</li>
+                <li><span class="attrs">attrs</span>
+                    <ul>
+                    <li><span class="attr">units</span>: Units of parameter</li>
+                    </ul>
+                    </li>
+                </ul>
+                </li>
+            <li><span class="dataset">&hellip;</span></li>
+            </ul>
+            </li>
+        <li><span class="group">&hellip;</span></li>
+        </ul>
+        </li>
+    <li><span class="group">processes</span>: group containing sub-groups containing datasets for process state 
+        <ul>
+        <li><span class="group">process-1-name</span>: group containing datasets for each process parameter
+            <ul>
+            <li><span class="dataset">process-1-parameter-1</span>: dataset representing the first process' first parameter
+                <ul>
+                <li><span class="value">value</span>: Value of parameter</li>
+                <li><span class="attrs">attrs</span>
+                    <ul>
+                    <li><span class="attr">units</span>: Units of parameter</li>
+                    </ul>
+                    </li>
+                </ul>
+                </li>
+            <li><span class="dataset">process-1-parameter-2</span>: dataset representing the first process' second parameter
+                <ul>
+                <li><span class="value">value</span>: Value of parameter</li>
+                <li><span class="attrs">attrs</span>
+                    <ul>
+                    <li><span class="attr">units</span>: Units of parameter</li>
+                    </ul>
+                    </li>
+                </ul>
+                </li>
+            <li><span class="dataset">&hellip;</span></li>
+            </ul>
+            </li>
+        <li><span class="group">process-2-name</span>: group containing datasets for each process parameter
+            <ul>
+            <li><span class="dataset">process-2-parameter-1</span>: dataset representing the second process' first parameter
+                <ul>
+                <li><span class="value">value</span>: Value of parameter</li>
+                <li><span class="attrs">attrs</span>
+                    <ul>
+                    <li><span class="attr">units</span>: Units of parameter</li>
+                    </ul>
+                    </li>
+                </ul>
+                </li>
+            <li><span class="dataset">process-2-parameter-2</span>: dataset representing the second process' second parameter
+                <ul>
+                <li><span class="value">value</span>: Value of parameter</li>
+                <li><span class="attrs">attrs</span>
+                    <ul>
+                    <li><span class="attr">units</span>: Units of parameter</li>
+                    </ul>
+                    </li>
+                </ul>
+                </li>
+            <li><span class="dataset">&hellip;</span></li>
+            </ul>
+            </li>
+        <li><span class="group">&hellip;</span></li>
+        </ul>
+        </li>
+    </ul>
+    </li>
+<li><span class="group">processes</span>: group containing sub-groups for each process
+    <ul>
+    <li><span class="group">process-1-name</span>: group repesenting process 1</li>
+    <li><span class="group">process-2-name</span>: group repesenting process 2</li>
+    <li><span class="group">&hellip;</span></li>
+    </ul>
+    </li>
+<li><span class="group">states</span>: group containing sub-groups for each state containing datasets for each predicted phenotype
+    <ul>
+    <li><span class="group">state-1-name</span>: group containing datasets for each predicted phenotype
+        <ul>
+        <li><span class="group">property-1-name</span>: group representing the first state's first predicted phenotype    
+            <ul>
+            <li><span class="dataset">data</span>: dataset representing the phenotype's predicted value
+                <ul>
+                <li><span class="value">value</span>: NumPy ndarray containing phenotype's predicted value</li>
+                </ul>
+                </li>
+            <li><span class="dataset">units</span>: dataset representing the phenotype's units
+                <ul>
+                <span class="value">value</span>: string indicating phenotype's units
+                </ul>
+                </li>
+            <li><span class="group">labels</span>: group contain sub-group for each dimension's labels  
+                <ul>
+                <li><span class="group">0</span>
+                    <ul>
+                    <li><span class="value">value</span>: list of labels for first dimension</li>
+                    </ul>
+                    </li>
+                <li><span class="group">1</span>
+                    <ul>
+                    <li><span class="value">value</span>: list of labels for first dimension</li>
+                    </ul>
+                    </li>
+                <li><span class="group">&hellip;</span></li>
+                </ul>
+                </li>
+            </ul>
+            </li>
+        <li><span class="group">property-2-name</span>: group representing the first state's second predicted phenotype    
+            <ul>
+            <li><span class="dataset">data</span>: dataset representing the phenotype's predicted value
+                <ul>
+                <li><span class="value">value</span>: NumPy ndarray containing phenotype's predicted value</li>
+                </ul>
+                </li>
+            <li><span class="dataset">units</span>: dataset representing the phenotype's units
+                <ul>
+                <span class="value">value</span>: string indicating phenotype's units
+                </ul>
+                </li>
+            <li><span class="group">labels</span>: group contain sub-group for each dimension's labels  
+                <ul>
+                <li><span class="group">0</span>
+                    <ul>
+                    <li><span class="value">value</span>: list of labels for first dimension</li>
+                    </ul>
+                    </li>
+                <li><span class="group">1</span>
+                    <ul>
+                    <li><span class="value">value</span>: list of labels for first dimension</li>
+                    </ul>
+                    </li>
+                <li><span class="group">&hellip;</span></li>
+                </ul>
+                </li>
+            </ul>
+            </li>
+        <li><span class="group">&hellip;</span></li>
+        </ul>        
+        </li>
+    <li><span class="group">state-2-name</span>: group containing datasets for each predicted phenotype
+        <ul>
+        <li><span class="group">property-1-name</span>: group representing the second state's first predicted phenotype    
+            <ul>
+            <li><span class="dataset">data</span>: dataset representing the phenotype's predicted value
+                <ul>
+                <li><span class="value">value</span>: NumPy ndarray containing phenotype's predicted value</li>
+                </ul>
+                </li>
+            <li><span class="dataset">units</span>: dataset representing the phenotype's units
+                <ul>
+                <span class="value">value</span>: string indicating phenotype's units
+                </ul>
+                </li>
+            <li><span class="group">labels</span>: group contain sub-group for each dimension's labels  
+                <ul>
+                <li><span class="group">0</span>
+                    <ul>
+                    <li><span class="value">value</span>: list of labels for first dimension</li>
+                    </ul>
+                    </li>
+                <li><span class="group">1</span>
+                    <ul>
+                    <li><span class="value">value</span>: list of labels for first dimension</li>
+                    </ul>
+                    </li>
+                <li><span class="group">&hellip;</span></li>
+                </ul>
+                </li>
+            </ul>
+            </li>
+        <li><span class="group">property-2-name</span>: group representing the second state's second predicted phenotype    
+            <ul>
+            <li><span class="dataset">data</span>: dataset representing the phenotype's predicted value
+                <ul>
+                <li><span class="value">value</span>: NumPy ndarray containing phenotype's predicted value</li>
+                </ul>
+                </li>
+            <li><span class="dataset">units</span>: dataset representing the phenotype's units
+                <ul>
+                <span class="value">value</span>: string indicating phenotype's units
+                </ul>
+                </li>
+            <li><span class="group">labels</span>: group contain sub-group for each dimension's labels  
+                <ul>
+                <li><span class="group">0</span>
+                    <ul>
+                    <li><span class="value">value</span>: list of labels for first dimension</li>
+                    </ul>
+                    </li>
+                <li><span class="group">1</span>
+                    <ul>
+                    <li><span class="value">value</span>: list of labels for first dimension</li>
+                    </ul>
+                    </li>
+                <li><span class="group">&hellip;</span></li>
+                </ul>
+                </li>
+            </ul>
+            </li>
+        <li><span class="group">&hellip;</span></li>
+        </ul>        
+        </li>
+    <li><span class="group">&hellip;</span></li>
+    </ul>
+    </li>
+</ul>
+</p>
+
+<h3>Converting simulations from MAT-File to HDF5 format</h3>
+<p>Simulations can be converted from the original <a href="http://www.mathworks.com/help/matlab/import_export/mat-file-versions.html">MAT-File format</a> used by the <i>M. genitalium</i> whole-cell model (see <a href="https://simtk.org/frs/download.php?file_id=3125">User Guide section 2.2</a> and <a href="https://github.com/CovertLab/WholeCell/blob/master/src/%2Bedu/%2Bstanford/%2Bcovert/%2Bcell/%2Bsim/%2Butil/DiskLogger.m">DiskLogger.m</a>) using following script:
+<pre>
+cd /path/to/WholeCellDB
+
+organism="Mycoplasma genitalium"
+simulation_batch_name="Wild-type set #1"
+path_to_simulation_batch=/path/to/simulation-batch
+n_simulations=128
+
+for i in {1..$n_simulations}
+do
+    python wcdbcli/convert_mat_to_hdf5.py "${organism}" "${simulation_batch}" ${path_to_simulation_batch}/${i} ${i}
+done
+</pre>
+</p>
+
+<p>The following script can be used to convert simulations using a cluster. The Perl script uses the job script template <tt>wcdbcli/convert_mat_to_hdf5.sh.tmpl</tt> to submit jobs to a cluster schedule. The job scripts in turn call <tt>wcdbcli/convert_mat_to_hdf5.py</tt>.
+<pre>
+cd /path/to/WholeCellDB
+
+organism="Mycoplasma genitalium"
+simulation_batch_name="Wild-type set #1"
+path_to_simulation_batch=/path/to/simulation-batch
+n_simulations=128
+
+for i in {1..$n_simulations}
+do
+    wcdbcli/convert_mat_to_hdf5.pl "${organism}" "${simulation_batch}" ${path_to_simulation_batch}/${i} ${i}
+done
+</pre>
+</p>
+
 </div>
 
-<div>
+<div class="section">
 <a name="contact"></a>
-<h1>Need help?</h1>
+<h2>Need help?</h2>
 <p>Please contact the development team at <a href="wholecelldb@lists.stanford.edu">wholecelldb@lists.stanford.edu</a>.</p>
+</div>
+
 </div>
 {% endblock %}
