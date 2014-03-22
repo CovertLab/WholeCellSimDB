@@ -1,5 +1,4 @@
 import glob
-import h5py
 import os
 from wcdb.models import SimulationBatch, Simulation
 
@@ -7,11 +6,8 @@ def save_simulation_batch(batch_dir, first_sim_idx = None, max_num_simulations =
     if first_sim_idx is None:
         first_sim_idx = 1
     
-    h5file = h5py.File(os.path.join(batch_dir, '%d' % first_sim_idx, 'data.h5'), 'r')
-    md = h5file.attrs
-    
     #save batch
-    SimulationBatch.objects.create_simulation_batch(h5file)
+    SimulationBatch.objects.create_simulation_batch(os.path.join(batch_dir, '%d' % first_sim_idx, 'data.h5'))
         
     #save simulations
     sim_dirs = glob.glob(os.path.join(batch_dir, "[0-9]*"))

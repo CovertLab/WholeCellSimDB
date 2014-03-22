@@ -519,7 +519,9 @@ class Simulation(models.Model):
         app_label = 'wcdb'
         
 class SimulationBatchManager(models.Manager):
-    def create_simulation_batch(self, md):
+    def create_simulation_batch(self, mdfilename):
+        md = h5py.File(mdfilename, 'r')
+    
         #get/create organism
         organism = Organism.objects.get_or_create(name = md.attrs['batch__organism__name'])[0]
         organism.save()
