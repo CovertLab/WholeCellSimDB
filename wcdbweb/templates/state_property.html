@@ -26,15 +26,8 @@ Created: 2014-03-10
     <thead>
         <tr>
             <td></td>
-            {% regroup simulation_batches by organism__name as organisms %}
-            {% for organism in organisms %}
-            <th colspan="{{organism.list|length}}"><i><a href="{% url wcdbweb.views.organism id=organism.list.0.organism__id %}">{{organism.grouper}}</i></a></th>
-            {% endfor %}
-        </tr>
-        <tr>
-            <td></td>
-            {% for batch in simulation_batches %}
-            <th><div><a href="{% url wcdbweb.views.simulation_batch id=batch.id %}">{{batch.name}}</a></div></th>
+            {% for id, organism in organisms.iteritems %}
+            <th><div><i><a href="{% url wcdbweb.views.organism id=id %}">{{organism.name}}</i></a></div></th>
             {% endfor %}
         </tr>
     </thead>
@@ -47,7 +40,7 @@ Created: 2014-03-10
             {% regroup dimension.list by name as dimension_labels %}
             {% if dimension_labels|length > 1 or dimension_labels.0.grouper != '' %}
     <tr>
-        <th colspan="{{simulation_batches.count|add:1}}">
+        <th colspan="{{organisms|length|add:1}}">
                 {% if dimension.grouper == 0 %}Rows
                 {% elif dimension.grouper == 1 %}Columns
                 {% elif dimension.grouper == 2 %}Depth
@@ -59,7 +52,6 @@ Created: 2014-03-10
                 {% for label in dimension_labels %}
                     {% if label.grouper != '' %}
     <tr>
-        {% spaceless %}
         <td class="level1">
             {% if show_slice_links and dimension.grouper == 0 %}
                 <a href="{% url wcdbweb.views.state_property_row state_name=state_name property_name=property_name row_name=label.grouper %}">{{label.grouper}}</a>
@@ -69,10 +61,9 @@ Created: 2014-03-10
                 {{label.grouper}}
             {% endif %}
         </td>
-        {% endspaceless %}
-                        {% regroup_by label.list by 'property__state__simulation_batch__id' simulation_batch_ids as batches %}
-                        {% for batch in batches %}
-        <td class="level1">{% if batch.list|length > 0 %}x{% endif %}</td>
+                        {% regroup_by label.list by 'property__state__simulation_batch__organism__id' organism_ids as label_organisms %}
+                        {% for label_organism in label_organisms %}
+        <td class="level1">{% if label_organism.list|length > 0 %}{% if label_organism.list.0.n_batches == organisms|get_organisms_n_batches:label_organism.grouper %}&#10003;{% else %}&#9632;{% endif %}{% endif %}</td>
                         {% endfor %}
     </tr>
                     {% endif %}
@@ -80,20 +71,18 @@ Created: 2014-03-10
             {% endif %}
         {% endfor %}
     {% else %}
-        {% regroup_by labels by 'property__state__simulation_batch__id' simulation_batch_ids as batches %}
+        {% regroup_by labels by 'property__state__simulation_batch__organism__id' organism_ids as label_organisms %}
     <tr>
-        {% spaceless %}
         <th><i>
         {% if show_slice_links %}
             <a href="{% url wcdbweb.views.state_property_row state_name=state_name property_name=property_name row_name='' %}">state</a>
         {% else %}
             state
         {% endif %}
-        </i></td>
-        {% endspaceless %}
+        </i></th>
         
-        {% for batch in batches %}
-        <th>{% if batch.list|length > 0 %}x{% endif %}</td>
+        {% for label_organism in label_organisms %}
+        <th>{% if label_organism.list|length > 0 %}{% if label_organism.list.0.n_batches == organisms|get_organisms_n_batches:label_organism.grouper %}&#10003;{% else %}&#9632;{% endif %}{% endif %}</th>
         {% endfor %}
     </tr>
     {% endif %}

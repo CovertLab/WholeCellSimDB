@@ -27,6 +27,10 @@ def get_template_last_updated(templateFile):
 def set_time_zone(datetime):
 	return datetime.replace(tzinfo=tzlocal())
     
+@register.filter    
+def get_organisms_n_batches(organisms, id):
+    return organisms[id].n_batches
+    
 @register.assignment_tag
 def regroup_by(all_objects, by, field, values):
     tmp = {}    

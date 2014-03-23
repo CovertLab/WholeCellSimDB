@@ -22,14 +22,8 @@ Created: 2014-03-10
     <thead>
         <tr>
             <td></td>
-            {% for organism in organisms %}
-            <th colspan="{{organism.simulation_batches.count}}"><i><a href="{% url wcdbweb.views.organism id=organism.id %}">{{organism.name}}</i></a></th>
-            {% endfor %}
-        </tr>        
-        <tr>
-            <td></td>
-            {% for batch in simulation_batches %}
-            <th><div><a href="{% url wcdbweb.views.simulation_batch id=batch.id %}">{{batch.name}}</a></div></th>
+            {% for id, organism in organisms.iteritems %}
+            <th><div><i><a href="{% url wcdbweb.views.organism id=id %}">{{organism.name}}</i></a></div></th>
             {% endfor %}
         </tr>
     </thead>
@@ -38,9 +32,9 @@ Created: 2014-03-10
         {% for process in processes_grouped %}
         <tr>
             <td><a href="{% url wcdbweb.views.process process_name=process.grouper %}">{{process.grouper}}</a></td>
-            {% regroup_by process.list by 'simulation_batch__id' simulation_batch_ids as process_batches %}
-            {% for batch in process_batches %}    
-            <td>{% if batch.list|length > 0 %}x{% endif %}</td>
+            {% regroup_by process.list by 'simulation_batch__organism__id' organism_ids as process_organisms %}
+            {% for process_organism in process_organisms %}    
+            <td>{% if process_organism.list|length > 0 %}{% if process_organism.list.0.n_batches == organisms|get_organisms_n_batches:process_organism.grouper %}&#10003;{% else %}&#9632;{% endif %}{% endif %}</td>
             {% endfor %}
         </tr>
         {% endfor %}

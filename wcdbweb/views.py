@@ -180,31 +180,33 @@ def simulation(request, id):
     })
 
 def list_options(request):
-    options = models.Option.objects.all()
-    
-    organisms = models.Organism.objects.all().order_by('name')
-    simulation_batches = models.SimulationBatch.objects.order_by('organism__name', 'name')
-    simulation_batch_ids = [x[0] for x in simulation_batches.values_list('id')]
+    tmp = models.Organism.objects.all() \
+        .annotate(n_batches=Count('simulation_batches__id')) \
+        .order_by('name')
+    organism_ids = [x.id for x in tmp]
+    organisms = {x.id: x for x in tmp}
     
     options = {
         'Global': models.Option.objects
             .filter(process__isnull=True, state__isnull=True)
-            .values('name', 'units', 'value', 'index', 'simulation_batch__id', 'simulation_batch__name')
+            .values('name', 'units', 'value', 'index', 'simulation_batch__organism__id')
+            .annotate(Count('name'), Count('index'), Count('value'), n_batches=Count('simulation_batch__organism__id'))
             .order_by('name', 'simulation_batch__name', 'index'),
         'Processes': models.Option.objects
             .filter(process__isnull=False)
-            .values('process__name', 'name', 'units', 'value', 'index', 'simulation_batch__id', 'simulation_batch__name')
+            .values('process__name', 'name', 'units', 'value', 'index', 'simulation_batch__organism__id')
+            .annotate(Count('process__name'), Count('name'), Count('index'), Count('value'), n_batches=Count('simulation_batch__organism__id'))
             .order_by('process__name', 'name', 'simulation_batch__name', 'index'),
         'States': models.Option.objects
             .filter(state__isnull=False)
-            .values('state__name', 'name', 'units', 'value', 'index', 'simulation_batch__id', 'simulation_batch__name')
+            .values('state__name', 'name', 'units', 'value', 'index', 'simulation_batch__organism__id')
+            .annotate(Count('state__name'), Count('name'), Count('index'), Count('value'), n_batches=Count('simulation_batch__organism__id'))
             .order_by('state__name', 'name', 'simulation_batch__name', 'index'),
         }
     
     return render_template('list_options.html', request, data = {
         'organisms': organisms,
-        'simulation_batches': simulation_batches,
-        'simulation_batch_ids': simulation_batch_ids,
+        'organism_ids': organism_ids,
         'options': options
     })
     
@@ -221,29 +223,33 @@ def option(request, option_name, process_name=None, state_name=None):
     })
     
 def list_parameters(request):
-    organisms = models.Organism.objects.all().order_by('name')
-    simulation_batches = models.SimulationBatch.objects.order_by('organism__name', 'name')
-    simulation_batch_ids = [x[0] for x in simulation_batches.values_list('id')]
+    tmp = models.Organism.objects.all() \
+        .annotate(n_batches=Count('simulation_batches__id')) \
+        .order_by('name')
+    organism_ids = [x.id for x in tmp]
+    organisms = {x.id: x for x in tmp}
     
     parameters = {
         'Global': models.Parameter.objects
             .filter(process__isnull=True, state__isnull=True)
-            .values('name', 'units', 'value', 'index', 'simulation_batch__id', 'simulation_batch__name')
+            .values('name', 'units', 'value', 'index', 'simulation_batch__organism__id')
+            .annotate(Count('name'), Count('index'), Count('value'), n_batches=Count('simulation_batch__organism__id'))
             .order_by('name', 'simulation_batch__name', 'index'),
         'Processes': models.Parameter.objects
             .filter(process__isnull=False)
-            .values('process__name', 'name', 'units', 'value', 'index', 'simulation_batch__id', 'simulation_batch__name')
+            .values('process__name', 'name', 'units', 'value', 'index', 'simulation_batch__organism__id')
+            .annotate(Count('process__name'), Count('name'), Count('index'), Count('value'), n_batches=Count('simulation_batch__organism__id'))
             .order_by('process__name', 'name', 'simulation_batch__name', 'index'),
         'States': models.Parameter.objects
             .filter(state__isnull=False)
-            .values('state__name', 'name', 'units', 'value', 'index', 'simulation_batch__id', 'simulation_batch__name')
+            .values('state__name', 'name', 'units', 'value', 'index', 'simulation_batch__organism__id')
+            .annotate(Count('state__name'), Count('name'), Count('index'), Count('value'), n_batches=Count('simulation_batch__organism__id'))
             .order_by('state__name', 'name', 'simulation_batch__name', 'index'),
         }
     
     return render_template('list_parameters.html', request, data = {
         'organisms': organisms,
-        'simulation_batches': simulation_batches,
-        'simulation_batch_ids': simulation_batch_ids,
+        'organism_ids': organism_ids,
         'parameters': parameters
     })
     
@@ -260,94 +266,105 @@ def parameter(request, parameter_name, process_name=None, state_name=None):
     })
     
 def list_processes(request):
-    organisms = models.Organism.objects.all().order_by('name')
-    simulation_batches = models.SimulationBatch.objects.order_by('organism__name', 'name')
-    simulation_batch_ids = [x[0] for x in simulation_batches.values_list('id')]
+    tmp = models.Organism.objects.all() \
+        .annotate(n_batches=Count('simulation_batches__id')) \
+        .order_by('name')    
+    organism_ids = [x.id for x in tmp]
+    organisms = {x.id: x for x in tmp}
+    
     processes =  models.Process.objects \
-        .values('name', 'simulation_batch__id', 'simulation_batch__name') \
-        .order_by('name', 'simulation_batch__name')
+        .values('name', 'simulation_batch__organism__id') \
+        .annotate(Count('name'), n_batches=Count('simulation_batch__organism__id')) \
+        .order_by('name')
     
     return render_template('list_processes.html', request, data = {
         'organisms': organisms,
-        'simulation_batches': simulation_batches,
-        'simulation_batch_ids': simulation_batch_ids,
-        'processes': processes
+        'organism_ids': organism_ids,
+        'processes': processes,
     })
     
 def process(request, process_name):
-    simulation_batches = models.SimulationBatch.objects \
-        .filter(processes__name=process_name) \
-        .values('organism__name', 'organism__id', 'name', 'id') \
-        .order_by('organism__name', 'name')
-    simulation_batch_ids = [x['id'] for x in simulation_batches]
+    tmp = models.Organism.objects.all() \
+        .annotate(n_batches=Count('simulation_batches__id')) \
+        .order_by('name')    
+    organism_ids = [x.id for x in tmp]
+    organisms = {x.id: x for x in tmp}
     
     options = models.Option.objects \
         .filter(process__name=process_name) \
-        .values('name', 'units', 'value', 'index', 'simulation_batch__id', 'simulation_batch__name') \
+        .values('name', 'units', 'value', 'index', 'simulation_batch__organism__id') \
+        .annotate(Count('name'), Count('value'), Count('index'), n_batches=Count('simulation_batch__organism__id')) \
         .order_by('name', 'index')
     parameters = models.Parameter.objects \
         .filter(process__name=process_name) \
-        .values('name', 'units', 'value', 'index', 'simulation_batch__id', 'simulation_batch__name') \
+        .values('name', 'units', 'value', 'index', 'simulation_batch__organism__id') \
+        .annotate(Count('name'), Count('value'), Count('index'), n_batches=Count('simulation_batch__organism__id')) \
         .order_by('name', 'index')
         
     return render_template('process.html', request, data = {
         'process_name': process_name,
-        'simulation_batches': simulation_batches,
-        'simulation_batch_ids': simulation_batch_ids,
+        'organisms': organisms,
+        'organism_ids': organism_ids,
         'options': options, 
         'parameters': parameters
     })
     
 def list_states(request):
-    organisms = models.Organism.objects.all().order_by('name')
-    simulation_batches = models.SimulationBatch.objects.order_by('organism__name', 'name')
-    simulation_batch_ids = [x[0] for x in simulation_batches.values_list('id')]
-    state_properties =  models.Property.objects \
-        .values('name', 'state__name', 'state__simulation_batch__id', 'state__simulation_batch__name') \
+    tmp = models.Organism.objects.all() \
+        .annotate(n_batches=Count('simulation_batches__id')) \
+        .order_by('name')
+    organism_ids = [x.id for x in tmp]
+    organisms = {x.id: x for x in tmp}
+        
+    state_properties = models.Property.objects \
+        .values('name', 'state__name', 'state__simulation_batch__organism__id') \
+        .annotate(Count('name'), Count('state__name'), n_batches=Count('state__simulation_batch__organism__id')) \
         .order_by('state__name', 'name')
     
     return render_template('list_states.html', request, data = {
         'organisms': organisms,
-        'simulation_batches': simulation_batches,
-        'simulation_batch_ids': simulation_batch_ids,
-        'state_properties': state_properties
+        'organism_ids': organism_ids,
+        'state_properties': state_properties,
     })
     
 def state(request, state_name):
-    simulation_batches = models.SimulationBatch.objects \
-        .filter(states__name=state_name) \
-        .values('organism__name', 'organism__id', 'name', 'id') \
-        .order_by('organism__name', 'name')
-    simulation_batch_ids = [x['id'] for x in simulation_batches]
+    tmp = models.Organism.objects.all() \
+        .annotate(n_batches=Count('simulation_batches__id')) \
+        .order_by('name')    
+    organism_ids = [x.id for x in tmp]
+    organisms = {x.id: x for x in tmp}
     
     options = models.Option.objects \
         .filter(state__name=state_name) \
-        .values('name', 'units', 'value', 'index', 'simulation_batch__id', 'simulation_batch__name') \
+        .values('name', 'units', 'value', 'index', 'simulation_batch__organism__id') \
+        .annotate(Count('name'), Count('value'), Count('index'), n_batches=Count('simulation_batch__organism__id')) \
         .order_by('name', 'index')
     parameters = models.Parameter.objects \
         .filter(state__name=state_name) \
-        .values('name', 'units', 'value', 'index', 'simulation_batch__id', 'simulation_batch__name') \
+        .values('name', 'units', 'value', 'index', 'simulation_batch__organism__id') \
+        .annotate(Count('name'), Count('value'), Count('index'), n_batches=Count('simulation_batch__organism__id')) \
         .order_by('name', 'index')
     properties = models.Property.objects \
         .filter(state__name=state_name) \
-        .values('name', 'state__simulation_batch__id', 'state__simulation_batch__name') \
+        .values('name', 'units', 'state__simulation_batch__organism__id') \
+        .annotate(Count('name'), n_batches=Count('state__simulation_batch__organism__id')) \
         .order_by('name')
         
     return render_template('state.html', request, data = {
         'state_name': state_name,
-        'simulation_batches': simulation_batches,
-        'simulation_batch_ids': simulation_batch_ids,
+        'organisms': organisms,
+        'organism_ids': organism_ids,
         'options': options, 
         'parameters': parameters,
         'properties': properties,
     })
     
 def state_property(request, state_name, property_name):
-    simulation_batches = models.SimulationBatch.objects \
-        .filter(states__name=state_name, states__properties__name=property_name) \
-        .values('organism__name', 'organism__id', 'name', 'id') \
-        .order_by('organism__name', 'name')
-    simulation_batch_ids = [x['id'] for x in simulation_batches]
+    tmp = models.Organism.objects.all() \
+        .annotate(n_batches=Count('simulation_batches__id')) \
+        .order_by('name')    
+    organism_ids = [x.id for x in tmp]
+    organisms = {x.id: x for x in tmp}
     
     labels = models.PropertyLabel.objects \
         .filter(property__name=property_name, property__state__name=state_name)
@@ -357,14 +374,15 @@ def state_property(request, state_name, property_name):
     show_slice_links = 0 in dimension_values and 1 in dimension_values
     
     label_values = labels \
-        .values('dimension', 'name', 'property__state__simulation_batch__id', 'property__state__simulation_batch__name') \
+        .values('dimension', 'name', 'property__state__simulation_batch__organism__id') \
+        .annotate(Count('dimension'), Count('name'), n_batches=Count('property__state__simulation_batch__organism__id')) \
         .order_by('dimension', 'name')
         
     return render_template('state_property.html', request, data = {
         'state_name': state_name,
         'property_name': property_name,
-        'simulation_batches': simulation_batches,
-        'simulation_batch_ids': simulation_batch_ids,
+        'organisms': organisms,
+        'organism_ids': organism_ids,
         'is_labeled': is_labeled,
         'show_slice_links': show_slice_links,
         'labels': label_values,

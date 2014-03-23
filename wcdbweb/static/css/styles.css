@@ -431,9 +431,9 @@ select.error {border-color:red;}
 /* options */
 #content div table.list_options {width:100%;}
 #content div table.list_options thead tr th { background: #d6edff;}
-#content div table.list_options thead tr:nth-child(1) th { border-top: 1px solid #3d80b3; text-align:center; padding-bottom:3px;}
-#content div table.list_options thead tr:nth-child(2) td, #content div table.list_options thead tr:nth-child(2) th {height:160px; overflow:hidden; text-overflow:ellipsis;}
-#content div table.list_options thead tr:nth-child(2) th div {
+#content div table.list_options thead tr:nth-child(1) th {border-top: 1px solid #3d80b3; padding-bottom:3px;}
+#content div table.list_options thead tr:nth-child(1) th {height:123px; overflow:hidden; text-overflow:ellipsis;}
+#content div table.list_options thead tr:nth-child(1) th div {
     line-height: 1.5em;
     display:block;
     white-space:nowrap;
@@ -441,14 +441,15 @@ select.error {border-color:red;}
     padding-left:3px;
     width:0px;
     min-width:15px;
+    margin: 0 auto;
     
     writing-mode: tb-rl;
     filter: flipv fliph;
-    transform: rotate(270deg) translate(-160px,0);
+    transform: rotate(270deg) translate(-123px,0);
     transform-origin: 0 0;
-    -moz-transform: rotate(270deg) translate(-160px,0);
+    -moz-transform: rotate(270deg) translate(-123px,0);
     -moz-transform-origin: 0 0;
-    -webkit-transform: rotate(270deg) translate(-160px,0);
+    -webkit-transform: rotate(270deg) translate(-123px,0);
     -webkit-transform-origin: 0 0;
     }
 #content div table.list_options thead tr th { border-left: 1px solid #3d80b3;}
@@ -461,15 +462,15 @@ select.error {border-color:red;}
 #content div table.list_options tbody tr .level1:first-child {padding-left:12px;}
 #content div table.list_options tbody tr .level2:first-child {padding-left:24px;}
 #content div table.list_options tr th, #content div table.list_options tr td{padding-right: 0px; padding-left: 0px;}
-#content div table.list_options tr td{text-align:center; max-width:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+#content div table.list_options tr td{text-align:center; max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 #content div table.list_options tr td:first-child{text-align:left; padding-right:3px; max-width:none; width:100%;}
 
 /* parameters */
 #content div table.list_parameters {width:100%;}
 #content div table.list_parameters thead tr th { background: #d6edff;}
-#content div table.list_parameters thead tr:nth-child(1) th { border-top: 1px solid #3d80b3; text-align:center; padding-bottom:3px;}
-#content div table.list_parameters thead tr:nth-child(2) td, #content div table.list_parameters thead tr:nth-child(2) th {height:160px; overflow:hidden; text-overflow:ellipsis;}
-#content div table.list_parameters thead tr:nth-child(2) th div {
+#content div table.list_parameters thead tr:nth-child(1) th {border-top: 1px solid #3d80b3; padding-bottom:3px;}
+#content div table.list_parameters thead tr:nth-child(1) th {height:123px; overflow:hidden; text-overflow:ellipsis;}
+#content div table.list_parameters thead tr:nth-child(1) th div {
     line-height: 1.5em;
     display:block;
     white-space:nowrap;
@@ -477,14 +478,15 @@ select.error {border-color:red;}
     padding-left:3px;
     width:0px;
     min-width:15px;
+    margin: 0 auto;
     
     writing-mode: tb-rl;
     filter: flipv fliph;
-    transform: rotate(270deg) translate(-160px,0);
+    transform: rotate(270deg) translate(-123px,0);
     transform-origin: 0 0;
-    -moz-transform: rotate(270deg) translate(-160px,0);
+    -moz-transform: rotate(270deg) translate(-123px,0);
     -moz-transform-origin: 0 0;
-    -webkit-transform: rotate(270deg) translate(-160px,0);
+    -webkit-transform: rotate(270deg) translate(-123px,0);
     -webkit-transform-origin: 0 0;
     }
 #content div table.list_parameters thead tr th { border-left: 1px solid #3d80b3;}
@@ -497,15 +499,15 @@ select.error {border-color:red;}
 #content div table.list_parameters tbody tr .level1:first-child {padding-left:12px;}
 #content div table.list_parameters tbody tr .level2:first-child {padding-left:24px;}
 #content div table.list_parameters tr th, #content div table.list_parameters tr td{padding-right: 0px; padding-left: 0px;}
-#content div table.list_parameters tr td{text-align:center; max-width:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+#content div table.list_parameters tr td{text-align:center; max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 #content div table.list_parameters tr td:first-child{text-align:left; padding-right:3px; max-width:none; width:100%;}
 
 /* processes */
 #content div table.list_processes {width:100%;}
 #content div table.list_processes thead tr th { background: #d6edff;}
-#content div table.list_processes thead tr:nth-child(1) th { border-top: 1px solid #3d80b3; text-align:center; padding-bottom:3px;}
-#content div table.list_processes thead tr:nth-child(2) td, #content div table.list_processes thead tr:nth-child(2) th {height:160px; overflow:hidden; text-overflow:ellipsis;}
-#content div table.list_processes thead tr:nth-child(2) th div {
+#content div table.list_processes thead tr:nth-child(1) th {border-top: 1px solid #3d80b3; padding-bottom:3px;}
+#content div table.list_processes thead tr:nth-child(1) th {height:123px; overflow:hidden; text-overflow:ellipsis;}
+#content div table.list_processes thead tr:nth-child(1) th div {
     line-height: 1.5em;
     display:block;
     white-space:nowrap;
@@ -513,14 +515,15 @@ select.error {border-color:red;}
     padding-left:3px;
     width:0px;
     min-width:15px;
+    margin: 0 auto;
     
     writing-mode: tb-rl;
     filter: flipv fliph;
-    transform: rotate(270deg) translate(-160px,0);
+    transform: rotate(270deg) translate(-123px,0);
     transform-origin: 0 0;
-    -moz-transform: rotate(270deg) translate(-160px,0);
+    -moz-transform: rotate(270deg) translate(-123px,0);
     -moz-transform-origin: 0 0;
-    -webkit-transform: rotate(270deg) translate(-160px,0);
+    -webkit-transform: rotate(270deg) translate(-123px,0);
     -webkit-transform-origin: 0 0;
     }
 #content div table.list_processes thead tr th { border-left: 1px solid #3d80b3;}
@@ -533,15 +536,15 @@ select.error {border-color:red;}
 #content div table.list_processes tbody tr:nth-child(even) td{ background:#e3e3e3;}
 #content div table.list_processes tbody tr:nth-child(odd) td{background:#efefef;}
 #content div table.list_processes tr th, #content div table.list_processes tr td{padding-right: 0px; padding-left: 0px;}
-#content div table.list_processes tr td{text-align:center; max-width:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+#content div table.list_processes tr td{text-align:center; max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 #content div table.list_processes tr td:first-child{text-align:left; padding-right:3px; max-width:none; width:100%;}
 
 /* states */
 #content div table.list_states {width:100%;}
 #content div table.list_states thead tr th { background: #d6edff;}
-#content div table.list_states thead tr:nth-child(1) th { border-top: 1px solid #3d80b3; text-align:center; padding-bottom:3px;}
-#content div table.list_states thead tr:nth-child(2) td, #content div table.list_states thead tr:nth-child(2) th {height:160px; overflow:hidden; text-overflow:ellipsis;}
-#content div table.list_states thead tr:nth-child(2) th div {
+#content div table.list_states thead tr:nth-child(1) th {border-top: 1px solid #3d80b3; padding-bottom:3px;}
+#content div table.list_states thead tr:nth-child(1) th {height:123px; overflow:hidden; text-overflow:ellipsis;}
+#content div table.list_states thead tr:nth-child(1) th div {
     line-height: 1.5em;
     display:block;
     white-space:nowrap;
@@ -549,14 +552,15 @@ select.error {border-color:red;}
     padding-left:3px;
     width:0px;
     min-width:15px;
+    margin: 0 auto;
     
     writing-mode: tb-rl;
     filter: flipv fliph;
-    transform: rotate(270deg) translate(-160px,0);
+    transform: rotate(270deg) translate(-123px,0);
     transform-origin: 0 0;
-    -moz-transform: rotate(270deg) translate(-160px,0);
+    -moz-transform: rotate(270deg) translate(-123px,0);
     -moz-transform-origin: 0 0;
-    -webkit-transform: rotate(270deg) translate(-160px,0);
+    -webkit-transform: rotate(270deg) translate(-123px,0);
     -webkit-transform-origin: 0 0;
     }
 #content div table.list_states thead tr th { border-left: 1px solid #3d80b3;}
@@ -568,7 +572,7 @@ select.error {border-color:red;}
 #content div table.list_states tbody tr .level1 {border-top:1px solid #BDD4E6;}
 #content div table.list_states tbody tr .level1:first-child {padding-left:12px;}
 #content div table.list_states tr th, #content div table.list_states tr td{padding-right: 0px; padding-left: 0px;}
-#content div table.list_states tr td{text-align:center; max-width:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+#content div table.list_states tr td{text-align:center; max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 #content div table.list_states tr td:first-child{text-align:left; padding-right:3px; max-width:none; width:100%;}
 
 /* investigators */
@@ -689,9 +693,9 @@ select.error {border-color:red;}
 /* process */
 #content div table.list_process_option_parameter {width:100%;}
 #content div table.list_process_option_parameter thead tr th { background: #d6edff;}
-#content div table.list_process_option_parameter thead tr:nth-child(1) th { border-top: 1px solid #3d80b3; text-align:center; padding-bottom:3px;}
-#content div table.list_process_option_parameter thead tr:nth-child(2) td, #content div table.list_process_option_parameter thead tr:nth-child(2) th {height:160px; overflow:hidden; text-overflow:ellipsis;}
-#content div table.list_process_option_parameter thead tr:nth-child(2) th div {
+#content div table.list_process_option_parameter thead tr:nth-child(1) th {border-top: 1px solid #3d80b3; padding-bottom:3px;}
+#content div table.list_process_option_parameter thead tr:nth-child(1) th {height:123px; overflow:hidden; text-overflow:ellipsis;}
+#content div table.list_process_option_parameter thead tr:nth-child(1) th div {
     line-height: 1.5em;
     display:block;
     white-space:nowrap;
@@ -699,14 +703,15 @@ select.error {border-color:red;}
     padding-left:3px;
     width:0px;
     min-width:15px;
+    margin: 0 auto;
     
     writing-mode: tb-rl;
     filter: flipv fliph;
-    transform: rotate(270deg) translate(-160px,0);
+    transform: rotate(270deg) translate(-123px,0);
     transform-origin: 0 0;
-    -moz-transform: rotate(270deg) translate(-160px,0);
+    -moz-transform: rotate(270deg) translate(-123px,0);
     -moz-transform-origin: 0 0;
-    -webkit-transform: rotate(270deg) translate(-160px,0);
+    -webkit-transform: rotate(270deg) translate(-123px,0);
     -webkit-transform-origin: 0 0;
     }
 #content div table.list_process_option_parameter thead tr th { border-left: 1px solid #3d80b3;}
@@ -718,15 +723,15 @@ select.error {border-color:red;}
 #content div table.list_process_option_parameter tbody tr .level1 {border-top:1px solid #BDD4E6;}
 #content div table.list_process_option_parameter tbody tr .level1:first-child {padding-left:12px;}
 #content div table.list_process_option_parameter tr th, #content div table.list_process_option_parameter tr td{padding-right: 0px; padding-left: 0px;}
-#content div table.list_process_option_parameter tr td{text-align:center; max-width:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+#content div table.list_process_option_parameter tr td{text-align:center; max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 #content div table.list_process_option_parameter tr td:first-child{text-align:left; padding-right:3px; max-width:none; width:100%;}
 
 /* state */
 #content div table.list_state_option_parameter_property {width:100%;}
 #content div table.list_state_option_parameter_property thead tr th { background: #d6edff;}
-#content div table.list_state_option_parameter_property thead tr:nth-child(1) th { border-top: 1px solid #3d80b3; text-align:center; padding-bottom:3px;}
-#content div table.list_state_option_parameter_property thead tr:nth-child(2) td, #content div table.list_state_option_parameter_property thead tr:nth-child(2) th {height:160px; overflow:hidden; text-overflow:ellipsis;}
-#content div table.list_state_option_parameter_property thead tr:nth-child(2) th div {
+#content div table.list_state_option_parameter_property thead tr:nth-child(1) th {border-top: 1px solid #3d80b3; padding-bottom:3px;}
+#content div table.list_state_option_parameter_property thead tr:nth-child(1) th {height:123px; overflow:hidden; text-overflow:ellipsis;}
+#content div table.list_state_option_parameter_property thead tr:nth-child(1) th div {
     line-height: 1.5em;
     display:block;
     white-space:nowrap;
@@ -734,14 +739,15 @@ select.error {border-color:red;}
     padding-left:3px;
     width:0px;
     min-width:15px;
+    margin: 0 auto;
     
     writing-mode: tb-rl;
     filter: flipv fliph;
-    transform: rotate(270deg) translate(-160px,0);
+    transform: rotate(270deg) translate(-123px,0);
     transform-origin: 0 0;
-    -moz-transform: rotate(270deg) translate(-160px,0);
+    -moz-transform: rotate(270deg) translate(-123px,0);
     -moz-transform-origin: 0 0;
-    -webkit-transform: rotate(270deg) translate(-160px,0);
+    -webkit-transform: rotate(270deg) translate(-123px,0);
     -webkit-transform-origin: 0 0;
     }
 #content div table.list_state_option_parameter_property thead tr th { border-left: 1px solid #3d80b3;}
@@ -753,15 +759,15 @@ select.error {border-color:red;}
 #content div table.list_state_option_parameter_property tbody tr .level1 {border-top:1px solid #BDD4E6;}
 #content div table.list_state_option_parameter_property tbody tr .level1:first-child {padding-left:12px;}
 #content div table.list_state_option_parameter_property tr th, #content div table.list_state_option_parameter_property tr td{padding-right: 0px; padding-left: 0px;}
-#content div table.list_state_option_parameter_property tr td{text-align:center; max-width:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+#content div table.list_state_option_parameter_property tr td{text-align:center; max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 #content div table.list_state_option_parameter_property tr td:first-child{text-align:left; padding-right:3px; max-width:none; width:100%;}
 
 /* state property */
 #content div table.list_state_property_labels {width:100%;}
 #content div table.list_state_property_labels thead tr th { background: #d6edff;}
-#content div table.list_state_property_labels thead tr:nth-child(1) th { border-top: 1px solid #3d80b3; text-align:center; padding-bottom:3px;}
-#content div table.list_state_property_labels thead tr:nth-child(2) td, #content div table.list_state_property_labels thead tr:nth-child(2) th {height:160px; overflow:hidden; text-overflow:ellipsis;}
-#content div table.list_state_property_labels thead tr:nth-child(2) th div {
+#content div table.list_state_property_labels thead tr:nth-child(1) th {border-top: 1px solid #3d80b3; padding-bottom:3px;}
+#content div table.list_state_property_labels thead tr:nth-child(1) th {height:123px; overflow:hidden; text-overflow:ellipsis;}
+#content div table.list_state_property_labels thead tr:nth-child(1) th div {
     line-height: 1.5em;
     display:block;
     white-space:nowrap;
@@ -769,14 +775,15 @@ select.error {border-color:red;}
     padding-left:3px;
     width:15px;
     min-width:15px;
+    margin: 0 auto;
     
     writing-mode: tb-rl;
     filter: flipv fliph;
-    transform: rotate(270deg) translate(-160px,0);
+    transform: rotate(270deg) translate(-123px,0);
     transform-origin: 0 0;
-    -moz-transform: rotate(270deg) translate(-160px,0);
+    -moz-transform: rotate(270deg) translate(-123px,0);
     -moz-transform-origin: 0 0;
-    -webkit-transform: rotate(270deg) translate(-160px,0);
+    -webkit-transform: rotate(270deg) translate(-123px,0);
     -webkit-transform-origin: 0 0;
     }
 #content div table.list_state_property_labels thead tr th { border-left: 1px solid #3d80b3;}
@@ -788,14 +795,14 @@ select.error {border-color:red;}
 #content div table.list_state_property_labels tbody tr .level1 {border-top:1px solid #BDD4E6;}
 #content div table.list_state_property_labels tbody tr .level1:first-child {padding-left:12px;}
 #content div table.list_state_property_labels tr th, #content div table.list_state_property_labels tr td{padding-right: 0px; padding-left: 0px;}
-#content div table.list_state_property_labels tr td{text-align:center; max-width:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+#content div table.list_state_property_labels tr td{text-align:center; max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 #content div table.list_state_property_labels tr td:first-child{text-align:left; padding-right:3px; max-width:none; width:100%;}
 
 /* state property row */
 #content div table.list_state_property_row_simulation_batches {width:100%;}
 #content div table.list_state_property_row_simulation_batches thead tr th { background: #d6edff;}
-#content div table.list_state_property_row_simulation_batches thead tr:nth-child(1) th { border-top: 1px solid #3d80b3; text-align:center; padding-bottom:3px;}
-#content div table.list_state_property_row_simulation_batches thead tr:nth-child(1) td, #content div table.list_state_property_labels thead tr:nth-child(1) th {height:160px; overflow:hidden; text-overflow:ellipsis;}
+#content div table.list_state_property_row_simulation_batches thead tr:nth-child(1) th {border-top: 1px solid #3d80b3; padding-bottom:3px;}
+#content div table.list_state_property_row_simulation_batches thead tr:nth-child(1) th {height:123px; overflow:hidden; text-overflow:ellipsis;}
 #content div table.list_state_property_row_simulation_batches thead tr:nth-child(1) th div {
     line-height: 1.5em;
     display:block;
@@ -804,14 +811,15 @@ select.error {border-color:red;}
     padding-left:3px;
     width:0px;
     min-width:15px;
+    margin: 0 auto;
     
     writing-mode: tb-rl;
     filter: flipv fliph;
-    transform: rotate(270deg) translate(-160px,0);
+    transform: rotate(270deg) translate(-123px,0);
     transform-origin: 0 0;
-    -moz-transform: rotate(270deg) translate(-160px,0);
+    -moz-transform: rotate(270deg) translate(-123px,0);
     -moz-transform-origin: 0 0;
-    -webkit-transform: rotate(270deg) translate(-160px,0);
+    -webkit-transform: rotate(270deg) translate(-123px,0);
     -webkit-transform-origin: 0 0;
     }
 #content div table.list_state_property_row_simulation_batches thead tr th { border-left: 1px solid #3d80b3;}
@@ -823,7 +831,7 @@ select.error {border-color:red;}
 #content div table.list_state_property_row_simulation_batches tbody tr .level1 {border-top:1px solid #BDD4E6;}
 #content div table.list_state_property_row_simulation_batches tbody tr .level1:first-child {padding-left:12px;}
 #content div table.list_state_property_row_simulation_batches tr th, #content div table.list_state_property_row_simulation_batches tr td{padding-right: 0px; padding-left: 0px;}
-#content div table.list_state_property_row_simulation_batches tr td{text-align:center; max-width:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+#content div table.list_state_property_row_simulation_batches tr td{text-align:center; max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 #content div table.list_state_property_row_simulation_batches tr td:first-child{text-align:left; padding-right:3px; max-width:none; width:100%;}
 
 /****************
