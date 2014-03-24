@@ -1237,27 +1237,27 @@ def sitemap_top_level(request):
     return render_template('sitemap_top_level.xml', request, data = {
         'ROOT_URL': settings.ROOT_URL,
         'organisms': models.Organism.objects.all(),
-        'simulation_batches': models.SimulationBatch.objects.all(),
-        'simulations': models.Simulation.objects.all(),
+        'simulation_batches': models.SimulationBatch.objects,
+        'simulations': models.Simulation.objects,
         'investigators': models.Investigator.objects.all(),
         'options': models.Option.objects
-            .values('name', 'state__name', 'process__name', 'simulation_batch__date')
+            .values('name', 'state__name', 'process__name')
             .annotate(Count('name'), Count('state__name'), Count('process__name'), date=Max('simulation_batch__date'))
             .order_by('process__name', 'state__name', 'name'),
         'parameters': models.Parameter.objects
-            .values('name', 'state__name', 'process__name', 'simulation_batch__date')
+            .values('name', 'state__name', 'process__name')
             .annotate(Count('name'), Count('state__name'), Count('process__name'), date=Max('simulation_batch__date'))
             .order_by('process__name', 'state__name', 'name'),
         'processes': models.Process.objects
-            .values('name', 'simulation_batch__date')
+            .values('name')
             .annotate(Count('name'), date=Max('simulation_batch__date'))
             .order_by('name'),
         'states': models.State.objects
-            .values('name', 'simulation_batch__date')
+            .values('name')
             .annotate(Count('name'), date=Max('simulation_batch__date'))
             .order_by('name'),
         'state_properties': models.Property.objects
-            .values('name', 'state__name', 'state__simulation_batch__date')
+            .values('name', 'state__name')
             .annotate(Count('name'), Count('state__name'), date=Max('state__simulation_batch__date'))
             .order_by('state__name', 'name')
         })
