@@ -13,6 +13,12 @@ Created: 2014-03-10
 
 {% block head_title %}{{ block.super }} &rsaquo; State &rsaquo; {{state_name}} &rsaquo; {{property_name}}{% endblock %}
 
+{% block head %}
+{{ block.super }}
+	<!-- disallow bots -->
+	<meta name="robots" content="nofollow" />
+{% endblock %}
+
 {% block content %}
 
 <div>
