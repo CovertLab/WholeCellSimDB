@@ -205,7 +205,9 @@ class Property(models.Model):
         returnVal.fill(numpy.NaN)
             
         for idx, sim in enumerate(simulations):
-            returnVal[:, :, :sim.length, idx] = sim.property_values.get(property=self).get_dataset_slice(rowLabels, colLabels)
+            sim_val = sim.property_values.get(property=self).get_dataset_slice(rowLabels, colLabels)
+            if sim_val is not None:
+                returnVal[:, :, :sim.length, idx] = sim_val
             
         return returnVal
     
@@ -311,6 +313,9 @@ class PropertyValue(models.Model):
             return False
             
     def get_dataset_slice(self, rowLabels = None, colLabels = None):
+        if self.shape is None:
+            return
+    
         if rowLabels is None and colLabels is None:
             returnVal = numpy.empty(self.shape, dtype = self.dtype)
             self.dataset.read_direct(returnVal)

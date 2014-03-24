@@ -619,6 +619,9 @@ def get_data_series(request):
             
     for data_series_request in data_series_requests:
         property_value = models.PropertyValue.objects.get(simulation__id=data_series_request['simulation'], property__id=data_series_request['property'])
+        if property_value.shape is None:
+            continue
+        
         property = property_value.property
         state = property.state
         batch = state.simulation_batch
@@ -846,6 +849,9 @@ def state_property_row_col_batch_download(request, state_name, property_name, ro
         tmp_filename = tmp_file.filename
         
         for pv in prop.values.all():
+            if pv.shape is None:
+                continue
+         
             sim = pv.simulation
             pathname = '%s/%s/%d/%s/%s%s%s/data' % (batch.organism.name, batch.name, sim.batch_index, state_name, property_name, '/%s' % row_name if row_name else '', '/%s' % col_name if col_name else '', )
             dset = tmp_file.create_dataset(pathname, 
@@ -889,6 +895,9 @@ def state_property_row_col_batch_download(request, state_name, property_name, ro
             
         data = []
         for pv in prop.values.all():
+            if pv.shape is None:
+                continue
+                
             sim = pv.simulation
 
             tmp = numpy.transpose(pv.get_dataset_slice(row, col)[:,:,::downsample_step], (2, 0, 1)).squeeze()
