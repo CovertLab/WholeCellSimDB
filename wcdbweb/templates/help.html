@@ -113,15 +113,22 @@ mysql &gt;&gt; flush privileges;
 <li><p>Create a directory to store the HDF5 simulation data, and grant permissions to the webserver daemon:
     <pre>
 mkdir /path/to/WholeCellDB/wcdb/data
-sudo chown :&lt;apache-user&gt;. /path/to/WholeCellDB/wcdb/data
+sudo chown :&lt;apache-user&gt; /path/to/WholeCellDB/wcdb/data
 sudo chmod ug+rw /path/to/WholeCellDB/wcdb/data
 </pre>
     </p></li>
 <li><p>Create a temporary directory, and grant permissions to the webserver daemon:
     <pre>
 mkdir /path/to/WholeCellDB/tmp
-sudo chown :&lt;apache-user&gt;. /path/to/WholeCellDB/tmp
+sudo chown :&lt;apache-user&gt; /path/to/WholeCellDB/tmp
 sudo chmod ug+rw /path/to/WholeCellDB/tmp
+</pre>
+    </p></li>
+<li><p>Create a file to store error logs:
+    <pre>
+mkdir /path/to/WholeCellDB/log
+sudo chown :&lt;apache-user&gt; /path/to/WholeCellDB/log
+sudo chmod ug+rw /path/to/WholeCellDB/log
 </pre>
     </p></li>
 <li><p>Edit the settings file <tt>/path/to/WholeCellDB/WholeCellDB/settings.py</tt></p>
@@ -179,8 +186,8 @@ python manage.py syncdb
 <li><p>Build search indices and grant permissions to webserver daemon:
     <pre>
 python manage.py rebuild_index
-sudo chown -R :&lt;apache-user&gt;. /path/to/WholeCellDB/wcdbsearch/indexes
-sudo chmod ug+rw /path/to/WholeCellDB/wcdbsearch/indexes
+sudo chown -R :&lt;apache-user&gt; /path/to/WholeCellDB/wcdbsearch/indexes
+sudo chmod -R ug+rw /path/to/WholeCellDB/wcdbsearch/indexes
 </pre>
     </p></li>
     
