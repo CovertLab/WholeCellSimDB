@@ -17,12 +17,12 @@ import sys
 import tempfile
 import zipfile
 
-def render_template(templateFile, request, data = {}):
+def render_template(templateFile, request, data = {}, mimetype = 'text/html'):
     #add data
     data['last_updated_date'] = datetime.datetime.fromtimestamp(os.path.getmtime(os.path.join(settings.TEMPLATE_DIRS[0], templateFile)))
 
     #render
-    return render_to_response(templateFile, data, context_instance = RequestContext(request))
+    return render_to_response(templateFile, data, context_instance = RequestContext(request), mimetype = mimetype)
         
 def get_organism_list_with_stats(qs):
     organisms = []

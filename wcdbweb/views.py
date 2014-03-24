@@ -1226,6 +1226,17 @@ def search_advanced_states(batches, forms):
                 batches = batches.exclude(states__name = state, states__properties__name=property)
     
     return batches
+    
+def robots(request):
+    return render_template('robots.txt', request, data = {
+        'organisms': models.Organism.objects.values('id'),
+        'simulation_batches': models.SimulationBatch.objects.values('id'),
+        'simulations': models.Simulation.objects.values('id'),
+        'states': models.State.objects.values('name').distinct(),
+        'state_properties': models.Property.objects.values('name', 'state__name').distinct(),
+        #'state_property_rows': models.PropertyLabel.objects.filter(dimension=0).values('name', 'property__name', 'property__state__name').distinct(),
+        'investigators': models.Investigator.objects.values('id'),
+        }, mimetype = 'text/plain')
 
 def sitemap(request):
     return render_template('sitemap.xml', request, data = {
