@@ -107,6 +107,8 @@ Created: 2014-03-10
 {% endblock %}
 
 {% block action_icons %}
+{% if request.user.is_authenticated %}
 <a href="{% url wcdbweb.views.state_download state_name=state_name %}"><img src="{% get_static_prefix %}img/hdf.png" alt="HDF5" title="HDF5"/></a>
+{% endif %}
 {{ block.super }}
 {% endblock %}

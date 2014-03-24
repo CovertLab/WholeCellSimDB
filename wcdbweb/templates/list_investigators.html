@@ -20,7 +20,7 @@ Created: 2013-09-13
     <thead>
         <tr>
             <th colspan="2">Investigator</th>
-            <th colspan="4">Simulations</th>
+            <th colspan="{{request.user.is_authenticated|add:3}}">Simulations</th>
         </tr>
         <tr>
             <th>Name</th>
@@ -28,7 +28,9 @@ Created: 2013-09-13
             <th>No. organisms</th>
             <th>No. batches</th>
             <th>No. simulations</th>
+            {% if request.user.is_authenticated %}
             <th>Download</th>
+            {% endif %}
         </tr>
     </thead>
     <tbody>
@@ -39,7 +41,9 @@ Created: 2013-09-13
             <td>{{ investigator.n_organism }}</td>
             <td>{{ investigator.n_simulation_batch }}</td>
             <td>{{ investigator.n_simulation }}</td>
+            {% if request.user.is_authenticated %}
             <td><a href="{% url wcdbweb.views.investigator_download id=investigator.id %}">HDF5</a></td>
+            {% endif %}
         </tr>
         {% endfor %}
     </tbody>

@@ -61,6 +61,8 @@ option.subsub span{
 input.error {border-color:red;}
 select.error {border-color:red;}
 
+p.error {color:red; }
+
 /****************
  * header 
  ****************/

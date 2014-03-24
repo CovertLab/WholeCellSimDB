@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.core.servers.basehttp import FileWrapper
 from django.db.models import Avg, Count, Min, Max
@@ -691,12 +692,14 @@ def download(request):
                 }
             )
     else:
+        batch_ids = form.cleaned_data['simulation_batches']    
         batches = models.SimulationBatch.objects.filter(id__in=form.cleaned_data['simulation_batches'])
         response = helpers.download_batches(batches, 'WholeCellDB')
         
     response['X-Robots-Tag'] = 'noindex'
     return response
 
+@login_required
 def organism_download(request, id):
     organism = models.Organism.objects.get(id=id)    
     response = helpers.download_batches(organism.simulation_batches.all(), organism.name)
@@ -725,6 +728,7 @@ def simulation_download(request, id):
     file.seek(0)
     return response
 
+@login_required
 def state_download(request, state_name):
     tmp_file = helpers.create_temp_hdf5_file()
     tmp_filename = tmp_file.filename
@@ -756,6 +760,7 @@ def state_download(request, state_name):
     response['X-Robots-Tag'] = 'noindex'
     return response
 
+@login_required
 def state_property_download(request, state_name, property_name):
     tmp_file = helpers.create_temp_hdf5_file()
     tmp_filename = tmp_file.filename
@@ -786,6 +791,7 @@ def state_property_download(request, state_name, property_name):
     response['X-Robots-Tag'] = 'noindex'
     return response
 
+@login_required
 def state_property_row_download(request, state_name, property_name, row_name):
     tmp_file = helpers.create_temp_hdf5_file()
     tmp_filename = tmp_file.filename
@@ -917,7 +923,8 @@ def state_property_row_col_batch_download(request, state_name, property_name, ro
         return response
     else:
         raise ValidationError('Invalid format: %s' % format)
-    
+
+@login_required        
 def investigator_download(request, id):
     investigator = models.Investigator.objects.get(id=id)    
     response = helpers.download_batches(investigator.simulation_batches.all(), investigator.user.get_full_name())

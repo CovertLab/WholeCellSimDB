@@ -6,6 +6,7 @@ from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django.utils import simplejson
 from haystack.models import SearchResult
+from haystack.query import SearchQuerySet
 from WholeCellDB import settings
 import bson
 import datetime
@@ -19,6 +20,7 @@ import zipfile
 
 def render_template(templateFile, request, data = {}, mimetype = 'text/html'):
     #add data
+    data['request'] = request
     data['last_updated_date'] = datetime.datetime.fromtimestamp(os.path.getmtime(os.path.join(settings.TEMPLATE_DIRS[0], templateFile)))
 
     #render
@@ -42,7 +44,7 @@ def get_organism_list_with_stats(qs):
     return organisms
 
 def get_simulation_batch_list_with_stats(qs):
-    if isinstance(qs, (SearchResult, list)):
+    if isinstance(qs, (SearchQuerySet, list)):
         batches = []
         for batch in qs:
             if isinstance(batch, SearchResult):

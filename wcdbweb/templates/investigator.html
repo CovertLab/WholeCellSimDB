@@ -89,6 +89,8 @@ Created: 2013-09-16
 
 
 {% block action_icons %}
+{% if request.user.is_authenticated %}
 <a href="{% url wcdbweb.views.investigator_download id=investigator.id %}"><img src="{% get_static_prefix %}img/hdf.png" alt="HDF5" title="HDF5"/></a>
+{% endif %}
 {{ block.super }}
 {% endblock %}

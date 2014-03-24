@@ -180,3 +180,9 @@ class DownloadForm(forms.Form):
             for batch in organism.simulation_batches.all():
                 choices.append((batch.id, batch.name, ))
         self.fields['simulation_batches'].choices = choices
+        
+    def clean_simulation_batches(self):
+        value = self.cleaned_data['simulation_batches']
+        if len(value) > 3:
+            raise forms.ValidationError("Please select at most 3 simulation batches to download.")
+        return value

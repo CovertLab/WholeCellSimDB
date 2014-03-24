@@ -77,6 +77,8 @@ Created: 2013-09-16
 {% endblock %}
 
 {% block action_icons %}
+{% if request.user.is_authenticated %}
 <a href="{% url wcdbweb.views.organism_download id=organism.id %}"><img src="{% get_static_prefix %}img/hdf.png" alt="HDF5" title="HDF5"/></a>
+{% endif %}
 {{ block.super }}
 {% endblock %}
