@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% comment %}
+Page not found error template
+
+Author: Jonathan Karr, jkarr@stanford.edu
+Affiliation: Covert Lab, Department of Bioengineering, Stanford University
+Created: 2014-03-24
+{% endcomment %}
+
+{% block content %}
+<div>
+<h1>Page not found!</h1>
+
+<p>We don't have any URLs matching {{request_path}}.</p>
+
+<p>If you continue to see this error message please contact us at <a href="mailto:wholecell[at]lists.stanford.edu">wholecell@lists.stanford.edu</a>.</p>
+
+</div>
+{% endblock %}
