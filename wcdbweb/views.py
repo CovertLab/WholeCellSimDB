@@ -1234,7 +1234,6 @@ def robots(request):
         'simulations': models.Simulation.objects.values('id'),
         'states': models.State.objects.values('name').distinct(),
         'state_properties': models.Property.objects.values('name', 'state__name').distinct(),
-        #'state_property_rows': models.PropertyLabel.objects.filter(dimension=0).values('name', 'property__name', 'property__state__name').distinct(),
         'investigators': models.Investigator.objects.values('id'),
         }, mimetype = 'text/plain')
 
