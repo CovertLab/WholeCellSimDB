@@ -42,21 +42,24 @@ def get_organism_list_with_stats(qs):
     return organisms
 
 def get_simulation_batch_list_with_stats(qs):
-    batches = []
-    for batch in qs:
-        if isinstance(batch, SearchResult):
-            batch = batch.object
-        batches.append({
-            'id': batch.id,
-            'name': batch.name,
-            'date': batch.date,
-            'investigator': batch.investigator,
-            'organism': batch.organism,
-            'organism_version': batch.organism_version,
-            'simulations': batch.simulations,
-            'length_avg': batch.simulations.all().aggregate(Avg('length'))['length__avg']
-            })
-    return batches
+    if isinstance(qs, (SearchResult, list)):
+        batches = []
+        for batch in qs:
+            if isinstance(batch, SearchResult):
+                batch = batch.object
+            batches.append({
+                'id': batch.id,
+                'name': batch.name,
+                'date': batch.date,
+                'investigator': batch.investigator,
+                'organism': batch.organism,
+                'organism_version': batch.organism_version,
+                'simulations': batch.simulations,
+                'length_avg': batch.simulations.all().aggregate(Avg('length'))['length__avg']
+                })
+        return batches
+    else:
+        return qs.annotate(length_avg=Avg('simulations__length'))
     
 def get_investigator_list_with_stats(qs):
     investigators = []

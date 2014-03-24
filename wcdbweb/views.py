@@ -148,7 +148,7 @@ def simulation_batch(request, id):
     })
     
 def list_simulations(request):    
-    simulations = models.Simulation.objects.all().order_by('batch__organism__name', 'batch__organism_version', 'batch__name', 'batch_index')
+    simulations = models.Simulation.objects.all().order_by('batch__organism__name', 'batch__organism_version', 'batch__name', 'batch_index').select_related('simulation_batch', 'simulation_batch__organism', 'simulation_batch__investigator', 'simulation_batch__investigator__user')
     return render_template('list_simulations.html', request, data = {
         'simulations': simulations
     })
@@ -694,7 +694,7 @@ def download(request):
             templateFile = 'download.html', 
             data = {
                 'form': form,
-                'organisms': models.Organism.objects.all().order_by('name')
+                'batches': models.SimulationBatch.objects.annotate(n_simulations=Count('simulations')).values('organism__id', 'organism__name', 'name', 'id', 'n_simulations').order_by('organism__name', 'name')
                 }
             )
     else:
@@ -1005,9 +1005,9 @@ def search_advanced(request):
     
     #options
     tmp = {('option-%d-operator' % i): 'eq' for i in range(n_option_filters)}
-    tmp = dict(tmp.items() + request.POST.items())
-    option_form = forms.AdvancedSearchOptionForm(tmp)
+    tmp = dict(tmp.items() + request.POST.items())    
     option_forms = []
+    option_form = forms.AdvancedSearchOptionForm(tmp)
     for i in range(n_option_filters):
         option_form_i = copy.deepcopy(option_form)
         option_form_i.prefix = 'option-%d' % i

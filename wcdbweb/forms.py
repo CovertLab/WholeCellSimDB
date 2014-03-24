@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from django.db.models import Count
+from django.db.models import Count, Max
 from wcdb import models
 
 RESULT_FORMAT_CHOICES = (
@@ -64,35 +64,31 @@ class AdvancedSearchOptionForm(forms.Form):
         super(AdvancedSearchOptionForm, self).__init__(*args, **kwargs)
         
         global_choices = []
-        options = models.Option.objects.filter(process__isnull=True, state__isnull=True).values('name', 'index').order_by('name', 'index').distinct()
-        for i in range(options.count()):
-            option = options[i]
-            if option['index'] > 0 or (i + 1 < options.count() and option['name'] == options[i+1]['name']):
+        options = models.Option.objects.filter(process__isnull=True, state__isnull=True).values('name', 'index').annotate(Count('name'), Max('index')).order_by('name', 'index')
+        for option in options:
+            if option['index__max'] > 0:
                 tmp = '%s[%d]' % (option['name'], option['index'])
             else:
                 tmp = '%s' % (option['name'])
             global_choices.append((tmp, tmp))
-            
+                   
         process_choices = []
-        options = models.Option.objects.filter(process__isnull=False).values('process__name', 'name', 'index').order_by('process__name', 'name', 'index').distinct()
-        for i in range(options.count()):
-            option = options[i]
-            if option['index'] > 0 or (i + 1 < options.count() and option['process__name'] == options[i+1]['process__name'] and option['name'] == options[i+1]['name']):
+        options = models.Option.objects.filter(process__isnull=False).values('process__name', 'name', 'index').annotate(Count('process__name'), Count('name'), Max('index')).order_by('process__name', 'name', 'index')
+        for option in options:
+            if option['index__max'] > 0:
                 tmp = '%s.%s[%d]' % (option['process__name'], option['name'], option['index'])
             else:
                 tmp = '%s.%s' % (option['process__name'], option['name'])
             process_choices.append(('process:' + tmp, tmp))
-            
+        
         state_choices = []
-        options = models.Option.objects.filter(state__isnull=False).values('state__name', 'name', 'index').order_by('state__name', 'name', 'index').distinct()
-        for i in range(options.count()):
-            option = options[i]
-            if option['index'] > 0 or (i + 1 < options.count() and option['state__name'] == options[i+1]['state__name'] and option['name'] == options[i+1]['name']):
+        options = models.Option.objects.filter(state__isnull=False).values('state__name', 'name', 'index').annotate(Count('state__name'), Count('name'), Max('index')).order_by('state__name', 'name', 'index')
+        for option in options:
+            if option['index__max'] > 0:
                 tmp = '%s.%s[%d]' % (option['state__name'], option['name'], option['index'])
             else:
                 tmp = '%s.%s' % (option['state__name'], option['name'])
             state_choices.append(('state:' + tmp, tmp))
-            
         self.fields['option'].choices = (
             ('Global', global_choices),
             ('Process', process_choices),
@@ -113,30 +109,27 @@ class AdvancedSearchParameterForm(forms.Form):
         super(AdvancedSearchParameterForm, self).__init__(*args, **kwargs)
         
         global_choices = []
-        parameters = models.Parameter.objects.filter(process__isnull=True, state__isnull=True).values('name', 'index').order_by('name', 'index').distinct()
-        for i in range(parameters.count()):
-            parameter = parameters[i]
-            if parameter['index'] > 0 or (i + 1 < parameters.count() and parameter['name'] == parameters[i+1]['name']):
+        parameters = models.Parameter.objects.filter(process__isnull=True, state__isnull=True).values('name', 'index').annotate(Count('name'), Max('index')).order_by('name', 'index')
+        for parameter in parameters:
+            if parameter['index__max'] > 0:
                 tmp = '%s[%d]' % (parameter['name'], parameter['index'])
             else:
                 tmp = '%s' % (parameter['name'])
             global_choices.append((tmp, tmp))
             
         process_choices = []
-        parameters = models.Parameter.objects.filter(process__isnull=False).values('process__name', 'name', 'index').order_by('process__name', 'name', 'index').distinct()
-        for i in range(parameters.count()):
-            parameter = parameters[i]
-            if parameter['index'] > 0 or (i + 1 < parameters.count() and parameter['process__name'] == parameters[i+1]['process__name'] and parameter['name'] == parameters[i+1]['name']):
+        parameters = models.Parameter.objects.filter(process__isnull=False).values('process__name', 'name', 'index').annotate(Count('process__name'), Count('name'), Max('index')).order_by('process__name', 'name', 'index')
+        for parameter in parameters:
+            if parameter['index__max'] > 0:
                 tmp = '%s.%s[%d]' % (parameter['process__name'], parameter['name'], parameter['index'])
             else:
                 tmp = '%s.%s' % (parameter['process__name'], parameter['name'])
             process_choices.append(('process:' + tmp, tmp))
             
         state_choices = []
-        parameters = models.Parameter.objects.filter(state__isnull=False).values('state__name', 'name', 'index').order_by('state__name', 'name', 'index').distinct()
-        for i in range(parameters.count()):
-            parameter = parameters[i]
-            if parameter['index'] > 0 or (i + 1 < parameters.count() and parameter['state__name'] == parameters[i+1]['state__name'] and parameter['name'] == parameters[i+1]['name']):
+        parameters = models.Parameter.objects.filter(state__isnull=False).values('state__name', 'name', 'index').annotate(Count('state__name'), Count('name'), Max('index')).order_by('state__name', 'name', 'index')
+        for parameter in parameters:
+            if parameter['index__max'] > 0:
                 tmp = '%s.%s[%d]' % (parameter['state__name'], parameter['name'], parameter['index'])
             else:
                 tmp = '%s.%s' % (parameter['state__name'], parameter['name'])
@@ -159,7 +152,7 @@ class AdvancedSearchProcessForm(forms.Form):
        
     def __init__(self, *args, **kwargs):
         super(AdvancedSearchProcessForm, self).__init__(*args, **kwargs)        
-        self.fields['process'].choices = [(p['name'], p['name']) for p in models.Process.objects.values('name').order_by('name').distinct()]
+        self.fields['process'].choices = [(p['name'], p['name']) for p in models.Process.objects.values('name').distinct().order_by('name')]
         
 class AdvancedSearchStateForm(forms.Form):
     state_property = forms.ChoiceField(required = False, widget = forms.Select, label='State/property', help_text='Select a state/property')
@@ -168,9 +161,9 @@ class AdvancedSearchStateForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(AdvancedSearchStateForm, self).__init__(*args, **kwargs)
         choices = []
-        for s in models.State.objects.values('name').order_by('name').distinct():
+        for s in models.State.objects.values('name').distinct().order_by('name'):
             state_choices = []
-            for p in models.Property.objects.filter(state__name=s['name']).values('name').order_by('name').distinct():
+            for p in models.Property.objects.filter(state__name=s['name']).values('name').distinct().order_by('name'):
                 val = '%s.%s' % (s['name'], p['name'])
                 state_choices.append((val, p['name']))
             choices.append((s['name'], state_choices))

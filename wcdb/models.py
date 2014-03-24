@@ -94,8 +94,8 @@ class Parameter(models.Model):
 
     def __unicode__(self):
         names = [
-            simulation_batch.organism.name,
-            simulation_batch.name,
+            self.simulation_batch.organism.name,
+            self.simulation_batch.name,
             ]
         if self.state is not None:
             names.append(self.state.name)
@@ -581,6 +581,7 @@ class SimulationBatchManager(models.Manager):
             units = val.attrs['units']
             value = val.value
             if isinstance(value, numpy.ndarray):
+                value = value.tolist()
                 for index, index_value in enumerate(value):
                     option = batch.options.create(name = prop_name, units = units, value = index_value, index = index)
                     option.save()
@@ -594,7 +595,8 @@ class SimulationBatchManager(models.Manager):
             for prop_name, val in props.iteritems():
                 units = val.attrs['units']
                 value = val.value
-                if isinstance(value, numpy.ndarray):  
+                if isinstance(value, numpy.ndarray):
+                    value = value.tolist()
                     for index, index_value in enumerate(value):
                         option = batch.options.create(process = process, name = prop_name, units = units, value = index_value, index = index)
                         option.save()
@@ -609,6 +611,7 @@ class SimulationBatchManager(models.Manager):
                 units = val.attrs['units']
                 value = val.value
                 if isinstance(value, numpy.ndarray):  
+                    value = value.tolist()
                     for index, index_value in enumerate(value):
                         option = batch.options.create(state = state, name = prop_name, units = units, value = index_value, index = index)
                         option.save()
@@ -623,6 +626,7 @@ class SimulationBatchManager(models.Manager):
             units = val.attrs['units']
             value = val.value
             if isinstance(value, numpy.ndarray):  
+                value = value.tolist()
                 for index, index_value in enumerate(value):
                     parameter = batch.parameters.create(name = prop_name, units = units, value = index_value, index = index)
                     parameter.save()
@@ -637,6 +641,7 @@ class SimulationBatchManager(models.Manager):
                 units = val.attrs['units']
                 value = val.value
                 if isinstance(value, numpy.ndarray):  
+                    value = value.tolist()
                     for index, index_value in enumerate(value):
                         parameter = batch.parameters.create(process = process, name = prop_name, units = units, value = index_value, index = index)
                         parameter.save()
@@ -651,6 +656,7 @@ class SimulationBatchManager(models.Manager):
                 units = val.attrs['units']
                 value = val.value
                 if isinstance(value, numpy.ndarray):  
+                    value = value.tolist()
                     for index, index_value in enumerate(value):
                         parameter = batch.parameters.create(state = state, name = prop_name, units = units, value = index_value, index = index)
                         parameter.save()
