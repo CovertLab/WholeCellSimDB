@@ -689,7 +689,7 @@ def get_data_series(request):
 def download(request):
     form = forms.DownloadForm(request.POST)
     if not form.is_valid():        
-        return render_template(
+        response = render_template(
             request = request,
             templateFile = 'download.html', 
             data = {
@@ -699,15 +699,22 @@ def download(request):
             )
     else:
         batches = models.SimulationBatch.objects.filter(id__in=form.cleaned_data['simulation_batches'])
-        return helpers.download_batches(batches, 'WholeCellDB')        
+        response = helpers.download_batches(batches, 'WholeCellDB')
+        
+    response['X-Robots-Tag'] = 'noindex'
+    return response
 
 def organism_download(request, id):
     organism = models.Organism.objects.get(id=id)    
-    return helpers.download_batches(organism.simulation_batches.all(), organism.name)   
+    response = helpers.download_batches(organism.simulation_batches.all(), organism.name)
+    response['X-Robots-Tag'] = 'noindex'
+    return response
     
 def simulation_batch_download(request, id):
     batch = models.SimulationBatch.objects.get(id=id)    
-    return helpers.download_batches([batch], batch.name)    
+    response = helpers.download_batches([batch], batch.name)
+    response['X-Robots-Tag'] = 'noindex'
+    return response
     
 def simulation_download(request, id):
     simulation = models.Simulation.objects.get(id=id)
@@ -721,6 +728,7 @@ def simulation_download(request, id):
         )
     response['Content-Disposition'] = ("attachment; filename=simulation-%d.h5" % simulation.id)
     response['Content-Length'] = file.tell()
+    response['X-Robots-Tag'] = 'noindex'
     file.seek(0)
     return response
 
@@ -751,7 +759,9 @@ def state_download(request, state_name):
     
     tmp_file.close()
     
-    return helpers.render_tempfile_response(tmp_filename, state_name, 'h5', 'application/x-hdf')
+    response = helpers.render_tempfile_response(tmp_filename, state_name, 'h5', 'application/x-hdf')
+    response['X-Robots-Tag'] = 'noindex'
+    return response
 
 def state_property_download(request, state_name, property_name):
     tmp_file = helpers.create_temp_hdf5_file()
@@ -779,7 +789,9 @@ def state_property_download(request, state_name, property_name):
     
     tmp_file.close()
     
-    return helpers.render_tempfile_response(tmp_filename, '%s-%s' % (state_name, property_name), 'h5', 'application/x-hdf')
+    response = helpers.render_tempfile_response(tmp_filename, '%s-%s' % (state_name, property_name), 'h5', 'application/x-hdf')
+    response['X-Robots-Tag'] = 'noindex'
+    return response
 
 def state_property_row_download(request, state_name, property_name, row_name):
     tmp_file = helpers.create_temp_hdf5_file()
@@ -812,7 +824,9 @@ def state_property_row_download(request, state_name, property_name, row_name):
     
     tmp_file.close()
     
-    return helpers.render_tempfile_response(tmp_filename, '%s-%s-%s' % (state_name, property_name, row_name), 'h5', 'application/x-hdf')
+    response = helpers.render_tempfile_response(tmp_filename, '%s-%s-%s' % (state_name, property_name, row_name), 'h5', 'application/x-hdf')
+    response['X-Robots-Tag'] = 'noindex'
+    return response
     
 def state_property_row_col_batch_download(request, state_name, property_name, row_name, col_name, batch_id):
     if row_name is None:
@@ -850,7 +864,9 @@ def state_property_row_col_batch_download(request, state_name, property_name, ro
         tmp_file.close()
         
         filename = '%s-%s-%s-%s%s%s' % (batch.organism.name, batch.name, state_name, property_name, '-%s' % row_name if row_name else '', '-%s' % col_name if col_name else '')
-        return helpers.render_tempfile_response(tmp_filename, filename, 'h5', 'application/x-hdf')
+        response = helpers.render_tempfile_response(tmp_filename, filename, 'h5', 'application/x-hdf')
+        response['X-Robots-Tag'] = 'noindex'
+        return response
     elif format in ['json', 'bson', 'msgpack']:
         max_datapoints = 5e5
         n_datapoints = batch.simulations.count() * batch.simulations.aggregate(Max('length'))['length__max']        
@@ -893,17 +909,21 @@ def state_property_row_col_batch_download(request, state_name, property_name, ro
                     },
                 })        
         if format == 'json':
-            return helpers.render_json_response(data)
+            response = helpers.render_json_response(data)
         elif format == 'bson':
-            return helpers.render_bson_response(data)
+            response = helpers.render_bson_response(data)
         else:
-            return helpers.render_msgpack_response(data)
+            response = helpers.render_msgpack_response(data)
+        response['X-Robots-Tag'] = 'noindex'
+        return response
     else:
         raise ValidationError('Invalid format: %s' % format)
     
 def investigator_download(request, id):
     investigator = models.Investigator.objects.get(id=id)    
-    return helpers.download_batches(investigator.simulation_batches.all(), investigator.user.get_full_name())
+    response = helpers.download_batches(investigator.simulation_batches.all(), investigator.user.get_full_name())
+    response['X-Robots-Tag'] = 'noindex'
+    return response
     
 ### SED-ML    
 def simulation_batch_sedml(request, id):
@@ -921,6 +941,7 @@ def simulation_batch_sedml(request, id):
                 }, 
         }, context_instance = RequestContext(request), mimetype = 'application/xml')
     response['Content-Disposition'] = ("attachment; filename=simulation_batch-%d.sed-ml.xml" % batch.id)
+    response['X-Robots-Tag'] = 'noindex'
     return response
    
 def simulation_sedml(request, id):
@@ -939,8 +960,8 @@ def simulation_sedml(request, id):
                 }, 
         }, context_instance = RequestContext(request), mimetype = 'application/xml')
     response['Content-Disposition'] = ("attachment; filename=simulation-%d.sed-ml.xml" % simulation.id)
+    response['X-Robots-Tag'] = 'noindex'
     return response
-    
     
 ###################
 ### searching

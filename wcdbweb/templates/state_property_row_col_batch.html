@@ -21,6 +21,12 @@ Created: 2014-03-10
 {% if col_name != '' %} &rsaquo; {{col_name}}{% endif %}
 {% endblock %}
 
+{% block head %}
+{{ block.super }}
+	<!-- disallow bots -->
+	<meta name="robots" content="noindex" />
+{% endblock %}
+
 {% block content %}
 
 <div>

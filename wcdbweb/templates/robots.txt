@@ -6,38 +6,37 @@ User-agent: *
 Crawl-delay: 10
 Host: {{ROOT_DOMAIN}}
 Sitemap: {% url wcdbweb.views.sitemap %}
-Disallow: {% url wcdbweb.views.list_data_series %}/
-Disallow: {% url wcdbweb.views.get_data_series %}/
+
+Disallow: /*?* #pages with query parameters
+
+Disallow: {% url wcdbweb.views.list_data_series %}
+Disallow: {% url wcdbweb.views.get_data_series %}
 
 {% for organism in organisms %}
 Disallow: {% url wcdbweb.views.organism_download id=organism.id %}
-Disallow: {% url wcdbweb.views.organism_download id=organism.id %}/
 {% endfor %}
 
 {% for batch in simulation_batches %}
 Disallow: {% url wcdbweb.views.simulation_batch_download id=batch.id %}
-Disallow: {% url wcdbweb.views.simulation_batch_download id=batch.id %}/
+Disallow: {% url wcdbweb.views.simulation_batch_sedml id=batch.id %}
 {% endfor %}
 
 {% for simulation in simulations %}
 Disallow: {% url wcdbweb.views.simulation_download id=simulation.id %}
-Disallow: {% url wcdbweb.views.simulation_download id=simulation.id %}/
+Disallow: {% url wcdbweb.views.simulation_sedml id=simulation.id %}
 {% endfor %}
 
 {% for state in states %}
 Disallow: {% url wcdbweb.views.state_download state_name=state.name %}
-Disallow: {% url wcdbweb.views.state_download state_name=state.name %}/
 {% endfor %}
 
 {% for state_property in state_properties %}
 Disallow: {% url wcdbweb.views.state_property_download state_name=state_property.state__name property_name=state_property.name %}
-Disallow: {% url wcdbweb.views.state_property_download state_name=state_property.state__name property_name=state_property.name %}/
-Disallow: {% url wcdbweb.views.state_property state_name=state_property.state__name property_name=state_property.name %}/row/
+Disallow: {% url wcdbweb.views.state_property state_name=state_property.state__name property_name=state_property.name %}/row
 {% endfor %}
 
 {% for investigator in investigators %}
 Disallow: {% url wcdbweb.views.investigator_download id=investigator.id %}
-Disallow: {% url wcdbweb.views.investigator_download id=investigator.id %}/
 {% endfor %}
 
 {% endgapless %}
