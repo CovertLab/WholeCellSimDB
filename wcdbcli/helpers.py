@@ -7,18 +7,18 @@ def save_simulation_batch(batch_dir, first_sim_idx = None, max_num_simulations =
         first_sim_idx = 1
     
     #save batch
-    SimulationBatch.objects.create_simulation_batch(os.path.join(batch_dir, '%d' % first_sim_idx, 'data.h5'))
+    SimulationBatch.objects.create_simulation_batch(os.path.join(batch_dir, '%d.h5' % first_sim_idx))
         
     #save simulations
-    sim_dirs = glob.glob(os.path.join(batch_dir, "[0-9]*"))
-    sim_dirs = sim_dirs[first_sim_idx-1:]
+    sim_files = glob.glob(os.path.join(batch_dir, "[0-9]*.h5"))
+    sim_files = sim_files[first_sim_idx-1:]
     if max_num_simulations is not None:
-        sim_dirs = sim_dirs[:max_num_simulations]
+        sim_files = sim_files[:max_num_simulations]
     
-    for sim_idx, sim_dir in enumerate(sim_dirs):
-        print "Saving simulation %d of %d ... " % (sim_idx+1, len(sim_dirs))
-        save_simulation(sim_dir)
+    for sim_idx, sim_file in enumerate(sim_files):
+        print "Saving simulation %d of %d ... " % (sim_idx+1, len(sim_files))
+        save_simulation(sim_file)
 
-def save_simulation(sim_dir):
-    sim = Simulation.objects.create_simulation(os.path.join(sim_dir, 'data.h5'))
-    sim.save()    
+def save_simulation(sim_file):
+    sim = Simulation.objects.create_simulation(sim_file)
+    sim.save()

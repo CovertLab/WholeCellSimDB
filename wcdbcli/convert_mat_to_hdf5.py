@@ -27,7 +27,7 @@ def main():
     excluded_properties = ['Metabolite/processAllocations', 'Metabolite/processRequirements', 'Metabolite/processUsages']
     
     #create h5 file
-    h5file = h5py.File(os.path.join(sim_dir, 'data.h5'), 'w')
+    h5file = h5py.File('%s.h5' % sim_dir, 'w')
     
     #load metadata
     md = scipy.io.loadmat(os.path.join(sim_dir, 'metadata.mat'))

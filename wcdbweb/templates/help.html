@@ -213,11 +213,11 @@ path_to_simuation_batch = '/path/to/simulation-batch'
 n_simulations = 128
 
 # Load simulation batch
-models.SimulationBatch.objects.create_simulation_batch(os.path.join(path_to_simuation_batch, '1', 'data.h5'))
+models.SimulationBatch.objects.create_simulation_batch(os.path.join(path_to_simuation_batch, '1.h5'))
     
 # Load individual simulations
 for idx in range(1, n_simulations + 1):
-    models.Simulation.objects.create_simulation(os.path.join(path_to_simuation_batch, '%d' % idx, 'data.h5'))
+    models.Simulation.objects.create_simulation(os.path.join(path_to_simuation_batch, '%d.5' % idx))
 </pre>
 </p>
 
@@ -225,7 +225,7 @@ for idx in range(1, n_simulations + 1):
 <h3>Simulation file format</h3>
 <p>WholeCellDB imports and exports simulations using the following format.</p>
 
-<p>First, simulations must be organized into batches. A batch is a set of simulations run using the same code, same options, and same parameter values. Individual simulations within a batch should differ only in their random number generator seeds. Batches must be stored as a folder, with subfolders for each simulation numbered sequentially starting from 1. Each simulation subfolder must contain a file "data.h5" containing the predicted phenotypes for each simulation.</p>
+<p>First, simulations must be organized into batches. A batch is a set of simulations run using the same code, same options, and same parameter values. Individual simulations within a batch should differ only in their random number generator seeds. Batches must be stored as a folder, with HDF5 files for each simulation numbered sequentially starting from 1 containing the predicted phenotypes for each simulation.</p>
 
 <p>Second, each simulation (including its metadata and predicted phenotypes) must be stored using the <a href="http://www.hdfgroup.org/HDF5/">HDF5 format</a> using the following schema (red indicates HDF groups, blue indicates HDF datasets, cyan indicates HDF dataset values, green indicates HDF dataset attribute containers, grey indicates individual HDF dataset attributes). An example simulation is available <a href="{% url wcdbweb.views.simulation_download id=1 %}">here</a>.
 <ul class="hdf-schema">
