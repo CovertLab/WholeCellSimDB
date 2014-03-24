@@ -54,7 +54,7 @@ Created: 2014-03-10
                 <td class="level1"><a href="{% url wcdbweb.views.simulation_batch id=batch.list.0.property__state__simulation_batch__id %}">{{batch.grouper}}</a></td>
                 {% regroup_by batch.list by 'name' col_names as cols %}
                 {% for col in cols %}
-                {% spaceless %}<td class="level1">
+                <td class="level1">
                 {% if col.list|length > 0 %}
                     {% if batch.list.0.property__state__simulation_batch__id in property_value_batches %}
                     <a href="{% url wcdbweb.views.state_property_row_col_batch state_name=state_name property_name=property_name row_name=row_name col_name=col.grouper batch_id=col.list.0.property__state__simulation_batch__id %}">&#10003;</a>
@@ -62,7 +62,7 @@ Created: 2014-03-10
                     &#10003;
                     {% endif %}                    
                 {% endif %}
-                </td>{% endspaceless %}
+                </td>
                 {% endfor %}
             </tr>
             {% endfor %}

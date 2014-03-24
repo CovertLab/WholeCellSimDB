@@ -393,10 +393,10 @@ def state_property_row(request, state_name, property_name, row_name):
         .order_by('property__state__simulation_batch__organism__name', 'property__state__simulation_batch__name', 'name')
         
     tmp = models.PropertyValue.objects \
-        .filter(property__name=property_name, property__state__name=state_name) \
+        .filter(property__name=property_name, property__state__name=state_name, dtype__isnull=False) \
         .values('simulation__batch__id', 'simulation__batch__name') \
         .distinct()
-    property_value_batches = {x['simulation__batch__id']: x['simulation__batch__name'] for x in tmp}
+    property_value_batches = [x['simulation__batch__id'] for x in tmp]
     
     return render_template('state_property_row.html', request, data = {
         'state_name': state_name, 
