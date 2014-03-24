@@ -407,11 +407,11 @@ function setupInitialPlots() {
     var selected_property_ids = [
         {% for data_series in default_data_series %}
         {
-            organism: {{data_series.organism.id}},
-            simulation_batch: {{data_series.simulation_batch.id}},
-            simulation: {{data_series.simulation.id}},
-            state: {{data_series.state.id}},
-            property: {{data_series.property.id}},
+            organism: {{data_series.property__state__simulation_batch__organism__id}},
+            simulation_batch: {{data_series.property__state__simulation_batch__id}},
+            simulation: {{data_series.simulation__id}},
+            state: {{data_series.property__state__id}},
+            property: {{data_series.property__id}},
             row: {% if data_series.row %}{{data_series.row.id}}{% else %}''{% endif %},
             col: {% if data_series.col %}{{data_series.col.id}}{% else %}''{% endif %},
             },

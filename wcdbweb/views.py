@@ -26,9 +26,9 @@ import tempfile
 ###################
 def index(request):
     summary = {
-        'n_in_silico_organism': models.Organism.objects.all().count(),
-        'n_simulation_batch': models.SimulationBatch.objects.all().count(), 
-        'n_simulation': models.Simulation.objects.all().count(), 
+        'n_in_silico_organism': models.Organism.objects.count(),
+        'n_simulation_batch': models.SimulationBatch.objects.count(), 
+        'n_simulation': models.Simulation.objects.count(), 
         'n_process': models.Process.objects.values('name').distinct().count(),
         'n_state': models.State.objects.values('name').distinct().count(),
         'n_property': models.Property.objects
@@ -43,29 +43,19 @@ def index(request):
             .values('name', 'process__name', 'state__name')
             .distinct()
             .count(),
-        'n_investigator': models.Investigator.objects.all().count(),        
+        'n_investigator': models.Investigator.objects.count(),        
     }
     
-    batch = models.SimulationBatch.objects.get(id=1)
-    state = batch.states.get(name='MetabolicReaction')
-    prop = state.properties.get(name='growth')
-    default_data_series = []
-    for sim in batch.simulations.all()[:5]:
-        default_data_series.append({
-            'organism': batch.organism, 
-            'simulation_batch': batch, 
-            'simulation': sim, 
-            'state': state, 
-            'property': prop, 
-            'row': None, 
-            'col': None,
-            })
+    default_data_series = models.PropertyValue.objects \
+        .filter(property__state__simulation_batch__id=1, property__state__name='MetabolicReaction', property__name='growth', simulation__batch_index__lte=5) \
+        .values('property__id', 'property__state__id', 'property__state__simulation_batch__id', 'property__state__simulation_batch__organism__id', 'simulation__id') \
+        .order_by('simulation__batch_index')
     
     return render_template('index.html', request, data = {
             'summary': summary,
             'default_data_series': default_data_series,
             'x_axis': {
-                'max': models.Simulation.objects.aggregate(Max('length'))['length__max'],
+                'max': models.Simulation.objects.filter(batch__id=1, batch_index__lte=5).aggregate(Max('length'))['length__max'],
                 },
             'y_axis': {
                 'label': 'Value',
