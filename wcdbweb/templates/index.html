@@ -283,16 +283,13 @@ $(
 var setData = function(data) {
     plotContainer.find('.status').fadeOut(1000);
     
-    if (data.length > 0) {
-        var downsample_step = data[0].attrs.downsample_step;
-    } else {
-        var downsample_step = '';
-    }
-    
+    var downsample_step = '';    
     var series = [];
     var xaxisMax = 0;
     for (var i = 0; i < data.length; i++) {
         xaxisMax = Math.max(xaxisMax, data[i].data.length);
+        
+        downsample_step = data[i].attrs.downsample_step
         
         timePoints = [];
         for (j = 0; j < data[i].data.length; j++) {
