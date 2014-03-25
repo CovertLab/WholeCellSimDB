@@ -7,10 +7,15 @@ Crawl-delay: 10
 Host: {{ROOT_DOMAIN}}
 Sitemap: {% url wcdbweb.views.sitemap %}
 
-Disallow: /*?* #pages with query parameters
-
 Disallow: {% url wcdbweb.views.list_data_series %}
 Disallow: {% url wcdbweb.views.get_data_series %}
+
+Disallow: {% url wcdbweb.views.search_basic %}/?
+Disallow: {% url wcdbweb.views.search_basic %}?
+Disallow: {% url wcdbweb.views.search_advanced %}/?
+Disallow: {% url wcdbweb.views.search_advanced %}?
+Disallow: {% url wcdbweb.views.download %}/?
+Disallow: {% url wcdbweb.views.download %}?
 
 {% for organism in organisms %}
 Disallow: {% url wcdbweb.views.organism_download id=organism.id %}

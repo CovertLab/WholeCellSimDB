@@ -98,7 +98,7 @@ Updated: 2014-03-09
 	<url>
 		<loc>{{ ROOT_URL }}{% url wcdbweb.views.organism id=organism.id %}</loc> 
 		<lastmod>{{ organism.simulation_batches.latest.date|set_time_zone|date:"c" }}</lastmod>
-		<changefreq>montly</changefreq>
+		<changefreq>monthly</changefreq>
 	</url>
 	{% endfor %}
 	
@@ -107,7 +107,7 @@ Updated: 2014-03-09
 	<url>
 		<loc>{{ ROOT_URL }}{% url wcdbweb.views.investigator id=investigator.id %}</loc> 
 		<lastmod>{{ investigator.user.date_joined|set_time_zone|date:"c" }}</lastmod>
-		<changefreq>montly</changefreq>
+		<changefreq>monthly</changefreq>
 	</url>
 	{% endfor %}
 	
@@ -122,7 +122,7 @@ Updated: 2014-03-09
 		<loc>{{ ROOT_URL }}{% url wcdbweb.views.option option_name=option.name %}</loc> 
 		{% endif %}
 		<lastmod>{{ option.date|set_time_zone|date:"c" }}</lastmod>
-		<changefreq>montly</changefreq>
+		<changefreq>monthly</changefreq>
 	</url>
 	{% endfor %}
 	
@@ -137,7 +137,7 @@ Updated: 2014-03-09
 		<loc>{{ ROOT_URL }}{% url wcdbweb.views.parameter parameter_name=parameter.name %}</loc> 
 		{% endif %}
 		<lastmod>{{ parameter.date|set_time_zone|date:"c" }}</lastmod>
-		<changefreq>montly</changefreq>
+		<changefreq>monthly</changefreq>
 	</url>
 	{% endfor %}
 	
@@ -146,7 +146,7 @@ Updated: 2014-03-09
 	<url>
 		<loc>{{ ROOT_URL }}{% url wcdbweb.views.process process_name=process.name %}</loc> 
 		<lastmod>{{ process.date|set_time_zone|date:"c" }}</lastmod>
-		<changefreq>montly</changefreq>
+		<changefreq>monthly</changefreq>
 	</url>
 	{% endfor %}
 	
@@ -155,7 +155,7 @@ Updated: 2014-03-09
 	<url>
 		<loc>{{ ROOT_URL }}{% url wcdbweb.views.state state_name=state.name %}</loc> 
 		<lastmod>{{ state.date|set_time_zone|date:"c" }}</lastmod>
-		<changefreq>montly</changefreq>
+		<changefreq>monthly</changefreq>
 	</url>
 	{% endfor %}
 	
@@ -163,7 +163,7 @@ Updated: 2014-03-09
 	<url>
 		<loc>{{ ROOT_URL }}{% url wcdbweb.views.state_property state_name=state_property.state__name property_name=state_property.name %}</loc> 
 		<lastmod>{{ state_property.date|set_time_zone|date:"c" }}</lastmod>
-		<changefreq>montly</changefreq>
+		<changefreq>monthly</changefreq>
 	</url>
 	{% endfor %}	
 	
