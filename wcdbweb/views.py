@@ -1256,6 +1256,7 @@ def search_advanced_states(batches, forms):
     
 def robots(request):
     return render_template('robots.txt', request, data = {
+        'ROOT_URL': settings.ROOT_URL,
         'ROOT_DOMAIN': settings.ROOT_URL.replace('http://', ''),
         'organisms': models.Organism.objects.values('id'),
         'simulation_batches': models.SimulationBatch.objects.values('id'),
