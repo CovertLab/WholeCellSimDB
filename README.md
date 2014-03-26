@@ -45,7 +45,6 @@ WholeCellDB was developed by researchers at Mount Sinai School of Medicine, Stan
 * [Jonathan Karr](http://research.mssm.edu/karr), Mount Sinai School of Medicine
 * [Nolan Phillips](http://ca.linkedin.com/pub/nolan-phillips/68/935/702), University of Prince Edward Island
 * [Markus Covert](http://covertlab.stanford.edu), Stanford University
-* [Yingwei Wang](http://www.csit.upei.ca/~ywang/), University of Prince Edward Island
 
 <a name="citing"/>
 ## Citing WholeCellDB
@@ -56,7 +55,7 @@ Please see the following for more information or to cite WholeCellDB:
 <a name="license"/>
 ## The MIT License (MIT)
 
-Copyright &copy; 2013-2014 Jonathan Karr, Nolan Philips, Markus Covert, Yingwei Wang
+Copyright &copy; 2013-2014 Covert Lab, Stanford University
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
