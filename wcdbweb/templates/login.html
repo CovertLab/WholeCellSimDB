@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% comment %}
+Login page
+
+Author: Jonathan Karr, jkarr@stanford.edu
+Affiliation: Covert Lab, Department of Bioengineering, Stanford University
+Created: 2014-03-25
+{% endcomment %}
+
+{% block content %}
+<div>
+<h1>Login</h1>
+
+{% if form.errors %}
+<p class="error">Your username and password didn't match. Please try again.</p>
+{% endif %}
+
+<form method="post" action="{% url wcdbweb.views.login %}">
+{% csrf_token %}
+	<table class="login">
+	<tr>
+		<td>{{ form.username.label_tag }}</td>
+		<td><input class="text" id="id_username" type="text" name="username" maxlength="30" /></td>
+	</tr>
+	<tr>
+		<td>{{ form.password.label_tag }}</td>
+		<td><input class="text" type="password" name="password" id="id_password" /></td>
+	</tr>
+	<tr>
+		<td colspan="2"><input class="button" type="submit" value="login" /></td>
+	</tr>
+	</table>
+<input type="hidden" name="next" value="{{ next }}" />
+</form>
+
+</div>
+{% endblock %}

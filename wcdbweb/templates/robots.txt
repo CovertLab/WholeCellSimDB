@@ -7,6 +7,9 @@ Crawl-delay: 10
 Host: {{ROOT_DOMAIN}}
 Sitemap: {{ROOT_URL}}{% url wcdbweb.views.sitemap %}
 
+Disallow: {% url wcdbweb.views.login %}?
+Disallow: {% url wcdbweb.views.login %}/?
+
 Disallow: {% url wcdbweb.views.list_data_series %}
 Disallow: {% url wcdbweb.views.get_data_series %}
 

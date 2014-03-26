@@ -956,6 +956,14 @@ p.error {color:red; }
 .plot-container .info .content .details {font-style:italic;}
 
 /****************
+ * login 
+ ****************/
+#content table.login {margin-top:15px;}
+#content table.login input.text{width:200px; padding:0px;}
+#content table.login td:last-child{padding-left:10px;}
+#content table.login tr:last-child td{text-align:right; padding-top:10px;}
+
+/****************
  * help
  ****************/
 #content #help div.section{

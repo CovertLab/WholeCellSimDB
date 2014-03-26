@@ -135,6 +135,12 @@ Created: 2013-09-13
 				<li><a href="{% get_static_prefix %}doc">Source code docs</a></li>
 				<li><a href="{% url wcdbweb.views.about %}#contact">Contact</a></li>
 				</ul></li>
+            <li class="spacer"/>
+            {% if request.user.is_authenticated %}
+            <li><a href="{% url wcdbweb.views.logout %}">Logout</a></li>
+            {% else %}            
+            <li><a href="{% url wcdbweb.views.login %}">Login</a></li>
+            {% endif %}
 		</ul>
 	</div>
 

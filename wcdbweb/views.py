@@ -1,13 +1,17 @@
+from django.contrib.auth import login as auth_login, logout as auth_logout        
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import ValidationError
 from django.core.servers.basehttp import FileWrapper
 from django.db.models import Avg, Count, Min, Max
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django.utils import simplejson
+from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.debug import sensitive_post_parameters
 from haystack.query import SearchQuerySet
 from helpers import render_template
 from wcdb import models
@@ -1307,6 +1311,41 @@ def sitemap_simulation_batch(request):
         'ROOT_URL': settings.ROOT_URL,
         'batch': models.SimulationBatch.objects.get(id=id),
         })
+        
+@sensitive_post_parameters()
+@csrf_protect
+@never_cache
+def login(request):
+    next = request.REQUEST.get('next', '')
+    
+    if request.method == "POST":
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            auth_login(request, form.get_user())
+            
+            if request.session.test_cookie_worked():
+                request.session.delete_test_cookie()
+
+            if next:
+                return HttpResponseRedirect(next)
+            else:
+                return render_template('login_success.html', request)
+    else:
+        form = AuthenticationForm(request)
+
+    request.session.set_test_cookie()
+
+    return render_template('login.html', request, data = {
+        'form': form,
+        'next': next,
+        })
+        
+def login_sucess(request):
+    return render_template('login_sucess.html', request)
+    
+def logout(request):
+    auth_logout(request)
+    return render_template('logout.html', request)
         
 ###################
 ### documentation

@@ -80,7 +80,11 @@ urlpatterns += patterns('wcdbweb.views',
     
     #search
     url(r'^search_basic/*$', 'search_basic'),
-    url(r'^search_advanced/*$', 'search_advanced'),    
+    url(r'^search_advanced/*$', 'search_advanced'),
+    
+    #login, logout
+    url(r'^login/*$', 'login'),
+    url(r'^logout/*$', 'logout'),
     
     #documentation
     url(r'^tutorial/*$', 'tutorial'),

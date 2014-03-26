@@ -75,6 +75,13 @@ Updated: 2014-03-09
 		<lastmod>{{ "download.html"|get_template_last_updated|set_time_zone|date:"c" }}</lastmod>
 		<changefreq>yearly</changefreq>
 	</url>
+    
+    <!-- login -->
+	<url>
+		<loc>{{ ROOT_URL }}{% url wcdbweb.views.login %}</loc>
+		<lastmod>{{ "login.html"|get_template_last_updated|set_time_zone|date:"c" }}</lastmod>
+		<changefreq>yearly</changefreq>
+	</url>
 	
 	<!-- documentation -->
 	<url>
