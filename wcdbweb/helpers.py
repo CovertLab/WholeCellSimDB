@@ -93,7 +93,7 @@ def download_batches(batches, filename):
         os.mkdir(settings.TMP_DIR)
     
     file = tempfile.TemporaryFile(dir=settings.TMP_DIR, suffix='.zip')
-    zip = zipfile.ZipFile(file, 'w')
+    zip = zipfile.ZipFile(file, mode='w', compression=zipfile.ZIP_STORED, allowZip64=True)
     for batch in batches:
         for simulation in batch.simulations.all():
             zip.write(simulation.file_path, '%s/%s/%d.h5' % (slugify(batch.organism.name), slugify(batch.name), simulation.batch_index))
