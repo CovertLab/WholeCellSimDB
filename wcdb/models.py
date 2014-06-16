@@ -168,6 +168,9 @@ class Property(models.Model):
     name  = models.CharField(max_length=255, db_index=True)
     units = models.CharField(max_length=255, null=True, blank=True)
     
+    def get_dataset(self, rowLabels = None, colLabels = None, simulations = None):
+        return self.get_dataset_slice(rowLabels, colLabels, simulations)
+		
     def get_dataset_slice(self, rowLabels = None, colLabels = None, simulations = None):
         if simulations is None:
             simulations = self.state.simulation_batch.simulations.all()
@@ -175,8 +178,8 @@ class Property(models.Model):
         elif isinstance(simulations, Simulation):
             length = simulations.length
             simulations = [simulations]
-        else:
-            length = simulations[0].length
+        else:	
+            length = max([sim.length for sim in simulations])
             
         sim0 = self.state.simulation_batch.simulations.all()[0]
         pv0 = sim0.property_values.get(property__id=self.id)
@@ -312,6 +315,9 @@ class PropertyValue(models.Model):
         else:
             return False
             
+    def get_dataset(self, rowLabels = None, colLabels = None):
+        return self.get_dataset_slice(rowLabels, colLabels)
+		
     def get_dataset_slice(self, rowLabels = None, colLabels = None):
         if self.shape is None:
             return
@@ -358,7 +364,7 @@ class PropertyValue(models.Model):
                 colIndices = [x.index for x in colLabels]
             else:
                 colIndices = [colLabels.index]
-                
+            
             shape = list(self.shape)
             shape[0] = len(rowIndices)
             shape[1] = len(colIndices)

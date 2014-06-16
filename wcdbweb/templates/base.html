@@ -13,7 +13,7 @@ Created: 2013-09-13
 <head>
 	{% block head %}
 	<!-- metadata -->
-	<title>{% block head_title %}WholeCellDB{% endblock %}</title>
+	<title>{% block head_title %}WholeCellSimDB{% endblock %}</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Language" content="en-us" />
 	<meta http-equiv="Cache-Control" content="NO-CACHE" />
@@ -66,7 +66,10 @@ Created: 2013-09-13
 		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
 		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-		ga('create', 'UA-44127714-1', 'stanford.edu');
+
+		ga('create', 'UA-49394396-4', 'wholecellsimdb.org');
+		ga('require', 'displayfeatures');
+		ga('require', 'linkid', 'linkid.js');
 		ga('send', 'pageview');
 	</script>
 	{% endblock %}
@@ -91,7 +94,7 @@ Created: 2013-09-13
 				</tr>
 				<tr>
 					<td class="engine">
-						<input type="radio" name="engine" value="haystack" {% if not engine or engine == 'haystack' %} checked="true" {% endif %}/><span>WholeCellDB</span>
+						<input type="radio" name="engine" value="haystack" {% if not engine or engine == 'haystack' %} checked="true" {% endif %}/><span>WholeCellSimDB</span>
 						<input type="radio" name="engine" value="google" {% if engine == 'google' %} checked="true" {% endif %}/><span>Google</span>
 					</td>
 					<td></td>
@@ -124,15 +127,16 @@ Created: 2013-09-13
 			<li><a href="#">Download</a>
 				<ul>
 				<li><a href="{% url wcdbweb.views.download %}">Data</a></li>
-				<li><a href="http://github.com/CovertLab/WholeCellDB">Source code</a></li>
+				<li><a href="http://github.com/CovertLab/WholeCellSimDB">Source code</a></li>
 				</ul></li>
 			<li class="spacer"/>
 			<li><a href="#">Help</a>
-				<ul>                
+				<ul>				
 				<li><a href="{% url wcdbweb.views.tutorial %}">Tutorial</a></li>
 				<li><a href="{% url wcdbweb.views.help %}">Help</a></li>
+				<li><a href="{% url wcdbweb.views.advanced_analysis_gallery %}">Python API Gallery</a></li>
 				<li><a href="{% url wcdbweb.views.about %}">About</a></li>
-				<li><a href="{% get_static_prefix %}doc">Source code docs</a></li>
+				<li><a href="{% get_static_prefix %}doc/index.html">Source code docs</a></li>
 				<li><a href="{% url wcdbweb.views.about %}#contact">Contact</a></li>
 				</ul></li>
             <li class="spacer"/>
@@ -143,9 +147,16 @@ Created: 2013-09-13
             {% endif %}
 		</ul>
 	</div>
+	
+	{% block nav-left %}{% endblock %}
+	<div id="container-left">
+		<div id="content">
+		{% block content-left %}{% endblock %}
+		</div>
+	</div>
 
-	<div id="main">
-		<!-- content -->
+	<div id="container-centered">
+		<!-- centered content -->
 		<div id="content">
 		{% block content %}{% endblock %}
 		</div>

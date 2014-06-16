@@ -1,4 +1,4 @@
-from collections import OrderedDict
+from ordereddict import OrderedDict
 from django.db.models import Count
 from itertools import tee, izip
 
