@@ -1,4 +1,4 @@
-from collections import OrderedDict
+import ordereddict
 from dateutil.tz import tzlocal
 from django import template
 from django.utils.functional import allow_lazy

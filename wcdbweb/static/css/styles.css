@@ -257,9 +257,58 @@ p.error {color:red; }
 }
 
 /****************
- * content 
+ * nav 
  ****************/
-#main{
+#nav-left{
+	position:absolute;
+	left:20px;
+	top:90px;
+	width:145px;
+	padding:8px 10px 0px 10px;
+	border: 1px solid #aaaaaa;
+	border-radius:8px;
+	background: #cfcfcf;
+}
+#nav-left a{
+	color: #222222;
+}
+#nav-left a:hover{
+	text-decoration:underline;
+}
+#nav-left h1{
+	font-size:12px;
+	text-align:center;
+	margin-top:0px;
+	margin-bottom:8px;
+	padding-bottom:2px;
+	border-bottom:1px solid #222222;
+}
+#nav-left ul, #nav-left ol{
+	margin-left:0px;
+	margin-right:0px;	
+	padding-left:14px;
+}
+#nav-left ul li a, #nav-left ol li a{
+	position:relative;
+	left:-6px;
+}
+#nav-left ul li ul{
+	margin-left:0px;
+}
+
+/****************
+ * structure
+ ***************/
+#container-left {
+	position:absolute;
+	margin-top:55px;
+	margin-bottom:40px;
+	left:205px;	
+	padding:0px;
+	width:800px;
+}
+
+#container-centered{
 	margin:0 auto;
 	margin-top:80px;
 	margin-bottom:40px;
@@ -268,9 +317,21 @@ p.error {color:red; }
 	height:100%;
 }
 
-#content{
-	width:100%;
+/****************
+ * content
+ ****************/
+#container-left #content div h1 {
+	border-bottom:2px solid #3d80b3;
+	margin-top:24px;
+	margin-bottom:10px;
 }
+#container-left #content div#index h1 {
+	border-bottom:2px solid #3d80b3;
+	margin-top:10px;
+	margin-bottom:10px;
+}
+
+
 #content div h1{
 	color: #3d80b3;
 	margin-bottom:6px;
@@ -964,6 +1025,13 @@ p.error {color:red; }
 #content table.login tr:last-child td{text-align:right; padding-top:10px;}
 
 /****************
+ * API gallery
+ ****************/
+#content #gallery div.section{
+    margin-bottom:48px;
+}
+ 
+/****************
  * help
  ****************/
 #content #help div.section{
@@ -992,7 +1060,7 @@ p.error {color:red; }
     left:0px;
     right:0px;
     width:600px;
-    height:415px;
+    height:500px;
     border:2px solid #ccc;
     border-radius:12px;
     background:#DEDEDE;

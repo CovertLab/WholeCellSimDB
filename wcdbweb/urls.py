@@ -88,6 +88,7 @@ urlpatterns += patterns('wcdbweb.views',
     
     #documentation
     url(r'^tutorial/*$', 'tutorial'),
+	url(r'^advanced_analysis_gallery/*$', 'advanced_analysis_gallery'),
     url(r'^help/*$', 'help'),
     url(r'^about/*$', 'about'),
     

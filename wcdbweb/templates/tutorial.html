@@ -18,14 +18,19 @@ Created: 2013-09-13
 
 <ul>
 
-<li><h2>Browsing WholeCellDB</h2>
-    <p>Use the "Browse" menu at the top-left to explore WholeCellDB including the available in silico organisms and simulation batches.</p>
+<li><h2>Browsing WholeCellSimDB</h2>
+    <p>Use the "Browse" menu at the top-left to explore WholeCellSimDB including the available in silico organisms and simulation batches.</p>
     <img style="top:70px; left:-13px;" src="{% get_static_prefix %}img/tutorial/browse.png"/>
     </li>
 	
-<li><h2>Searching WholeCellDB</h2>
-    <p>Use the "Browse" menu at the top-left to explore WholeCellDB including the available in silico organisms and simulation batches.</p>
+<li><h2>Searching WholeCellSimDB</h2>
+    <p>Use the "Browse" menu at the top-left to explore WholeCellSimDB including the available in silico organisms and simulation batches.</p>
     <img style="top:70px; left:30px;" src="{% get_static_prefix %}img/tutorial/search.png"/>
+    </li>
+	
+<li><h2>Visualizing simulations</h2>
+    <p>Use the <a href="{% url wcdbweb.views.index %}#preview">basic plotting tool</a> to preview simulations. Use the Python API to construct more advanced visualizations (see <a href="{% url wcdbweb.views.advanced_analysis_gallery %}">examples</a>). <i>Note: The Python API is not publicly accessible. Researchers must install WholeCellSimDB on their own machines to use the Python API.</i></p>
+    <img style="top:70px; left:60px;" src="{% get_static_prefix %}img/tutorial/plot.png"/>
     </li>
 
 <li><h2>Exporting data</h2>
@@ -34,13 +39,13 @@ Created: 2013-09-13
 	<img style="bottom:21px; right:15px;" src="{% get_static_prefix %}img/tutorial/export-bottom.png"/>
     </li>
 
-<li><h2>Storing simulations in WholeCellDB</h2>
-    <p>See the <a href="{% url wcdbweb.views.about %}#getting_started_developers">developer instructions</a> for information about how to install WholeCellDB on your own machine, and save simulations to your own instance of WholeCellDB.</p>
+<li><h2>Storing simulations in WholeCellSimDB</h2>
+    <p>See the <a href="{% url wcdbweb.views.about %}#getting_started_developers">developer instructions</a> for information about how to install WholeCellSimDB on your own machine, and save simulations to your own instance of WholeCellSimDB.</p>
     <img style="top:70px; left:188px;" src="{% get_static_prefix %}img/tutorial/install.png"/>
     </li>
     
-<li><h2>Installing WholeCellDB</h2>
-    <p>See the <a href="{% url wcdbweb.views.about %}#getting_started_developers">developer instructions</a> for information about how to install WholeCellDB on your own machine, and save simulations to your own instance of WholeCellDB.</p>
+<li><h2>Installing WholeCellSimDB</h2>
+    <p>See the <a href="{% url wcdbweb.views.about %}#getting_started_developers">developer instructions</a> for information about how to install WholeCellSimDB on your own machine, and save simulations to your own instance of WholeCellSimDB.</p>
     <img style="top:70px; left:188px;" src="{% get_static_prefix %}img/tutorial/install.png"/>
     </li>
 

@@ -12,26 +12,56 @@ Created: 2013-09-13
 
 {% block head_title %}{{ block.super }} &rsaquo; Help{% endblock %}
 
-{% block content %}
+{% block nav-left %}
+<div id="nav-left">
+	<h1>Contents</h1>
+	<ul>
+	<li><a href="#users">User's Guide</a>
+		<ul>
+		<li><a href="#browsing">Browsing</a></li>
+		<li><a href="#searching">Searching</a></li>
+		<li><a href="#visualizing">Visualizing simulations</a></li>
+		<li><a href="#exporting">Exporting simulations</a></li>
+		</ul>
+	</li>
+	<li><a href="#developers">Developer's Guide</a>
+		<ul>
+		<li><a href="#installing">Installing WholeCellSimDB</a></li>
+		<li><a href="#storing">Storing simulations</a></li>
+		<li><a href="#format">Simulation HDF format</a></li>
+		<li><a href="#converting">Converting simulations to HDF format</a></li>
+		<li><a href="#api">Constructing advanced visualizations using the Python API</a></li>
+		</ul>
+	</li>
+	<li><a href="#help">Need help?</a></li>
+	</ul>
+</div>
+{% endblock %}
+
+{% block content-left %}
 <div id="help">
 <h1>Help</h1>
 
 <div class="section">
 <a name="getting_started_users"></a>
+<a name="users"></a>
 <h2>User's guide</h2>
 
+<a name="browsing"></a>
 <h3>Browsing</h3>
-<p>WholeCellDB is very easy to use. Use the "Browse" menu at the top-left to browse the organisms and simulation batches available in WholeCellDB.</p>
+<p>WholeCellSimDB is very easy to use. Use the "Browse" menu at the top-left to browse the organisms and simulation batches available in WholeCellSimDB.</p>
 
+<a name="searching"></a>
 <h3>Searching</h3>
-<p>Three methods are available to search WholeCellDB:
+<p>Three methods are available to search WholeCellSimDB:
 <ul class="inparagraph">
 <li>Basic full-text search: use the search box at the top-right of each page to search the organism, simulation batch, and investigator metadata.</li>
-<li>Google full-text search: use the search box at the top-right of each page to search the entire WholeCellDB site.</li>
+<li>Google full-text search: use the search box at the top-right of each page to search the entire WholeCellSimDB site.</li>
 <li>Advanced structured search: use the "Search" menu at the top-left to access the <a href="{% url wcdbweb.views.search_advanced %}">advanced search form</a> which allows users to search simulation batches by metadata, option and parameter values, and by modeled processes and states</li>
 </ul>
 </p>
 
+<a name="visualizing"></a>
 <h3>Visualizing simulations</h3>
 <p>Three methods are available to visualize predicted phenotypes:
 <ul class="inparagraph">
@@ -42,11 +72,12 @@ Created: 2013-09-13
 </ul>
 </p>
 
+<a name="exporting"></a>
 <h3>Exporting simulations</h3>
-<p>Three methods are available to export simulations from WholeCellDB:
+<p>Three methods are available to export simulations from WholeCellSimDB:
 <ul class="inparagraph">
 <li>Users can use the <a href="{% url wcdbweb.views.download %}">download form</a> to download simulations for selected simulation batches in HDF5 format.</li>
-<li>Users can use the HDF5 icon at the bottom-right of most pages to export the simulation data described on each page. This allows uers to export entire organisms, simulation batches, and  simulations. This also allows users to export states and properties across all simulations in WholeCellDB.</li>
+<li>Users can use the HDF5 icon at the bottom-right of most pages to export the simulation data described on each page. This allows uers to export entire organisms, simulation batches, and  simulations. This also allows users to export states and properties across all simulations in WholeCellSimDB.</li>
 <li>Users can use the <a href='{% url wcdbweb.views.get_data_series %}?format=json&data_series=[{"simulation":1,"property":{{growth_property.id}},"row":"","col":""}]'>get_data_series web service</a> to export the predicted phenotype of a particular rows/columns of a particular states of a particular simulations in HDF5,  JSON, BSON, or MessagePack format. The web service requires two query parameters:
     <ul>
     <li>format: string indicating desired export format: "hdf5", "json", "bson", or "msgpack"</li>
@@ -70,12 +101,15 @@ Created: 2013-09-13
 
 <div class="section">
 <a name="getting_started_developers"></a>
+<a name="developers"></a>
 <h2>Developer's guide</h2>
-<h3>Installing your own WholeCellDB server and storing simulations</h3>
-<p>Fellow the steps below to install WholeCellDB on your own server, and save simulations to your own WholeCellDB server. In addition, a fully configured version of WholeCellDB is available on the <a href="https://simtk.org/frs/outbound.php?fileid=3590">whole-cell virtual machine</a>.</p>
+
+<a name="installing"></a>
+<h3>Installing your own WholeCellSimDB server and storing simulations</h3>
+<p>Fellow the steps below to install WholeCellSimDB on your own server, and save simulations to your own WholeCellSimDB server. In addition, a fully configured version of WholeCellSimDB is available on the <a href="https://simtk.org/frs/outbound.php?fileid=3590">whole-cell virtual machine</a>.</p>
 
 <ol>
-<li><p>Obtain <a href="http://github.com/CovertLab/WholeCellDB">WholeCellDB</a> from GitHub, and save to <tt>/path/to/WholeCellDB/</tt>.</p></li>
+<li><p>Obtain <a href="http://github.com/CovertLab/WholeCellSimDB">WholeCellSimDB</a> from GitHub, and save to <tt>/path/to/WholeCellSimDB/</tt>.</p></li>
 <li><p>Install the required software packages:</p>
     <ul>    
     <li><p>apache</p></li>
@@ -103,69 +137,69 @@ Created: 2013-09-13
     </ul></li>
 <li><p>Create a new database and a new user, and grant the new user priveleges to the new database:
     <pre>
-mysql &gt;&gt; create database wholecelldb;
-mysql &gt;&gt; create user 'wholecelldb'@'localhost' identified by '9KNYdUnQaSFSUDCa';
-mysql &gt;&gt; grant all privileges on wholecelldb.* to 'wholecelldb'@'localhost';
+mysql &gt;&gt; create database wholecellsimdb;
+mysql &gt;&gt; create user 'wholecellsimdb'@'localhost' identified by '9KNYdUnQaSFSUDCa';
+mysql &gt;&gt; grant all privileges on wholecellsimdb.* to 'wholecellsimdb'@'localhost';
 mysql &gt;&gt; flush privileges;
 </pre>
     </p></li>    
     
 <li><p>Create a directory to store the HDF5 simulation data, and grant permissions to the webserver daemon:
     <pre>
-mkdir /path/to/WholeCellDB/wcdb/data
-sudo chown :&lt;apache-user&gt; /path/to/WholeCellDB/wcdb/data
-sudo chmod ug+rw /path/to/WholeCellDB/wcdb/data
+mkdir /path/to/WholeCellSimDB/wcdb/data
+sudo chown :&lt;apache-user&gt; /path/to/WholeCellSimDB/wcdb/data
+sudo chmod ug+rw /path/to/WholeCellSimDB/wcdb/data
 </pre>
     </p></li>
 <li><p>Create a temporary directory, and grant permissions to the webserver daemon:
     <pre>
-mkdir /path/to/WholeCellDB/tmp
-sudo chown :&lt;apache-user&gt; /path/to/WholeCellDB/tmp
-sudo chmod ug+rw /path/to/WholeCellDB/tmp
+mkdir /path/to/WholeCellSimDB/tmp
+sudo chown :&lt;apache-user&gt; /path/to/WholeCellSimDB/tmp
+sudo chmod ug+rw /path/to/WholeCellSimDB/tmp
 </pre>
     </p></li>
 <li><p>Create a file to store error logs:
     <pre>
-mkdir /path/to/WholeCellDB/log
-sudo chown :&lt;apache-user&gt; /path/to/WholeCellDB/log
-sudo chmod ug+rw /path/to/WholeCellDB/log
+mkdir /path/to/WholeCellSimDB/log
+sudo chown :&lt;apache-user&gt; /path/to/WholeCellSimDB/log
+sudo chmod ug+rw /path/to/WholeCellSimDB/log
 </pre>
     </p></li>
-<li><p>Edit the settings file <tt>/path/to/WholeCellDB/WholeCellDB/settings.py</tt></p>
+<li><p>Edit the settings file <tt>/path/to/WholeCellSimDB/WholeCellSimDB/settings.py</tt></p>
     <ul>
-    <li><p>Edit the root URL settings: <tt>ROOT_URL = 'http://domain/url/to/WholeCellDB'</tt></p></li>
+    <li><p>Edit the root URL settings: <tt>ROOT_URL = 'http://domain/url/to/WholeCellSimDB'</tt></p></li>
     <li><p>Edit the ALLOWED_HOSTS settings: <tt>ALLOWED_HOSTS = ['domain']</tt></p></li>
-    <li><p>Edit the HDF5 data directory setting: <tt>HDF5_ROOT = '/path/to/WholeCellDB/wcdb/data'</tt></p></li>
-    <li><p>Edit the temporary directory setting: <tt>TMP_DIR = '/path/to/WholeCellDB/tmp'</tt></p></li>
+    <li><p>Edit the HDF5 data directory setting: <tt>HDF5_ROOT = '/path/to/WholeCellSimDB/wcdb/data'</tt></p></li>
+    <li><p>Edit the temporary directory setting: <tt>TMP_DIR = '/path/to/WholeCellSimDB/tmp'</tt></p></li>
     <li><p>Edit the database settings. See the <a href="https://docs.djangoproject.com/en/1.5/intro/tutorial01/#database-setup">Django documentation</a> for more information.
         <pre>
-DATABASES.default.NAME = 'wholecelldb'
-DATABASES.default.USER = 'wholecelldb'
+DATABASES.default.NAME = 'wholecellsimdb'
+DATABASES.default.USER = 'wholecellsimdb'
 DATABASES.default.PASSWORD = '9KNYdUnQaSFSUDCa'
 DATABASES.default.HOST = ''
 </pre>
     </p></li>    
     </ul></li>
-<li><p>Configure your apache webserver. Add the following to your apache configuration (e.g. <tt>/etc/apache2/sites-enabled/WholeCellDB</tt>):
+<li><p>Configure your apache webserver. Add the following to your apache configuration (e.g. <tt>/etc/apache2/sites-enabled/WholeCellSimDB</tt>):
     <pre>
 WSGIDaemonProcess default processes=2 threads=25
-WSGIDaemonProcess wholecelldb:1 threads=1
-WSGIDaemonProcess wholecelldb:2 threads=1
+WSGIDaemonProcess wholecellsimdb:1 threads=1
+WSGIDaemonProcess wholecellsimdb:2 threads=1
 SetEnv PROCESS_GROUP default
 WSGIProcessGroup %{ENV:PROCESS_GROUP}
 WSGISocketPrefix /var/run/wsgi
 
-Alias /url/to/WholeCellDB/static /path/to/WholeCellDB/wcdbweb/static
-&lt;Location "/path/to/WholeCellDB/wcdbweb/static"&gt;
+Alias /url/to/WholeCellSimDB/static /path/to/WholeCellSimDB/wcdbweb/static
+&lt;Location "/path/to/WholeCellSimDB/wcdbweb/static"&gt;
     Order allow,deny
     Allow from all
 &lt;/Location&gt;
 
-WSGIScriptAlias /url/to/WholeCellDB /path/to/WholeCellDB/WholeCellDB/wsgi.py
-&lt;Directory /path/to/WholeCellDB/WholeCellDB&gt;
+WSGIScriptAlias /url/to/WholeCellSimDB /path/to/WholeCellSimDB/WholeCellSimDB/wsgi.py
+&lt;Directory /path/to/WholeCellSimDB/WholeCellSimDB&gt;
     WSGIApplicationGroup %{RESOURCE}
-    WSGIRestrictProcess wholecelldb:1 wholecelldb:2
-    SetEnv PROCESS_GROUP wholecelldb:1
+    WSGIRestrictProcess wholecellsimdb:1 wholecellsimdb:2
+    SetEnv PROCESS_GROUP wholecellsimdb:1
     AddHandler wsgi-script .py
 
     Options ExecCGI
@@ -178,7 +212,7 @@ WSGIScriptAlias /url/to/WholeCellDB /path/to/WholeCellDB/WholeCellDB/wsgi.py
 
 <li><p>Create database tables
     <pre>
-cd /path/to/WholeCellDB
+cd /path/to/WholeCellSimDB
 python manage.py syncdb
 </pre>
     </p></li>
@@ -186,20 +220,21 @@ python manage.py syncdb
 <li><p>Build search indices and grant permissions to webserver daemon:
     <pre>
 python manage.py rebuild_index
-sudo chown -R :&lt;apache-user&gt; /path/to/WholeCellDB/wcdbsearch/indexes
-sudo chmod -R ug+rw /path/to/WholeCellDB/wcdbsearch/indexes
+sudo chown -R :&lt;apache-user&gt; /path/to/WholeCellSimDB/wcdbsearch/indexes
+sudo chmod -R ug+rw /path/to/WholeCellSimDB/wcdbsearch/indexes
 </pre>
     </p></li>
     
-<li><p>Navigate to the WholeCellDB web frontend: <tt>http://domain/url/to/WholeCellDB</tt></p></li>
+<li><p>Navigate to the WholeCellSimDB web frontend: <tt>http://domain/url/to/WholeCellSimDB</tt></p></li>
 </ol>
 
+<a name="storing"></a>
 <h3>Storing simulations</h3>
-<p>Simulations can be imported into WholeCellDB via either the command line or programmatic (Python) interface. Simulations must be saved using the format described <a href="#simulation-file-format">below</a>.</p>
+<p>Simulations can be imported into WholeCellSimDB via either the command line or programmatic (Python) interface. Simulations must be saved using the format described <a href="#simulation-file-format">below</a>.</p>
 
 <p>This code snippet illustrates how to load simulations via the command line interface:
 <pre>
-cd /path/to/WholeCellDB
+cd /path/to/WholeCellSimDB
 python wcdbcli/save_simulation_batch.py "&lt;organism-name&gt;" "&lt;batch-1-name&gt;" /path/to/simulation-batch-1
 python wcdbcli/save_simulation_batch.py "&lt;organism-name&gt;" "&lt;batch-2-name&gt;" /path/to/simulation-batch-2
 python wcdbcli/save_simulation_batch.py "&lt;organism-name&gt;" "&lt;batch-3-name&gt;" /path/to/simulation-batch-3
@@ -211,7 +246,7 @@ python wcdbcli/save_simulation_batch.py "&lt;organism-name&gt;" "&lt;batch-3-nam
 import sys
 
 # Add the project to your path.
-sys.path.append('/path/to/WholeCellDB')
+sys.path.append('/path/to/WholeCellSimDB')
 
 # Import the models
 from wcdb import models
@@ -230,8 +265,9 @@ for idx in range(1, n_simulations + 1):
 </p>
 
 <a name="simulation-file-format" ></a>
+<a name="format"></a>
 <h3>Simulation file format</h3>
-<p>WholeCellDB imports and exports simulations using the following format.</p>
+<p>WholeCellSimDB imports and exports simulations using the following format.</p>
 
 <p>First, simulations must be organized into batches. A batch is a set of simulations run using the same code, same options, and same parameter values. Individual simulations within a batch should differ only in their random number generator seeds. Batches must be stored as a folder, with HDF5 files for each simulation numbered sequentially starting from 1 containing the predicted phenotypes for each simulation.</p>
 
@@ -662,10 +698,11 @@ for idx in range(1, n_simulations + 1):
 </ul>
 </p>
 
+<a name="converting"></a>
 <h3>Converting simulations from MAT-File to HDF5 format</h3>
 <p>Simulations can be converted from the original <a href="http://www.mathworks.com/help/matlab/import_export/mat-file-versions.html">MAT-File format</a> used by the <i>M. genitalium</i> whole-cell model (see <a href="https://simtk.org/frs/download.php?file_id=3125">User Guide section 2.2</a> and <a href="https://github.com/CovertLab/WholeCell/blob/master/src/%2Bedu/%2Bstanford/%2Bcovert/%2Bcell/%2Bsim/%2Butil/DiskLogger.m">DiskLogger.m</a>) using following script:
 <pre>
-cd /path/to/WholeCellDB
+cd /path/to/WholeCellSimDB
 
 organism="Mycoplasma genitalium"
 simulation_batch_name="Wild-type set #1"
@@ -681,7 +718,7 @@ done
 
 <p>The following script can be used to convert simulations using a cluster. The Perl script uses the job script template <tt>wcdbcli/convert_mat_to_hdf5.sh.tmpl</tt> to submit jobs to a cluster schedule. The job scripts in turn call <tt>wcdbcli/convert_mat_to_hdf5.py</tt>.
 <pre>
-cd /path/to/WholeCellDB
+cd /path/to/WholeCellSimDB
 
 organism="Mycoplasma genitalium"
 simulation_batch_name="Wild-type set #1"
@@ -695,10 +732,16 @@ done
 </pre>
 </p>
 
+<a name="api"></a>
+<h3>Constructing advanced visualizations using the Python API</h3>
+<p>
+See the <a href="{% url wcdbweb.views.advanced_analysis_gallery %}">Python API gallery</a> for examples of how to use Python API to construct more advanced visualizations. <i>Note: The Python API is not publicly accessible. Researchers must install WholeCellSimDB on their own machines to use the Python API.</i>
+</p>
 </div>
 
 <div class="section">
 <a name="contact"></a>
+<a name="help"></a>
 <h2>Need help?</h2>
 <p>Please contact the development team at <a href="mailto:wholecell@lists.stanford.edu">wholecell@lists.stanford.edu</a>.</p>
 </div>

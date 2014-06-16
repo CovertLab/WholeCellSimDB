@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% comment %}
+Advanced analysis gallery page
+
+Author: Jonathan Karr, jkarr@stanford.edu
+Affiliation: Covert Lab, Department of Bioengineering, Stanford University
+Created: 2014-06-16
+{% endcomment %}
+
+{% load static %}
+
+{% block head_title %}{{ block.super }} &rsaquo; Python API Advanced Analysis Gallery{% endblock %}
+
+{% block nav-left %}
+<div id="nav-left">
+	<h1>Examples</h1>
+	<ol>
+	<li><a href="#ex1">Growth dynamics of a single simulation</a></li>
+	<li><a href="#ex2">Growth dynamics of multiple simulations</a></li>
+	<li><a href="#ex3">NTP copy number dynamics of a single simulation</a></li>	
+	</ol>
+</div>
+{% endblock %}
+
+{% block content-left %}
+<div id="gallery">
+<h1>Python API Advanced Analysis Gallery</h1>
+
+<div class="section">
+<a name="ex1"></a>
+<h2>Example 1: Growth dynamics of a single simulation</h2>
+<img src="{% get_static_prefix %}img/advanced_analysis_gallery/ex1.png"/>
+<pre>
+from matplotlib import pyplot
+from wcdb import models
+import math
+import numpy
+
+#select simulation batch
+sim_batch = models.SimulationBatch.objects.get(name='Wild-type set #1')
+
+#select first simulation
+sim = sim_batch.simulations.all()[0]
+
+#select growth property of metabolic reaction state
+time_prop = models.Property.objects.get(name='values', state__name='Time', state__simulation_batch=sim_batch)
+growth_prop = models.Property.objects.get(name='growth', state__name='MetabolicReaction', state__simulation_batch=sim_batch)
+
+#get predicted growth rate
+time_val = time_prop.get_dataset(simulations=sim).squeeze() / 3600
+growth_val = growth_prop.get_dataset(simulations=sim).squeeze() * 3600 * 13.9
+
+#plot
+pyplot.figure(figsize=(9,3), dpi=200)
+pyplot.plot(time_val, growth_val)
+pyplot.xlim([0, time_val.max()])
+pyplot.ylim([growth_val.min(), growth_val.max()])
+pyplot.xticks(range(0, math.floor(numpy.nanmax(time_val))+1))
+pyplot.xlabel('Time (h)')
+pyplot.ylabel(r'Growth (fg h$^{-1}$)')
+pyplot.savefig('wcdbweb/static/img/advanced_analysis_gallery/ex1.png', bbox_inches='tight')
+pyplot.close()
+</pre>
+</div>
+
+<div class="section">
+<a name="ex2"></a>
+<h2>Example 2: Growth dynamics of multiple simulations</h2>
+<img src="{% get_static_prefix %}img/advanced_analysis_gallery/ex2.png"/>
+<pre>
+from matplotlib import pyplot
+from wcdb import models
+import math
+import numpy
+
+#select simulation batch
+sim_batch = models.SimulationBatch.objects.get(name='Wild-type set #1')
+
+#select first simulation
+sims = sim_batch.simulations.filter(batch_index__lte=5)
+
+#select growth property of metabolic reaction state
+time_prop = models.Property.objects.get(name='values', state__name='Time', state__simulation_batch=sim_batch)
+growth_prop = models.Property.objects.get(name='growth', state__name='MetabolicReaction', state__simulation_batch=sim_batch)
+
+#get predicted growth rate
+time_val = time_prop.get_dataset(simulations=sims).transpose(2, 3, 0, 1).squeeze() / 3600
+growth_val = growth_prop.get_dataset(simulations=sims).transpose(2, 3, 0, 1).squeeze() * 3600 * 13.9
+
+#plot
+pyplot.figure(figsize=(9,3), dpi=200)
+for i in range(0, 5):
+    pyplot.plot(time_val[:, i], growth_val[:, i])
+pyplot.xlim([0, numpy.nanmax(time_val)])
+pyplot.ylim([numpy.nanmin(growth_val), numpy.nanmax(growth_val)])
+pyplot.xticks(range(0, math.floor(numpy.nanmax(time_val))+1))
+pyplot.xlabel('Time (h)')
+pyplot.ylabel(r'Growth (fg h$^{-1}$)')
+pyplot.savefig('wcdbweb/static/img/advanced_analysis_gallery/ex2.png', bbox_inches='tight')
+pyplot.close()
+</pre>
+</div>
+
+<div class="section">
+<a name="ex3"></a>
+<h2>Example 3: NTP copy number dynamics of a single simulation</h2>
+<img src="{% get_static_prefix %}img/advanced_analysis_gallery/ex3.png"/>
+<pre>
+from matplotlib import pyplot
+from wcdb import models
+import math
+import numpy
+
+#select simulation batch
+sim_batch = models.SimulationBatch.objects.get(name='Wild-type set #1')
+
+#select first simulation
+sim = sim_batch.simulations.all()[0]
+
+#select growth property of metabolic reaction state
+time_prop = models.Property.objects.get(name='values', state__name='Time', state__simulation_batch=sim_batch)
+metabolite_prop = models.Property.objects.get(name='counts', state__name='Metabolite', state__simulation_batch=sim_batch)
+ntp_labels = metabolite_prop.labels.filter(name__in=['ATP','CTP','GTP','UTP'], dimension=0)
+cytosol_label = metabolite_prop.labels.filter(name='c', dimension=1)
+
+#get predicted growth rate
+time_val = time_prop.get_dataset(simulations=sim).transpose(2, 0, 1, 3).squeeze() / 3600
+metabolite_val = metabolite_prop.get_dataset(rowLabels=ntp_labels, colLabels=cytosol_label, simulations=sim).transpose(2, 1, 0, 3).squeeze()
+
+#plot
+pyplot.figure(figsize=(9,3), dpi=200)
+for i in range(0, 4):
+    pyplot.plot(time_val, metabolite_val[:, i])
+	
+pyplot.xlim([0, numpy.nanmax(time_val)])
+pyplot.ylim([numpy.nanmin(metabolite_val), numpy.nanmax(metabolite_val)])
+pyplot.xticks(range(0, math.floor(numpy.nanmax(time_val))+1))
+pyplot.xlabel('Time (h)')
+pyplot.ylabel(r'Metabolite copy number')
+pyplot.savefig('wcdbweb/static/img/advanced_analysis_gallery/ex3.png', bbox_inches='tight')
+pyplot.close()
+</pre>
+</div>
+
+</div>
+{% endblock %}

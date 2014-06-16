@@ -179,7 +179,8 @@ def list_options(request):
         .annotate(n_batches=Count('simulation_batches__id')) \
         .order_by('name')
     organism_ids = [x.id for x in tmp]
-    organisms = {x.id: x for x in tmp}
+#    organisms = {x.id: x for x in tmp}
+    organisms = dict([(x.id, x) for x in tmp])
     
     options = {
         'Global': models.Option.objects
@@ -222,7 +223,8 @@ def list_parameters(request):
         .annotate(n_batches=Count('simulation_batches__id')) \
         .order_by('name')
     organism_ids = [x.id for x in tmp]
-    organisms = {x.id: x for x in tmp}
+#    organisms = {x.id: x for x in tmp}
+    organisms = dict([(x.id, x) for x in tmp])
     
     parameters = {
         'Global': models.Parameter.objects
@@ -265,7 +267,8 @@ def list_processes(request):
         .annotate(n_batches=Count('simulation_batches__id')) \
         .order_by('name')    
     organism_ids = [x.id for x in tmp]
-    organisms = {x.id: x for x in tmp}
+#    organisms = {x.id: x for x in tmp}
+    organisms = dict([(x.id, x) for x in tmp])
     
     processes =  models.Process.objects \
         .values('name', 'simulation_batch__organism__id') \
@@ -283,7 +286,8 @@ def process(request, process_name):
         .annotate(n_batches=Count('simulation_batches__id')) \
         .order_by('name')    
     organism_ids = [x.id for x in tmp]
-    organisms = {x.id: x for x in tmp}
+#    organisms = {x.id: x for x in tmp}
+    organisms = dict([(x.id, x) for x in tmp])
     
     options = models.Option.objects \
         .filter(process__name=process_name) \
@@ -309,7 +313,8 @@ def list_states(request):
         .annotate(n_batches=Count('simulation_batches__id')) \
         .order_by('name')
     organism_ids = [x.id for x in tmp]
-    organisms = {x.id: x for x in tmp}
+#    organisms = {x.id: x for x in tmp}
+    organisms = dict([(x.id, x) for x in tmp])
         
     state_properties = models.Property.objects \
         .values('name', 'state__name', 'state__simulation_batch__organism__id') \
@@ -327,7 +332,8 @@ def state(request, state_name):
         .annotate(n_batches=Count('simulation_batches__id')) \
         .order_by('name')    
     organism_ids = [x.id for x in tmp]
-    organisms = {x.id: x for x in tmp}
+#    organisms = {x.id: x for x in tmp}
+    organisms = dict([(x.id, x) for x in tmp])
     
     options = models.Option.objects \
         .filter(state__name=state_name) \
@@ -359,7 +365,8 @@ def state_property(request, state_name, property_name):
         .annotate(n_batches=Count('simulation_batches__id')) \
         .order_by('name')    
     organism_ids = [x.id for x in tmp]
-    organisms = {x.id: x for x in tmp}
+#    organisms = {x.id: x for x in tmp}
+    organisms = dict([(x.id, x) for x in tmp])
     
     labels = models.PropertyLabel.objects \
         .filter(property__name=property_name, property__state__name=state_name)
@@ -1035,7 +1042,8 @@ def search_advanced(request):
         n_state_filters = 3
     
     #options
-    tmp = {('option-%d-operator' % i): 'eq' for i in range(n_option_filters)}
+#    tmp = {('option-%d-operator' % i): 'eq' for i in range(n_option_filters)}
+    tmp = dict([(('option-%d-operator' % i), 'eq') for i in range(n_option_filters)])
     tmp = dict(tmp.items() + request.POST.items())    
     option_forms = []
     option_form = forms.AdvancedSearchOptionForm(tmp)
@@ -1048,7 +1056,8 @@ def search_advanced(request):
         valid = option_form_i.is_valid() and valid
     
     #parameters
-    tmp = {('parameter-%d-operator' % i): 'eq' for i in range(n_parameter_filters)}
+#    tmp = {('parameter-%d-operator' % i): 'eq' for i in range(n_parameter_filters)}
+    tmp = dict([(('parameter-%d-operator' % i), 'eq') for i in range(n_parameter_filters)])
     tmp = dict(tmp.items() + request.POST.items())
     parameter_forms = []
     parameter_form = forms.AdvancedSearchParameterForm(tmp)
@@ -1061,7 +1070,8 @@ def search_advanced(request):
         valid = parameter_form_i.is_valid() and valid
         
     #processes
-    tmp = {('process-%d-modeled' % i): '1' for i in range(n_process_filters)}
+#    tmp = {('process-%d-modeled' % i): '1' for i in range(n_process_filters)}
+    tmp = dict([(('process-%d-modeled' % i), '1') for i in range(n_process_filters)])
     tmp = dict(tmp.items() + request.POST.items())
     process_forms = []
     process_form = forms.AdvancedSearchProcessForm(tmp)
@@ -1074,7 +1084,8 @@ def search_advanced(request):
         valid = process_form_i.is_valid() and valid
         
     #states
-    tmp = {('state-%d-modeled' % i): '1' for i in range(n_state_filters)}
+#    tmp = {('state-%d-modeled' % i): '1' for i in range(n_state_filters)}
+    tmp = dict([(('state-%d-modeled' % i), '1') for i in range(n_state_filters)])
     tmp = dict(tmp.items() + request.POST.items())
     state_forms = []
     state_form = forms.AdvancedSearchStateForm(tmp)
@@ -1353,6 +1364,9 @@ def logout(request):
 def tutorial(request):
     return render_template('tutorial.html', request)
     
+def advanced_analysis_gallery(request):
+	return render_template('advanced_analysis_gallery.html', request)
+	
 def help(request):
     return render_template('help.html', request, data = {
         'growth_property': models.Property.objects.get(name='growth', state__name='MetabolicReaction', state__simulation_batch__id=1),
