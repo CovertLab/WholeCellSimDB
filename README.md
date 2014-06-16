@@ -21,7 +21,7 @@ WholeCellSimDB is a database of whole-cell model simulations designed to make it
 * DNA modification positions, and
 * Ribome positions.
 
-See [wholecell.stanford.edu](http://wholecell.stanford.edu) for additional information about whole-cell models.
+See [wholecell.org](http://www.wholecell.org) for additional information about whole-cell models.
 
 <a name="users"/>
 ## User's guide: browsing and searching simulations
