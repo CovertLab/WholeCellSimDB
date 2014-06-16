@@ -1,20 +1,20 @@
-# WholeCellDB v1.1.0
+# WholeCellSimDB v1.1.0
 
 <a name="table_of_contents"/>
 
 1. [About](#about)
 2. [User's guide: browsing and searching simulations](#users)
-3. [Developer's guide: Installing your own WholeCellDB server and storing simulations](#developers)
+3. [Developer's guide: Installing your own WholeCellSimDB server and storing simulations](#developers)
 4. [Need help?](#help)
 5. [Implementation](#implementation)
 6. [Development team](#team)
-7. [Citing WholeCellDB](#citing)
+7. [Citing WholeCellSimDB](#citing)
 8. [License](#license)
 
 
 <a name="about"/>
 ## About
-WholeCellDB is a database of whole-cell model simulations designed to make it easy for researchers to explore and analyze whole-cell model predictions including predicted:
+WholeCellSimDB is a database of whole-cell model simulations designed to make it easy for researchers to explore and analyze whole-cell model predictions including predicted:
 * Metabolite concentrations,
 * DNA, RNA and protein expression,
 * DNA-bound protein positions,
@@ -25,31 +25,31 @@ See [wholecell.stanford.edu](http://wholecell.stanford.edu) for additional infor
 
 <a name="users"/>
 ## User's guide: browsing and searching simulations
-See the online [user's guide](http://wholecelldb.stanford.edu/help).
+See the online [user's guide](http://www.wholecellsimdb.org/help).
 
 <a name="developers"/>
-## Developer's guide: Installing your own WholeCellDB server and storing simulations
-See the online [developers's guide](http://wholecelldb.stanford.edu/help) for installation instructions including a list of required packages and instructions for integreating WholeCellDB with whole-cell models.
+## Developer's guide: Installing your own WholeCellSimDB server and storing simulations
+See the online [developers's guide](http://www.wholecellsimdb.org/help) for installation instructions including a list of required packages and instructions for integreating WholeCellSimDB with whole-cell models.
 
 <a name="help"/>
 ## Need help?
-Please contact the development team at [wholecelldb@lists.stanford.edu](mailto:wholecelldb@lists.stanford.edu).
+Please contact the development team at [wholecell@lists.stanford.edu](mailto:wholecell@lists.stanford.edu).
 
 <a name="implementation"/>
 ## Implementation
-WholeCellDB is a hybrid SQL/HDF database implemented in [Python](http://www.python.org/). The [Django](https://www.djangoproject.com/) framework was used to construct a [MySQL](http://www.mysql.org) database containing simulation metadata as well as links to HDF files containing the simulation predictions. The [H5py](http://www.h5py.org/) package was used to read and write HDF files. Full text search over the simulation metadata was implemented using [Xapian](http://xapian.org/) and [Haystack](http://haystacksearch.org/). The web interface was run using [Apache](http://httpd.apache.org/) and [mod_wsgi](https://code.google.com/p/modwsgi/). The web interface was developed using [flot](http://www.flotcharts.org/), [Google Fonts](https://www.google.com/fonts), [jQuery](http://jquery.com/), [jqTree](http://mbraak.github.io/jqTree), [jQWidgets](http://www.jqwidgets.com/), and [FamFamFam Silk icons](http://www.famfamfam.com/lab/icons/silk/).
+WholeCellSimDB is a hybrid SQL/HDF database implemented in [Python](http://www.python.org/). The [Django](https://www.djangoproject.com/) framework was used to construct a [MySQL](http://www.mysql.org) database containing simulation metadata as well as links to HDF files containing the simulation predictions. The [H5py](http://www.h5py.org/) package was used to read and write HDF files. Full text search over the simulation metadata was implemented using [Xapian](http://xapian.org/) and [Haystack](http://haystacksearch.org/). The web interface was run using [Apache](http://httpd.apache.org/) and [mod_wsgi](https://code.google.com/p/modwsgi/). The web interface was developed using [flot](http://www.flotcharts.org/), [Google Fonts](https://www.google.com/fonts), [jQuery](http://jquery.com/), [jqTree](http://mbraak.github.io/jqTree), [jQWidgets](http://www.jqwidgets.com/), and [FamFamFam Silk icons](http://www.famfamfam.com/lab/icons/silk/).
 
 <a name="team"/>
 ## Development team
-WholeCellDB was developed by researchers at Mount Sinai School of Medicine, Stanford University, and the University of Prince Edward Island.
+WholeCellSimDB was developed by researchers at Mount Sinai School of Medicine, Stanford University, and the University of Prince Edward Island.
 * [Jonathan Karr](http://research.mssm.edu/karr), Mount Sinai School of Medicine
 * [Nolan Phillips](http://ca.linkedin.com/pub/nolan-phillips/68/935/702), University of Prince Edward Island
 * [Markus Covert](http://covertlab.stanford.edu), Stanford University
 
 <a name="citing"/>
-## Citing WholeCellDB
-Please see the following for more information or to cite WholeCellDB:
-* Karr JR et al. WholeCellDB: hybrid HDF/SQL database for whole-cell model predictions. (In preparation).
+## Citing WholeCellSimDB
+Please see the following for more information or to cite WholeCellSimDB:
+* Karr JR et al. WholeCellSimDB: hybrid HDF/SQL database for whole-cell model predictions. (In preparation).
 * Karr JR, Sanghvi JC, Macklin DN, Gutschow MV, Jacobs JM, Bolival B, Assad-Garcia N, Glass JI, Covert MW. A Whole-Cell Computational Model Predicts Phenotype from Genotype. *Cell* **150**, 389-401 (2012). [Cell](http://www.cell.com/abstract/S0092-8674(12)00776-3) | [PubMed](http://www.ncbi.nlm.nih.gov/pubmed/22817898)
 
 <a name="license"/>
