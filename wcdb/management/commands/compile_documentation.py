@@ -14,8 +14,8 @@ class Command(BaseCommand):
             ), shell=True)
         
         #make images of data model
-        subprocess.call('python2.7 manage.py graph_models wcdb | dot -Tsvg -o %s' % os.path.join(settings.ROOT_DIR, '..', 'wcdbweb', 'static', 'doc', 'data_model.svg'), shell=True)
-        subprocess.call('python2.7 manage.py graph_models wcdb | dot -Tpng -o %s' % os.path.join(settings.ROOT_DIR, '..', 'wcdbweb', 'static', 'doc', 'data_model.png'), shell=True)
+        subprocess.call('python manage.py graph_models wcdb | dot -Tsvg -o %s' % os.path.join(settings.ROOT_DIR, '..', 'wcdbweb', 'static', 'doc', 'data_model.svg'), shell=True)
+        subprocess.call('python manage.py graph_models wcdb | dot -Tpng -o %s' % os.path.join(settings.ROOT_DIR, '..', 'wcdbweb', 'static', 'doc', 'data_model.png'), shell=True)
         
         #status message
         self.stdout.write('Successfully compiled documentation.\n')
