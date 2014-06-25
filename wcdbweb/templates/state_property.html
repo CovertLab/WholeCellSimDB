@@ -32,6 +32,7 @@ Created: 2014-03-10
     <thead>
         <tr>
             <td></td>
+			<th class="previewable"><div>Preview-able</div></th>
             {% for id, organism in organisms.iteritems %}
             <th><div><i><a href="{% url wcdbweb.views.organism id=id %}">{{organism.name}}</i></a></div></th>
             {% endfor %}
@@ -46,7 +47,7 @@ Created: 2014-03-10
             {% regroup dimension.list by name as dimension_labels %}
             {% if dimension_labels|length > 1 or dimension_labels.0.grouper != '' %}
     <tr>
-        <th colspan="{{organisms|length|add:1}}">
+        <th colspan="{{organisms|length|add:2}}">
                 {% if dimension.grouper == 0 %}Rows
                 {% elif dimension.grouper == 1 %}Columns
                 {% elif dimension.grouper == 2 %}Depth
@@ -66,10 +67,15 @@ Created: 2014-03-10
             {% else %}
                 {{label.grouper}}
             {% endif %}
-        </td>
-                        {% regroup_by label.list by 'property__state__simulation_batch__organism__id' organism_ids as label_organisms %}
+        </td>		
+                        {% regroup_by label.list by 'property__state__simulation_batch__organism__id' organism_ids as label_organisms %}						
+		<td class="level1 previewable">
+			{% if show_slice_links and dimension.grouper == 0 %}
+			&#10003;
+			{% endif %}
+		</td>
                         {% for label_organism in label_organisms %}
-        <td class="level1">{% if label_organism.list|length > 0 %}{% if label_organism.list.0.n_batches == organisms|get_organisms_n_batches:label_organism.grouper %}&#10003;{% else %}&#9632;{% endif %}{% endif %}</td>
+        <td class="level1 organisms">{% if label_organism.list|length > 0 %}{% if label_organism.list.0.n_batches == organisms|get_organisms_n_batches:label_organism.grouper %}&#10003;{% else %}&#9632;{% endif %}{% endif %}</td>
                         {% endfor %}
     </tr>
                     {% endif %}
@@ -86,9 +92,15 @@ Created: 2014-03-10
             state
         {% endif %}
         </i></th>
+		
+		<th class="previewable">
+
+		&#10003;
+
+        </th>
         
         {% for label_organism in label_organisms %}
-        <th>{% if label_organism.list|length > 0 %}{% if label_organism.list.0.n_batches == organisms|get_organisms_n_batches:label_organism.grouper %}&#10003;{% else %}&#9632;{% endif %}{% endif %}</th>
+        <th class="organisms">{% if label_organism.list|length > 0 %}{% if label_organism.list.0.n_batches == organisms|get_organisms_n_batches:label_organism.grouper %}&#10003;{% else %}&#9632;{% endif %}{% endif %}</th>
         {% endfor %}
     </tr>
     {% endif %}

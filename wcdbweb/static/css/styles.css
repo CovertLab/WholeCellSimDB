@@ -897,6 +897,15 @@ p.error {color:red; }
 #content div table.list_state_property_row_simulation_batches tr td{text-align:center; max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 #content div table.list_state_property_row_simulation_batches tr td:first-child{text-align:left; padding-right:3px; max-width:none; width:100%;}
 
+/* preview-able */
+#content div table thead tr th.previewable, #content div table tbody tr td.previewable {
+	background:#FFD6CC;
+}
+
+#content div table tbody tr td.organisms{
+	background:#d6edff;
+}
+
 /****************
  * download 
  ****************/

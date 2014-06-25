@@ -4,6 +4,7 @@ from django import template
 from django.utils.functional import allow_lazy
 from django.utils.encoding import force_unicode
 from WholeCellDB import settings
+from wcdb import models
 import datetime
 import os
 import re
@@ -17,6 +18,10 @@ def order_by(qs, field):
 @register.filter
 def is_dict(obj):
     return isinstance(obj, (dict, OrderedDict))
+	
+@register.filter
+def is_property_viewable(obj):
+    return models.PropertyLabel.objects.filter(property__id=obj['id'], index=0).count() > 1
     
 @register.filter
 def is_list(obj):
@@ -33,7 +38,7 @@ def set_time_zone(datetime):
 @register.filter    
 def get_organisms_n_batches(organisms, id):
     return organisms[id].n_batches
-    
+
 @register.assignment_tag
 def regroup_by(all_objects, by, field, values):
     tmp = {}    

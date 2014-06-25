@@ -22,6 +22,7 @@ Created: 2014-03-10
     <thead>
         <tr>
             <td></td>
+			<th class="previewable"><div>Preview-able</div></th>
             {% for id, organism in organisms.iteritems %}
             <th><div><i><a href="{% url wcdbweb.views.organism id=id %}">{{organism.name}}</i></a></div></th>
             {% endfor %}
@@ -30,16 +31,17 @@ Created: 2014-03-10
     <tbody>
         <!-- options -->
         <tr>
-            <th colspan="{{organisms|length|add:1}}">Options</td>
+            <th colspan="{{organisms|length|add:2}}">Options</td>
         </tr>
         {% regroup options by name as option_groups %}
         {% for option in option_groups %}
         <tr>
             <td class="level1"><a href="{% url wcdbweb.views.option state_name=state_name option_name=option.grouper %}">{{option.grouper}}</a>{% if option.list.0.units %} ({{option.list.0.units}}){% endif %}</td>
+			<td class="level1"></td>
                 {% regroup_by option.list by 'simulation_batch__organism__id' organism_ids as option_organisms %}
                 {% for option_organism in option_organisms %}
                     {% regroup option_organism.list by index as option_organism_indices %}
-            <td class="level1">
+            <td class="level1 organisms">
                     {% if option_organism.list|length > 0 %}
                         {% if option_organism_indices.0.list.0.n_batches == organisms|get_organisms_n_batches:option_organism.grouper %}
                             {% if option_organism_indices|length > 1 %}
@@ -58,16 +60,17 @@ Created: 2014-03-10
         
         <!-- parameters -->
         <tr>
-            <th colspan="{{organisms|length|add:1}}">Parameters</td>
+            <th colspan="{{organisms|length|add:2}}">Parameters</td>
         </tr>
         {% regroup parameters by name as parameter_groups %}
         {% for parameter in parameter_groups %}
         <tr>
             <td class="level1"><a href="{% url wcdbweb.views.parameter state_name=state_name parameter_name=parameter.grouper %}">{{parameter.grouper}}</a>{% if parameter.list.0.units %} ({{parameter.list.0.units}}){% endif %}</td>
+			<td class="level1"></td>
                 {% regroup_by parameter.list by 'simulation_batch__organism__id' organism_ids as parameter_organisms %}
                 {% for parameter_organism in parameter_organisms %}
                     {% regroup parameter_organism.list by index as parameter_organism_indices %}
-            <td class="level1">
+            <td class="level1 organisms">
                     {% if parameter_organism.list|length > 0 %}
                         {% if parameter_organism_indices.0.list.0.n_batches == organisms|get_organisms_n_batches:parameter_organism.grouper %}
                             {% if parameter_organism_indices|length > 1 %}
@@ -86,15 +89,21 @@ Created: 2014-03-10
         
         <!-- properties -->
         <tr>
-            <th colspan="{{organisms|length|add:1}}">Properties</td>
+            <th colspan="{{organisms|length|add:2}}">Properties</td>
         </tr>
         {% regroup properties by name as property_groups %}
         {% for property in property_groups %}
         <tr>
             <td class="level1"><a href="{% url wcdbweb.views.state_property state_name=state_name property_name=property.grouper %}">{{property.grouper}}</a></td>
+			<td class="level1 previewable">
+			{% regroup property.list by labels__dimension as dimensions %}			
+			{% if dimensions|length > 1 %}
+			&#10003;
+			{% endif %}
+			</td>
                 {% regroup_by property.list by 'state__simulation_batch__organism__id' organism_ids as property_organisms %}
                 {% for property_organism in property_organisms %}
-            <td class="level1">{% if property_organism.list|length > 0 %}{% if property_organism.list.0.n_batches == organisms|get_organisms_n_batches:property_organism.grouper %}&#10003;{% else %}&#9632;{% endif %}{% endif %}</td>
+            <td class="level1 organisms">{% if property_organism.list|length > 0 %}{% if property_organism.list.0.n_batches == organisms|get_organisms_n_batches:property_organism.grouper %}&#10003;{% else %}&#9632;{% endif %}{% endif %}</td>
                 {% endfor %}
         </tr>
         {% endfor %}
