@@ -19,6 +19,6 @@ def save_simulation_batch(batch_dir, first_sim_idx = None, max_num_simulations =
         print "Saving simulation %d of %d ... " % (sim_idx+1, len(sim_files))
         save_simulation(sim_file)
 
-def save_simulation(sim_file):
-    sim = Simulation.objects.create_simulation(sim_file)
+def save_simulation(data_file_h5):
+    sim = Simulation.objects.create_simulation(data_file_h5)
     sim.save()
