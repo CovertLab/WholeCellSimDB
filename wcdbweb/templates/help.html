@@ -28,7 +28,8 @@ Created: 2013-09-13
 		<ul>
 		<li><a href="#installing">Installing WholeCellSimDB</a></li>
 		<li><a href="#storing">Storing simulations</a></li>
-		<li><a href="#format">Simulation HDF format</a></li>
+		<li><a href="#format-hdf5">Simulation data HDF5 format</a></li>
+        <li><a href="#format-sedml">Simulation change SED-ML format</a></li>
 		<li><a href="#converting">Converting simulations to HDF format</a></li>
 		<li><a href="#api">Constructing advanced visualizations using the Python API</a></li>
 		</ul>
@@ -230,14 +231,14 @@ sudo chmod -R ug+rw /path/to/WholeCellSimDB/wcdbsearch/indexes
 
 <a name="storing"></a>
 <h3>Storing simulations</h3>
-<p>Simulations can be imported into WholeCellSimDB via either the command line or programmatic (Python) interface. Simulations must be saved using the format described <a href="#simulation-file-format">below</a>.</p>
+<p>Simulations can be imported into WholeCellSimDB via either the command line or programmatic (Python) interface. Simulations must be saved using the HDF5 and SED-ML formats described <a href="#simulation-file-format">below</a>.</p>
 
 <p>This code snippet illustrates how to load simulations via the command line interface:
 <pre>
 cd /path/to/WholeCellSimDB
-python wcdbcli/save_simulation_batch.py "&lt;organism-name&gt;" "&lt;batch-1-name&gt;" /path/to/simulation-batch-1
-python wcdbcli/save_simulation_batch.py "&lt;organism-name&gt;" "&lt;batch-2-name&gt;" /path/to/simulation-batch-2
-python wcdbcli/save_simulation_batch.py "&lt;organism-name&gt;" "&lt;batch-3-name&gt;" /path/to/simulation-batch-3
+python wcdbcli/save_simulation_batch.py -d /path/to/simulation-batch-1 -c /path/to/simulation-batch-1/changes.xml
+python wcdbcli/save_simulation_batch.py -d /path/to/simulation-batch-2 -c /path/to/simulation-batch-2/changes.xml
+python wcdbcli/save_simulation_batch.py -d /path/to/simulation-batch-3 -c /path/to/simulation-batch-3/changes.xml
 </pre>
 </p>
 
@@ -256,7 +257,9 @@ path_to_simuation_batch = '/path/to/simulation-batch'
 n_simulations = 128
 
 # Load simulation batch
-models.SimulationBatch.objects.create_simulation_batch(os.path.join(path_to_simuation_batch, '1.h5'))
+models.SimulationBatch.objects.create_simulation_batch(
+    os.path.join(path_to_simuation_batch, '1.h5'), 
+    os.path.join(path_to_simuation_batch, 'changes.xml'))
     
 # Load individual simulations
 for idx in range(1, n_simulations + 1):
@@ -265,9 +268,10 @@ for idx in range(1, n_simulations + 1):
 </p>
 
 <a name="simulation-file-format" ></a>
+<a name="format-hdf5"></a>
 <a name="format"></a>
-<h3>Simulation file format</h3>
-<p>WholeCellSimDB imports and exports simulations using the following format.</p>
+<h3>Simulation data file format</h3>
+<p>WholeCellSimDB imports and exports simulation data using the following format.</p>
 
 <p>First, simulations must be organized into batches. A batch is a set of simulations run using the same code, same options, and same parameter values. Individual simulations within a batch should differ only in their random number generator seeds. Batches must be stored as a folder, with HDF5 files for each simulation numbered sequentially starting from 1 containing the predicted phenotypes for each simulation.</p>
 
@@ -698,6 +702,50 @@ for idx in range(1, n_simulations + 1):
 </ul>
 </p>
 
+<p>
+Optionally, changes to the default simulation options and parameters can be described using the SED-ML format described <a href="#format-sedml">below</a>.
+</p>
+
+<a name="format-sedml"></a>
+<h3>Simulation change SED-ML format</h3>
+<p>Changes to the default simulation options and parameter values can be recorded by passing a <a href="http://sed-ml.org/">SED-ML</a> file to <tt>wcdbcli/save_simulation_batch.py</tt>. The XML snippet below illustrates how to use SED-ML to encode the modified option and parameter values.
+</p>
+
+<pre class="sedml-schema">
+<span class="tag">&lt;sedML</span>
+    <span class="attr">xmlns</span>=<span class="val">"http://sed-ml.org/sed-ml/level1/version2"</span> <span class="attr">level</span>=<span class="val">"1"</span> <span class="attr">version</span>=<span class="val">"2"</span>
+    <span class="attr">xmlns:xsi</span>=<span class="val">"http://www.w3.org/2001/XMLSchema-instance"</span>
+    <span class="attr">xsi:schemaLocation</span>=<span class="val">"http://sed-ml.org/sed-ml-L1-V2.xsd"</span>
+    <span class="attr">xmlns:xhtml</span>=<span class="val">"http://www.w3.org/1999/xhtml"</span>
+    <span class="attr">xmlns:math</span>=<span class="val">"http://www.w3.org/1998/Math/MathML"</span>
+    <span class="tag">&gt;</span>   
+    <span class="tag">&lt;listOfModels&gt;</span>
+        <span class="tag">&lt;model ... &gt;</span>
+            <span class="tag">&lt;listOfChanges&gt;</span>
+                <span class="comment">&lt;!-- global options --></span>
+                <span class="tag">&lt;changeAttribute</span> <span class="attr">target</span>=<span class="val">"<span class="var">option-name</span>/@value[<span class="var">index</span>]"</span> <span class="attr">newValue</span>=<span class="val">"<span class="var">new-value</span>"</span> <span class="tag">/&gt;</span>
+                ...
+                <span class="comment">&lt;!-- global parameters --></span>
+                <span class="tag">&lt;changeAttribute</span> <span class="attr">target</span>=<span class="val">"<span class="var">parameter-name</span>/@value[<span class="var">index</span>]"</span> <span class="attr">newValue</span>=<span class="val">"<span class="var">new-value</span>"</span> <span class="tag">/&gt;</span>
+                ...
+                <span class="comment">&lt;!-- process options --></span>
+                <span class="tag">&lt;changeAttribute</span> <span class="attr">target</span>=<span class="val">"processes.<span class="var">process-name</span>.<span class="var">option-name</span>/@value[<span class="var">index</span>]"</span> <span class="attr">newValue</span>=<span class="val">"<span class="var">new-value</span>"</span> <span class="tag">/&gt;</span>
+                ...
+                <span class="comment">&lt;!-- process parameters --></span>
+                <span class="tag">&lt;changeAttribute</span> <span class="attr">target</span>=<span class="val">"processes.<span class="var">process-name</span>.<span class="var">parameter-name</span>/@value[<span class="var">index</span>]"</span> <span class="attr">newValue</span>=<span class="val">"<span class="var">new-value</span>"</span> <span class="tag">/&gt;</span>
+                ...
+                <span class="comment">&lt;!-- state options --></span>
+                <span class="tag">&lt;changeAttribute</span> <span class="attr">target</span>=<span class="val">"processes.<span class="var">state-name</span>.<span class="var">option-name</span>/@value[<span class="var">index</span>]"</span> <span class="attr">newValue</span>=<span class="val">"<span class="var">new-value</span>"</span> <span class="tag">/&gt;</span>
+                ...
+                <span class="comment">&lt;!-- state parameters --></span>
+                <span class="tag">&lt;changeAttribute</span> <span class="attr">target</span>=<span class="val">"processes.<span class="var">state-name</span>.<span class="var">parameter-name</span>/@value[v]"</span> <span class="attr">newValue</span>=<span class="val">"<span class="var">new-value</span>"</span> <span class="tag">/&gt;</span>
+                ...
+            <span class="tag">&lt;/listOfChanges&gt;</span>
+        <span class="tag">&lt;/model&gt;</span>
+    <span class="tag">&lt;/listOfModels&gt;</span>
+<span class="tag">&lt;/sedML&gt;</span>
+</pre>
+
 <a name="converting"></a>
 <h3>Converting simulations from MAT-File to HDF5 format</h3>
 <p>Simulations can be converted from the original <a href="http://www.mathworks.com/help/matlab/import_export/mat-file-versions.html">MAT-File format</a> used by the <i>M. genitalium</i> whole-cell model (see <a href="https://simtk.org/frs/download.php?file_id=3125">User Guide section 2.2</a> and <a href="https://github.com/CovertLab/WholeCell/blob/master/src/%2Bedu/%2Bstanford/%2Bcovert/%2Bcell/%2Bsim/%2Butil/DiskLogger.m">DiskLogger.m</a>) using following script:
@@ -711,7 +759,11 @@ n_simulations=128
 
 for i in {1..$n_simulations}
 do
-    python wcdbcli/convert_mat_to_hdf5.py "${organism}" "${simulation_batch}" ${path_to_simulation_batch}/${i} ${i}
+    python wcdbcli/convert_mat_to_hdf5.py \
+        -o "${organism}" \
+        -n "${simulation_batch}" \
+        -d ${path_to_simulation_batch}/${i} \
+        -i ${i}
 done
 </pre>
 </p>
@@ -727,7 +779,11 @@ n_simulations=128
 
 for i in {1..$n_simulations}
 do
-    wcdbcli/convert_mat_to_hdf5.pl "${organism}" "${simulation_batch}" ${path_to_simulation_batch}/${i} ${i}
+    wcdbcli/convert_mat_to_hdf5.pl \
+        -o "${organism}" \
+        -n "${simulation_batch}" 
+        -d ${path_to_simulation_batch}/${i} 
+        -i ${i}
 done
 </pre>
 </p>
