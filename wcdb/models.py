@@ -1,11 +1,13 @@
 #!/usr/bin/env python
-from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
 from django.db.models import Max
 from django.db.models.query import QuerySet
-from django.contrib.auth.models import User
+from django.utils.html import strip_tags
 from helpers import is_sorted
 from WholeCellDB.settings import HDF5_ROOT
+from xml.etree import ElementTree
 import ast
 import dateutil.parser
 import dateutil.tz
@@ -531,29 +533,10 @@ class Simulation(models.Model):
         
 class SimulationBatchManager(models.Manager):
     #metadata_file can indicate HDF5 (h5) or SED-ML (xml) file
-    def create_simulation_batch(self, metadata_file):
-        ext = os.path.splitext(metadata_file)[1].lower()
-        if ext == '.h5':
-            return self.create_simulation_batch_hdf5(metadata_file)
-        elif ext == '.xml':        
-            return self.create_simulation_batch_sedml(metadata_file)
-        else:
-            raise ValueError('Unsupported metadata file type: %s' % ext)
-    
-    def create_simulation_batch_sedml(self, metadata_file):
-        return
-        
-        batch = organism.simulation_batches.create(
-            name = md.attrs['batch__name'],
-            description = md.attrs['batch__description'],
-            organism_version = md.attrs['batch__organism_version'],
-            investigator = investigator,
-            ip = md.attrs['batch__ip'],
-            date = dateutil.parser.parse(md.attrs['batch__date']).replace(tzinfo=dateutil.tz.tzlocal()),
-            )
-        batch.save()
-        
-        
+    def create_simulation_batch(self, metadata_file, changes_file):
+        batch = self.create_simulation_batch_hdf5(metadata_file)
+        self.modify_simulation_batch_sedml(batch, changes_file)
+           
     def create_simulation_batch_hdf5(self, metadata_file):
         md = h5py.File(metadata_file, 'r')
     
@@ -700,6 +683,157 @@ class SimulationBatchManager(models.Manager):
                     parameter.save()
         
         return batch
+        
+    def modify_simulation_batch_sedml(self, batch, metadata_file):
+        md = ElementTree.parse(metadata_file).getroot()
+        namespace = re.match(r'\{(.*)\}', md.tag).groups(0)[0]
+        model = md.find('{%s}listOfModels//{%s}model' % (namespace, namespace))
+
+        '''
+        #parse notes for name, description
+        notes = md.findall('{%s}notes//{http://www.w3.org/1999/xhtml}p' % namespace)
+
+        batch_name = None
+        batch_description = None
+        investigator_first_name = None
+        investigator_last_name = None
+        investigator_email = None
+        investigator_affiliation = None
+        ip = None
+        date = None
+        
+        for note in notes:
+            match = re.match(r'<html:p xmlns:html="http://www.w3.org/1999/xhtml">Name: (.*?)</html:p>', ElementTree.tostring(note))
+            if match is not None:
+                batch_name = match.groups(0)[0]
+                
+            match = re.match(r'<html:p xmlns:html="http://www.w3.org/1999/xhtml">Description: (.*?)</html:p>', ElementTree.tostring(note))
+            if match is not None:
+                batch_description = strip_tags(match.groups(0)[0].replace('<ns1:br />', '\n'))
+                
+            match = re.match(r'<html:p xmlns:html="http://www.w3.org/1999/xhtml">Investigator: (.*?), (.*?); (.*?) \((.*?)\)</html:p>', ElementTree.tostring(note))
+            if match is not None:
+                investigator_last_name = match.groups(0)[0]
+                investigator_first_name = match.groups(0)[1]
+                investigator_affiliation = match.groups(0)[2]
+                investigator_email = match.groups(0)[3]
+                
+            match = re.match(r'<html:p xmlns:html="http://www.w3.org/1999/xhtml">IP: (.*?)</html:p>', ElementTree.tostring(note))
+            if match is not None:
+                ip = match.groups(0)[0]
+                
+            match = re.match(r'<html:p xmlns:html="http://www.w3.org/1999/xhtml">Date: (.*?)</html:p>', ElementTree.tostring(note))
+            if match is not None:
+                date = dateutil.parser.parse(match.groups(0)[0]).replace(tzinfo=dateutil.tz.tzlocal())
+                        
+        if batch_name is None:
+            raise ValueError('Batch name missing')
+        if batch_description is None:
+            raise ValueError('Batch description missing')
+        if investigator_first_name is None:
+            raise ValueError('Investigator first name missing')
+        if investigator_last_name is None:
+            raise ValueError('Investigator last name missing')
+        if investigator_email is None:
+            raise ValueError('Investigator email missing')
+        if investigator_affiliation is None:
+            raise ValueError('Investigator affiliation missing')
+        if ip is None:
+            raise ValueError('IP address missing')
+        if date is None:
+            raise ValueError('Date missing')
+            
+        #parse model notes organism, version
+        model_notes = model.findall('{%s}notes//{http://www.w3.org/1999/xhtml}p' % (namespace))
+
+        organism_name = None
+        organism_version = None
+
+        for note in model_notes:
+            match = re.match(r'<html:p xmlns:html="http://www.w3.org/1999/xhtml">Organism: (.*?)</html:p>', ElementTree.tostring(note))
+            if match is not None:
+                organism_name = match.groups(0)[0]
+                
+            match = re.match(r'<html:p xmlns:html="http://www.w3.org/1999/xhtml">Version: (.*?)</html:p>', ElementTree.tostring(note))
+            if match is not None:
+                organism_version = match.groups(0)[0]
+                
+        if organism_name is None:
+            raise ValueError('Organism name missing')
+        if organism_version is None:
+            raise ValueError('Organism version missing')
+
+        #get/create organism        
+        organism = Organism.objects.get_or_create(name = organism_name)[0]
+        organism.save()
+        
+        #get/create investigator
+        user = User.objects.get_or_create(
+                first_name = investigator_first_name,
+                last_name = investigator_last_name,
+                email = investigator_email
+                )[0]
+        user.save()
+        try:
+            investigator = user.investigator
+            investigator.affiliation = investigator_affiliation
+        except Investigator.DoesNotExist:
+            investigator = Investigator(
+               user = user, 
+               affiliation = investigator_affiliation
+               )
+        investigator.save()
+        
+        #create batch
+        batch.name = batch_name
+        batch.description = batch_description
+        batch.organism_version = organism_version
+        batch.investigator = investigator
+        batch.ip = ip
+        batch.date = date
+        batch.save()
+        '''
+        
+        #get list of changes
+        model_changes = model.findall('{%s}listOfChanges//{%s}changeAttribute' % (namespace, namespace))
+        for change in model_changes:
+            change_process_name = None
+            change_state_name = None
+            change_name = None
+            change_index = None
+            
+            match = re.match(r'^processes\.([^.]+)\.([^.]+)/@value\[([0-9]+)\]$', change.get('target'))
+            if match is not None:
+                change_process_name = match.groups(0)[0] 
+                change_name = match.groups(0)[1]
+                change_index = int(float(match.groups(0)[2]))
+                
+            match = re.match(r'^states\.([^.]+)\.([^.]+)/@value\[([0-9]+)\]$', change.get('target'))
+            if match is not None:
+                change_state_name = match.groups(0)[0]
+                change_name = match.groups(0)[1]
+                change_index = int(float(match.groups(0)[2]))
+                
+            match = re.match(r'^([^.]+)/@value\[([0-9]+)\]$', change.get('target'))
+            if match is not None:
+                change_name = match.groups(0)[0]
+                change_index = int(float(match.groups(0)[1]))
+                
+            options = batch.options.filter(process__name=change_process_name, state__name=change_state_name, name=change_name, index=change_index)
+            parameters = batch.parameters.filter(process__name=change_process_name, state__name=change_state_name, name=change_name, index=change_index)
+            
+            if options.count() > 0:
+                option = options[0]
+                option.value = change.get('newValue')
+                option.save()
+            elif parameters.count() > 0:
+                parameter = parameters[0]
+                parameter.value = change.get('newValue')
+                parameter.save()
+            else:
+                raise ValueError('Invalid change: %s', change.get('target'))
+
+        return batch    
         
 class SimulationBatch(models.Model):
     organism         = models.ForeignKey('Organism', related_name = 'simulation_batches')

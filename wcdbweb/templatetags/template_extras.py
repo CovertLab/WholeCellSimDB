@@ -11,6 +11,10 @@ import re
 
 register = template.Library()
 
+@register.filter    
+def multiply(a, b):
+    return a * b
+
 @register.filter
 def order_by(qs, field):
     return qs.order_by(field)
