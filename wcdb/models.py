@@ -170,7 +170,7 @@ class Property(models.Model):
     
     def get_dataset(self, rowLabels = None, colLabels = None, simulations = None):
         return self.get_dataset_slice(rowLabels, colLabels, simulations)
-		
+        
     def get_dataset_slice(self, rowLabels = None, colLabels = None, simulations = None):
         if simulations is None:
             simulations = self.state.simulation_batch.simulations.all()
@@ -178,7 +178,7 @@ class Property(models.Model):
         elif isinstance(simulations, Simulation):
             length = simulations.length
             simulations = [simulations]
-        else:	
+        else:    
             length = max([sim.length for sim in simulations])
             
         sim0 = self.state.simulation_batch.simulations.all()[0]
@@ -317,7 +317,7 @@ class PropertyValue(models.Model):
             
     def get_dataset(self, rowLabels = None, colLabels = None):
         return self.get_dataset_slice(rowLabels, colLabels)
-		
+        
     def get_dataset_slice(self, rowLabels = None, colLabels = None):
         if self.shape is None:
             return
@@ -530,8 +530,32 @@ class Simulation(models.Model):
         app_label = 'wcdb'
         
 class SimulationBatchManager(models.Manager):
-    def create_simulation_batch(self, mdfilename):
-        md = h5py.File(mdfilename, 'r')
+    #metadata_file can indicate HDF5 (h5) or SED-ML (xml) file
+    def create_simulation_batch(self, metadata_file):
+        ext = os.path.splitext(metadata_file)[1].lower()
+        if ext == '.h5':
+            return self.create_simulation_batch_hdf5(metadata_file)
+        elif ext == '.xml':        
+            return self.create_simulation_batch_sedml(metadata_file)
+        else:
+            raise ValueError('Unsupported metadata file type: %s' % ext)
+    
+    def create_simulation_batch_sedml(self, metadata_file):
+        return
+        
+        batch = organism.simulation_batches.create(
+            name = md.attrs['batch__name'],
+            description = md.attrs['batch__description'],
+            organism_version = md.attrs['batch__organism_version'],
+            investigator = investigator,
+            ip = md.attrs['batch__ip'],
+            date = dateutil.parser.parse(md.attrs['batch__date']).replace(tzinfo=dateutil.tz.tzlocal()),
+            )
+        batch.save()
+        
+        
+    def create_simulation_batch_hdf5(self, metadata_file):
+        md = h5py.File(metadata_file, 'r')
     
         #get/create organism
         organism = Organism.objects.get_or_create(name = md.attrs['batch__organism__name'])[0]
