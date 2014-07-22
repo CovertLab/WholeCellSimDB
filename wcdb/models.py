@@ -414,9 +414,9 @@ class PropertyLabel(models.Model):
 
 
 class SimulationManager(models.Manager):
-    def create_simulation(self, h5filename): 
+    def create_simulation(self, data_file_h5): 
         #open source h5 file
-        h5file = h5py.File(h5filename, 'r')
+        h5file = h5py.File(data_file_h5, 'r')
         md = h5file.attrs
         
         # get simulation batch
@@ -456,7 +456,7 @@ class SimulationManager(models.Manager):
         h5file.close()
 
         #copy h5 file
-        shutil.copyfile(h5filename, simulation.file_path)
+        shutil.copyfile(data_file_h5, simulation.file_path)
         simulation.lock_file()
 
         return simulation
