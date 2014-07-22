@@ -1,8 +1,13 @@
 '''
 Example: 
->> python wcdbcli/convert_mat_to_hdf5.py "Mycoplasma genitalium" "Wild-type set#1" /home/projects/WholeCell/simulation/output/runSimulation/2011_10_19_02_53_45/1 1
+>> python wcdbcli/convert_mat_to_hdf5.py \
+     -o "Mycoplasma genitalium" \
+     -n "Wild-type set #1" \
+     -d /home/projects/WholeCell/simulation/output/runSimulation/2011_10_19_02_53_45/1 \
+     -i 1
 '''
 
+import argparse
 import h5py
 import numpy
 import os
@@ -16,13 +21,23 @@ sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
 from WholeCellDB import settings
 
 def main():
-    organism = sys.argv[1]
-    name = sys.argv[2]
-    sim_dir = sys.argv[3]
-    batch_index = int(float(sys.argv[4]))
-    path_to_mcr = sys.argv[5] if len(sys.argv) >= 6 else '/usr/local/bin/MATLAB/MATLAB_Compiler_Runtime/v81'
-    expand_sparse_mat = bool(float(sys.argv[6])) if len(sys.argv) >= 7 else True
-    tmp_dir = sys.argv[7] if len(sys.argv) >= 8 else settings.TMP_DIR
+    parser = argparse.ArgumentParser(description='Save batch of simulations to database.')
+    parser.add_argument('-o', metavar='organism', help='Name of organism', required=True)
+    parser.add_argument('-n', metavar='name', help='Name of simulation batch', required=True)
+    parser.add_argument('-d', metavar='directory', help='Path to directory containing simulation data and metadata', required=True)
+    parser.add_argument('-i', metavar='batch-index', type=int, help='Index of simulation within batch', required=True)
+    parser.add_argument('-m', metavar='mcr-path', default='/usr/local/bin/MATLAB/MATLAB_Compiler_Runtime/v81', help='Path to MATLAB MCR')
+    parser.add_argument('-e', metavar='expand-sparse-mat', type=bool, default=True, help='True/false indicating whether or not to expand sparse matrices')
+    parser.add_argument('-t', metavar='tmp-path', default=settings.TMP_DIR, help='Path to temporary directory')
+    args = parser.parse_args()
+    
+    organism = args.o
+    name = args.n
+    sim_dir = args.d
+    batch_index = args.i
+    path_to_mcr = args.m
+    expand_sparse_mat = args.e
+    tmp_dir = args.t
     
     excluded_properties = ['Metabolite/processAllocations', 'Metabolite/processRequirements', 'Metabolite/processUsages']
     
