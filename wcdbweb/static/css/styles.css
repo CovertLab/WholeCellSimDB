@@ -1058,6 +1058,12 @@ p.error {color:red; }
 #content #help ul.hdf-schema span.attrs {background: rgba(0, 255, 0, .3);}
 #content #help ul.hdf-schema span.attr {background: #dedede;}
 
+#content #help pre.sedml-schema span.tag {color: blue;}
+#content #help pre.sedml-schema span.attr {color: red;}
+#content #help pre.sedml-schema span.val {color: BlueViolet;}
+#content #help pre.sedml-schema span.comment {color: green;}
+#content #help pre.sedml-schema span.var {background: #DCBFF6;}
+
 /****************
  * tutorial
  ****************/
