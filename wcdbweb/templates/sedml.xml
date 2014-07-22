@@ -8,7 +8,10 @@
     >
     <notes>
         <xhtml:p>Name: {{batch.name}}</xhtml:p>
-        <xhtml:p>Desciption: {{batch.description|linebreaks}}</xhtml:p>
+        <xhtml:p>Description: {{batch.description|linebreaks}}</xhtml:p>
+        <xhtml:p>Investigator: {{batch.investigator.user.last_name}}, {{batch.investigator.user.first_name}}; {{batch.investigator.affiliation}} ({{batch.investigator.user.email}})</xhtml:p>
+        <xhtml:p>IP: {{batch.ip}}</xhtml:p>
+        <xhtml:p>Date: {{batch.date|date:"c"}}</xhtml:p>
         {% if simulation %}
         <xhtml:p>Batch index: {{simulation.batch_index}}</xhtml:p>
         {% endif %}

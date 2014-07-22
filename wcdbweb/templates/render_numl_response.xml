@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+{% load template_extras %}
+
+<numl version="1" level="1" xmlns="http://www.numl.org/numl/level1/version1">   
+    <ontologyTerms>
+        <ontologyTerm id="term1" term="model time" sourceTermId="SBO:0000586" ontologyURI="http://www.ebi.ac.uk/sbo/" />              
+        <ontologyTerm id="term2" term="quantitative systems description parameter" sourceTermId="SBO:0000002" ontologyURI="http://www.ebi.ac.uk/sbo/" />
+    </ontologyTerms>
+    <resultComponent id="component1">
+        <dimensionDescription>
+            <compositeDescription name="Species" indexType="string">
+                <compositeDescription name="Time (s)" ontologyTerm="term1" indexType="double">                
+                    <atomicDescription name="Predicted value" ontologyTerm="term2" valueType="double" />
+                </compositeDescription>
+            </compositeDescription>
+        </dimensionDescription>
+        <dimension>
+        {% with downsample_step=data.0.attrs.downsample_step %}
+            {% for data_series in data %}
+                {% with attrs=data_series.attrs %}
+            <compositeValue indexValue="{{attrs.organism}}::{{attrs.simulation_batch}}[{{attrs.simulation_batch_index}}]::{{attrs.state}}.{{attrs.property}}{% if attrs.row %}.{{attrs.row}}{% endif %}[{{attrs.col}}] ({{attrs.data_units}})">
+                        {% for val in data_series.data %}
+                <compositeValue indexValue="{{ forloop.counter|multiply:downsample_step }}">
+                    <atomicValue>{{ val }}</atomicValue>
+                </compositeValue>
+                        {% endfor %}
+            </compositeValue>
+                {% endwith %}
+            {% endfor %}
+        {% endwith %}
+        </dimension>
+    </resultComponent>
+</numl>

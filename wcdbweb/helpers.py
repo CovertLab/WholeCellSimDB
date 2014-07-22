@@ -138,7 +138,12 @@ def render_msgpack_response(data, filename = 'data'):
         content_type = "application/x-msgpack")
     response['Content-Disposition'] = "attachment; filename=%s.msgpack" % slugify(filename)
     
-    return response    
+    return response
+    
+def render_numl_response(data, filename = 'data'):    
+    response = render_to_response('render_numl_response.xml', {'data': data}, mimetype = 'text/plain')
+    #response['Content-Disposition'] = "attachment; filename=%s.xml" % slugify(filename)
+    return response
     
 def render_tempfile_response(tmp_filename, filename, extension, mimetype):
     tmp_file = open(tmp_filename, 'rb')

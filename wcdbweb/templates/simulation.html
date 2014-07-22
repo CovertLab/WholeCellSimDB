@@ -392,6 +392,7 @@ setupInitialPlots();
 <a href="javascript:downloadDataSeries('json');"><img src="{% get_static_prefix %}img/json.png" alt="JSON" title="JSON"/></a>
 <a href="javascript:downloadDataSeries('bson');"><img src="{% get_static_prefix %}img/bson.png" alt="BSON" title="BSON"/></a>
 <a href="javascript:downloadDataSeries('msgpack');"><img src="{% get_static_prefix %}img/msgpack.png" alt="MessagePack" title="MessagePack"/></a>
+<a href="javascript:downloadDataSeries('numl');"><img src="{% get_static_prefix %}img/numl.png" alt="NuML" title="NuML"/></a>
 <a href="{% url wcdbweb.views.simulation_sedml id=simulation.id %}"><img src="{% get_static_prefix %}img/sed-ml.png" alt="SED-ML" title="SED-ML"/></a>
 {{ block.super }}
 {% endblock %}

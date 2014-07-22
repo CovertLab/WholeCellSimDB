@@ -609,7 +609,7 @@ def list_data_series(request):
     
 def get_data_series(request):
     format = request.GET.get('format') or request.POST.get('format') or 'hdf5'
-    if format not in ['hdf5', 'json', 'bson', 'msgpack']:
+    if format not in ['hdf5', 'json', 'bson', 'msgpack', 'numl']:
         raise Exception('Invalid format')
     
     data_series_requests = simplejson.loads(request.GET.get('data_series') or request.POST.get('data_series'))
@@ -689,6 +689,8 @@ def get_data_series(request):
         return helpers.render_bson_response(data_series)
     elif format == 'msgpack':
         return helpers.render_msgpack_response(data_series)
+    elif format == 'numl':
+        return helpers.render_numl_response(data_series)
    
 ###################
 ### downloading
@@ -883,7 +885,7 @@ def state_property_row_col_batch_download(request, state_name, property_name, ro
         response = helpers.render_tempfile_response(tmp_filename, filename, 'h5', 'application/x-hdf')
         response['X-Robots-Tag'] = 'noindex'
         return response
-    elif format in ['json', 'bson', 'msgpack']:
+    elif format in ['json', 'bson', 'msgpack', 'numl']:
         max_datapoints = 5e5
         n_datapoints = batch.simulations.count() * batch.simulations.aggregate(Max('length'))['length__max']        
         if n_datapoints <= max_datapoints:
@@ -931,8 +933,10 @@ def state_property_row_col_batch_download(request, state_name, property_name, ro
             response = helpers.render_json_response(data)
         elif format == 'bson':
             response = helpers.render_bson_response(data)
-        else:
+        elif format == 'msgpack':
             response = helpers.render_msgpack_response(data)
+        elif format == 'numl':
+            response = helpers.render_numl_response(data)
         response['X-Robots-Tag'] = 'noindex'
         return response
     else:

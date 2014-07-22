@@ -2,12 +2,14 @@ import glob
 import os
 from wcdb.models import SimulationBatch, Simulation
 
-def save_simulation_batch(batch_dir, metadata_file, first_sim_idx = None, max_num_simulations = None):
+def save_simulation_batch(batch_dir, changes_file=None, first_sim_idx = None, max_num_simulations = None):
     if first_sim_idx is None:
         first_sim_idx = 1
+        
+    metadata_file = os.path.join(batch_dir, '%d.h5' % first_sim_idx)
     
     #save batch
-    SimulationBatch.objects.create_simulation_batch(metadata_file)
+    SimulationBatch.objects.create_simulation_batch(metadata_file, changes_file=None)
     
     #save simulations
     sim_files = glob.glob(os.path.join(batch_dir, "[0-9]*.h5"))
