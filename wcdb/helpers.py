@@ -71,17 +71,17 @@ def get_parameter_dict(batch):
     return parameters
     
 def get_downsample_step(sim):
-    time_propval = sim.property_values.get(property__state__name='Time', property__name='values')    
+    time_propval = sim.property_values.get(property__state__name='Time', property__name='values')
     time_units = time_propval.property.units
     times = time_propval.get_dataset_slice()
-    diff = times[0][0][1] - times[0][0][0]  
+    diff = times[0][0][1] - times[0][0][0]
     
     if time_units == 'h':
         diff *= 3600
     elif time_units == 'min':
         diff *= 60
     
-    return diff
+    return float(diff)
 
 def pairwise(iterable):
     a, b = tee(iterable)

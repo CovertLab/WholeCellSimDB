@@ -627,13 +627,11 @@ def list_data_series(request):
     raise Exception('Cannot dig deeper into hierarchy')
     
 def get_data_series(request):
-    #format = request.GET.get('format') or request.POST.get('format') or 'hdf5'
-    format = 'json'
+    format = request.GET.get('format') or request.POST.get('format') or 'hdf5'
     if format not in ['hdf5', 'json', 'bson', 'msgpack', 'numl']:
         raise Exception('Invalid format')
     
-    #data_series_requests = simplejson.loads(request.GET.get('data_series') or request.POST.get('data_series'))
-    data_series_requests = simplejson.loads('[{"organism":1,"simulation_batch":1,"simulation":1,"state":6,"property":48,"row":"","col":""},{"organism":1,"simulation_batch":1,"simulation":2,"state":6,"property":48,"row":"","col":""},{"organism":1,"simulation_batch":1,"simulation":3,"state":6,"property":48,"row":"","col":""},{"organism":1,"simulation_batch":1,"simulation":4,"state":6,"property":48,"row":"","col":""},{"organism":1,"simulation_batch":1,"simulation":5,"state":6,"property":48,"row":"","col":""}]')
+    data_series_requests = simplejson.loads(request.GET.get('data_series') or request.POST.get('data_series'))
     if len(data_series_requests) > 100:
         raise Exception('Queries are limited to 100 data series')
         
@@ -666,7 +664,7 @@ def get_data_series(request):
             
         data = property_value.get_dataset_slice(row, col)
         
-        downsample_step = float(get_downsample_step(simulation))
+        downsample_step = get_downsample_step(simulation)
         
         if format == 'hdf5':
             dset = data_series.create_dataset('%s/%s/%d/%s/%s%s%s/data' % (organism.name, batch.name, simulation.batch_index, state.name, property.name, '/%s' % row.name if row is not None else '', '/%s' % col.name if col is not None else ''),
@@ -789,7 +787,7 @@ def state_download(request, state_name):
                 dset.attrs['simulation_length'] = pv.simulation.length
                 dset.attrs['data_units'] = prop.units
                 dset.attrs['time_units'] = 's'
-                dset.attrs['downsample_step'] = float(get_downsample_step(pv.simulation))
+                dset.attrs['downsample_step'] = get_downsample_step(pv.simulation)
                 
                 tmp_file.flush()
     
@@ -820,7 +818,7 @@ def state_property_download(request, state_name, property_name):
             dset.attrs['simulation_length'] = pv.simulation.length
             dset.attrs['data_units'] = prop.units
             dset.attrs['time_units'] = 's'
-            dset.attrs['downsample_step'] = float(get_downsample_step(pv.simulation))
+            dset.attrs['downsample_step'] = get_downsample_step(pv.simulation)
             
             tmp_file.flush()
     
@@ -856,7 +854,7 @@ def state_property_row_download(request, state_name, property_name, row_name):
             dset.attrs['simulation_length'] = pv.simulation.length
             dset.attrs['data_units'] = prop.units
             dset.attrs['time_units'] = 's'
-            dset.attrs['downsample_step'] = float(get_downsample_step(pv.simulation))
+            dset.attrs['downsample_step'] = get_downsample_step(pv.simulation)
             
             tmp_file.flush()
     
@@ -898,7 +896,7 @@ def state_property_row_col_batch_download(request, state_name, property_name, ro
             dset.attrs['simulation_length'] = sim.length
             dset.attrs['data_units'] = prop.units
             dset.attrs['time_units'] = 's'
-            dset.attrs['downsample_step'] = float(get_downsample_step(sim))
+            dset.attrs['downsample_step'] = get_downsample_step(sim)
             
             tmp_file.flush()
             
