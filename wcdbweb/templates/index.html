@@ -291,7 +291,7 @@ $(
     "<div class='info'>" +
         "<span class='content'>"+
             "<span class='title'>Info</span><br/>" +
-            "<span class='details'>Downsampling: </span>" +
+            "<span class='details'>Timestep: </span>" +
         "</span>" + 
    "</div>"
     ).appendTo(plotContainer);
@@ -303,13 +303,13 @@ var setData = function(data) {
     var series = [];
     var xaxisMax = 0;
     for (var i = 0; i < data.length; i++) {
-        xaxisMax = Math.max(xaxisMax, data[i].data.length);
-        
         downsample_step = data[i].attrs.downsample_step
+    
+        xaxisMax = Math.max(xaxisMax, (data[i].data.length - 1) * downsample_step);
         
         timePoints = [];
         for (j = 0; j < data[i].data.length; j++) {
-            timePoints.push([(j * downsample_step + 1)/ 3600, data[i].data[j]]);
+            timePoints.push([j * downsample_step / 3600, data[i].data[j]]);
         }
         
         var attrs = data[i].attrs;
@@ -325,11 +325,11 @@ var setData = function(data) {
             });
     }
     plot.setData(series);
-    plot.getOptions().xaxes[0].max = xaxisMax/3600;
+    plot.getOptions().xaxes[0].max = xaxisMax / 3600;
     plot.setupGrid();
     plot.draw();
     
-    plotContainer.find('.info > .content > .details').html('Downsampling: ' + downsample_step + ' s');
+    plotContainer.find('.info > .content > .details').html('Timestep: ' + downsample_step + ' s');
     plotContainer.find('.info > .content')
         .css('backgroundColor', 'rgba(255, 0, 0, 0.5)')    
         .animate({
