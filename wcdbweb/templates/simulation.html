@@ -360,6 +360,7 @@ function setupInitialPlots() {
     plotContainer.find('.status').fadeIn(1000);
     
     var selected_property_ids = [
+        {% if default_data_series %}
         {
             organism: {{simulation.batch.organism.id}},
             simulation_batch: {{simulation.batch.id}},
@@ -369,6 +370,7 @@ function setupInitialPlots() {
             row: {% if default_data_series.row %}{{default_data_series.row.id}}{% else %}''{% endif %},
             col: {% if default_data_series.col %}{{default_data_series.col.id}}{% else %}''{% endif %},
         },
+        {% endif %}
     ];
     
     $.ajax({

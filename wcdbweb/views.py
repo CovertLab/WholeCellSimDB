@@ -14,8 +14,9 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from haystack.query import SearchQuerySet
 from helpers import render_template
+from odict import odict
 from wcdb import models
-from wcdb.helpers import get_option_dict, get_parameter_dict
+from wcdb.helpers import get_option_dict, get_parameter_dict, get_downsample_step
 from WholeCellDB import settings
 import copy
 import forms
@@ -154,10 +155,28 @@ def simulation(request, id):
     simulation = models.Simulation.objects.get(id=id)
     batch = simulation.batch
     
-    state = batch.states.get(name='MetabolicReaction')
-    prop = state.properties.get(name='growth')
-    default_data_series = {'state': state, 'property': prop, 'row': None, 'col': None}
+    state = batch.states.filter(name__in=['MetabolicReaction', 'Reaction'])
+    if state.count() > 0:
+        state = state[0]
+    elif batch.states.count() > 0:
+        state = batch.states.all()[0]
+    else:
+        state = None
     
+    if state is not None:
+        prop = state.properties.filter(name__in=['growth', 'Growth'])
+        if prop.count() > 0:
+            prop = prop[0]
+        elif state.properties.count() > 0:
+            prop = state.properties.all()[0]
+        else:
+            prop = None
+        
+    if prop is not None:
+        default_data_series = {'state': state, 'property': prop, 'row': None, 'col': None}
+    else:
+        default_data_series = None
+           
     x_axis = {
         'max': simulation.length,
         }
@@ -182,7 +201,7 @@ def list_options(request):
         .order_by('name')
     organism_ids = [x.id for x in tmp]
 #    organisms = {x.id: x for x in tmp}
-    organisms = dict([(x.id, x) for x in tmp])
+    organisms = odict([(x.id, x) for x in tmp])
     
     options = {
         'Global': models.Option.objects
@@ -226,7 +245,7 @@ def list_parameters(request):
         .order_by('name')
     organism_ids = [x.id for x in tmp]
 #    organisms = {x.id: x for x in tmp}
-    organisms = dict([(x.id, x) for x in tmp])
+    organisms = odict([(x.id, x) for x in tmp])
     
     parameters = {
         'Global': models.Parameter.objects
@@ -270,7 +289,7 @@ def list_processes(request):
         .order_by('name')    
     organism_ids = [x.id for x in tmp]
 #    organisms = {x.id: x for x in tmp}
-    organisms = dict([(x.id, x) for x in tmp])
+    organisms = odict([(x.id, x) for x in tmp])
     
     processes =  models.Process.objects \
         .values('name', 'simulation_batch__organism__id') \
@@ -289,7 +308,7 @@ def process(request, process_name):
         .order_by('name')    
     organism_ids = [x.id for x in tmp]
 #    organisms = {x.id: x for x in tmp}
-    organisms = dict([(x.id, x) for x in tmp])
+    organisms = odict([(x.id, x) for x in tmp])
     
     options = models.Option.objects \
         .filter(process__name=process_name) \
@@ -316,7 +335,7 @@ def list_states(request):
         .order_by('name')
     organism_ids = [x.id for x in tmp]
 #    organisms = {x.id: x for x in tmp}
-    organisms = dict([(x.id, x) for x in tmp])
+    organisms = odict([(x.id, x) for x in tmp])
         
     state_properties = models.Property.objects \
         .values('id', 'name', 'state__name', 'state__simulation_batch__organism__id') \
@@ -335,7 +354,7 @@ def state(request, state_name):
         .order_by('name')    
     organism_ids = [x.id for x in tmp]
 #    organisms = {x.id: x for x in tmp}
-    organisms = dict([(x.id, x) for x in tmp])
+    organisms = odict([(x.id, x) for x in tmp])
     
     options = models.Option.objects \
         .filter(state__name=state_name) \
@@ -369,7 +388,7 @@ def state_property(request, state_name, property_name):
         .order_by('name')    
     organism_ids = [x.id for x in tmp]
 #    organisms = {x.id: x for x in tmp}
-    organisms = dict([(x.id, x) for x in tmp])
+    organisms = odict([(x.id, x) for x in tmp])
     
     labels = models.PropertyLabel.objects \
         .filter(property__name=property_name, property__state__name=state_name)
@@ -608,11 +627,13 @@ def list_data_series(request):
     raise Exception('Cannot dig deeper into hierarchy')
     
 def get_data_series(request):
-    format = request.GET.get('format') or request.POST.get('format') or 'hdf5'
+    #format = request.GET.get('format') or request.POST.get('format') or 'hdf5'
+    format = 'json'
     if format not in ['hdf5', 'json', 'bson', 'msgpack', 'numl']:
         raise Exception('Invalid format')
     
-    data_series_requests = simplejson.loads(request.GET.get('data_series') or request.POST.get('data_series'))
+    #data_series_requests = simplejson.loads(request.GET.get('data_series') or request.POST.get('data_series'))
+    data_series_requests = simplejson.loads('[{"organism":1,"simulation_batch":1,"simulation":1,"state":6,"property":48,"row":"","col":""},{"organism":1,"simulation_batch":1,"simulation":2,"state":6,"property":48,"row":"","col":""},{"organism":1,"simulation_batch":1,"simulation":3,"state":6,"property":48,"row":"","col":""},{"organism":1,"simulation_batch":1,"simulation":4,"state":6,"property":48,"row":"","col":""},{"organism":1,"simulation_batch":1,"simulation":5,"state":6,"property":48,"row":"","col":""}]')
     if len(data_series_requests) > 100:
         raise Exception('Queries are limited to 100 data series')
         
@@ -645,6 +666,8 @@ def get_data_series(request):
             
         data = property_value.get_dataset_slice(row, col)
         
+        downsample_step = float(get_downsample_step(simulation))
+        
         if format == 'hdf5':
             dset = data_series.create_dataset('%s/%s/%d/%s/%s%s%s/data' % (organism.name, batch.name, simulation.batch_index, state.name, property.name, '/%s' % row.name if row is not None else '', '/%s' % col.name if col is not None else ''),
                 data = data,
@@ -654,7 +677,7 @@ def get_data_series(request):
             dset.attrs['simulation_length'] = simulation.length
             dset.attrs['data_units'] = property.units
             dset.attrs['time_units'] = 's'
-            dset.attrs['downsample_step'] = 1
+            dset.attrs['downsample_step'] = downsample_step
             
             data_series.flush()
         else:
@@ -667,7 +690,7 @@ def get_data_series(request):
                 'property': property.name,
                 'data_units': property.units,
                 'time_units': 's',
-                'downsample_step': 1,
+                'downsample_step': downsample_step,
                 }
             
             if row is not None:
@@ -766,7 +789,7 @@ def state_download(request, state_name):
                 dset.attrs['simulation_length'] = pv.simulation.length
                 dset.attrs['data_units'] = prop.units
                 dset.attrs['time_units'] = 's'
-                dset.attrs['downsample_step'] = 1
+                dset.attrs['downsample_step'] = float(get_downsample_step(pv.simulation))
                 
                 tmp_file.flush()
     
@@ -783,7 +806,7 @@ def state_property_download(request, state_name, property_name):
     
     batches = models.SimulationBatch.objects.filter(states__name=state_name, states__properties__name=property_name)
     for batch in batches:
-        prop = models.Property.objects.get(state__name=state_name, name=property_name, state__simulation_batch__id=batch.id)
+        prop = models.Property.objects.filter(state__name=state_name, name=property_name, state__simulation_batch__id=batch.id)[0]
         for pv in prop.values.all():
             if pv.shape is None:
                 continue
@@ -797,7 +820,7 @@ def state_property_download(request, state_name, property_name):
             dset.attrs['simulation_length'] = pv.simulation.length
             dset.attrs['data_units'] = prop.units
             dset.attrs['time_units'] = 's'
-            dset.attrs['downsample_step'] = 1
+            dset.attrs['downsample_step'] = float(get_downsample_step(pv.simulation))
             
             tmp_file.flush()
     
@@ -814,8 +837,8 @@ def state_property_row_download(request, state_name, property_name, row_name):
     
     batches = models.SimulationBatch.objects.filter(states__name=state_name, states__properties__name=property_name)
     for batch in batches:
-        prop = models.Property.objects.get(state__name=state_name, name=property_name, state__simulation_batch__id=batch.id)
-        row = prop.labels.get(name=row_name)
+        prop = models.Property.objects.filter(state__name=state_name, name=property_name, state__simulation_batch__id=batch.id)[0]
+        row = prop.labels.filter(name=row_name)[0]
         for pv in prop.values.all():
             if pv.shape is None:
                 continue
@@ -833,7 +856,7 @@ def state_property_row_download(request, state_name, property_name, row_name):
             dset.attrs['simulation_length'] = pv.simulation.length
             dset.attrs['data_units'] = prop.units
             dset.attrs['time_units'] = 's'
-            dset.attrs['downsample_step'] = 1
+            dset.attrs['downsample_step'] = float(get_downsample_step(pv.simulation))
             
             tmp_file.flush()
     
@@ -850,11 +873,11 @@ def state_property_row_col_batch_download(request, state_name, property_name, ro
         col_name = ''
         
     format = request.GET.get('format', 'hdf5')
-    
+           
     batch = models.SimulationBatch.objects.get(id=batch_id)
     prop = models.Property.objects.get(name=property_name, state__name=state_name, state__simulation_batch__id=batch_id)
-    row = models.PropertyLabel.objects.get(dimension=0, name=row_name, property__name=property_name, property__state__name=state_name, property__state__simulation_batch__id=batch_id)
-    col = models.PropertyLabel.objects.get(dimension=1, name=col_name, property__name=property_name, property__state__name=state_name, property__state__simulation_batch__id=batch_id)
+    row = models.PropertyLabel.objects.filter(dimension=0, name=row_name, property__name=property_name, property__state__name=state_name, property__state__simulation_batch__id=batch_id)[0]
+    col = models.PropertyLabel.objects.filter(dimension=1, name=col_name, property__name=property_name, property__state__name=state_name, property__state__simulation_batch__id=batch_id)[0]
     
     if format == 'hdf5':
         tmp_file = helpers.create_temp_hdf5_file()
@@ -875,7 +898,7 @@ def state_property_row_col_batch_download(request, state_name, property_name, ro
             dset.attrs['simulation_length'] = sim.length
             dset.attrs['data_units'] = prop.units
             dset.attrs['time_units'] = 's'
-            dset.attrs['downsample_step'] = 1
+            dset.attrs['downsample_step'] = float(get_downsample_step(sim))
             
             tmp_file.flush()
             
@@ -885,7 +908,7 @@ def state_property_row_col_batch_download(request, state_name, property_name, ro
         response = helpers.render_tempfile_response(tmp_filename, filename, 'h5', 'application/x-hdf')
         response['X-Robots-Tag'] = 'noindex'
         return response
-    elif format in ['json', 'bson', 'msgpack', 'numl']:
+    elif format in ['json', 'bson', 'msgpack', 'numl']:        
         max_datapoints = 5e5
         n_datapoints = batch.simulations.count() * batch.simulations.aggregate(Max('length'))['length__max']        
         if n_datapoints <= max_datapoints:
@@ -926,7 +949,7 @@ def state_property_row_col_batch_download(request, state_name, property_name, ro
                     'simulation_length': sim.length,
                     'data_units': prop.units,
                     'time_units': 's',
-                    'downsample_step': downsample_step
+                    'downsample_step': get_downsample_step(batch.simulations.all()[0]) * float(downsample_step)
                     },
                 })        
         if format == 'json':
