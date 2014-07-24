@@ -533,13 +533,14 @@ class Simulation(models.Model):
         
 class SimulationBatchManager(models.Manager):
     #metadata_file can indicate HDF5 (h5) or SED-ML (xml) file
-    def create_simulation_batch(self, metadata_file, changes_file):
+    def create_simulation_batch(self, metadata_file, changes_file=None):
         batch = self.create_simulation_batch_hdf5(metadata_file)
-        self.modify_simulation_batch_sedml(batch, changes_file)
+        if changes_file is not None:
+            self.modify_simulation_batch_sedml(batch, changes_file)
            
     def create_simulation_batch_hdf5(self, metadata_file):
         md = h5py.File(metadata_file, 'r')
-    
+        
         #get/create organism
         organism = Organism.objects.get_or_create(name = md.attrs['batch__organism__name'])[0]
         organism.save()
