@@ -70,7 +70,7 @@ def get_parameter_dict(batch):
     
     return parameters
     
-def get_downsample_step(sim):
+def get_timestep(sim):
     time_propval = sim.property_values.get(property__state__name='Time', property__name='values')
     time_units = time_propval.property.units
     times = time_propval.get_dataset_slice()

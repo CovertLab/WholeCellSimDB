@@ -37,7 +37,7 @@
     </listOfModels>
     
     <listOfSimulations>        
-        <uniformTimeCourse id="simulation" initialTime="0" outputStartTime="1" outputEndTime="{{batch__lengthSec}}" numberOfPoints="{{batch__lengthSec}}" >
+        <uniformTimeCourse id="simulation" initialTime="0" outputStartTime="1" outputEndTime="{{output_end_time}}" numberOfPoints="{{number_of_points}}" >
             <algorithm kisaoID="KISAO:0000037"/>
         </uniformTimeCourse>
     </listOfSimulations>

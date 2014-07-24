@@ -16,7 +16,7 @@ from haystack.query import SearchQuerySet
 from helpers import render_template
 from odict import odict
 from wcdb import models
-from wcdb.helpers import get_option_dict, get_parameter_dict, get_downsample_step
+from wcdb.helpers import get_option_dict, get_parameter_dict, get_timestep
 from WholeCellDB import settings
 import copy
 import forms
@@ -664,7 +664,7 @@ def get_data_series(request):
             
         data = property_value.get_dataset_slice(row, col)
         
-        downsample_step = get_downsample_step(simulation)
+        downsample_step = get_timestep(simulation)
         
         if format == 'hdf5':
             dset = data_series.create_dataset('%s/%s/%d/%s/%s%s%s/data' % (organism.name, batch.name, simulation.batch_index, state.name, property.name, '/%s' % row.name if row is not None else '', '/%s' % col.name if col is not None else ''),
@@ -787,7 +787,7 @@ def state_download(request, state_name):
                 dset.attrs['simulation_length'] = pv.simulation.length
                 dset.attrs['data_units'] = prop.units
                 dset.attrs['time_units'] = 's'
-                dset.attrs['downsample_step'] = get_downsample_step(pv.simulation)
+                dset.attrs['downsample_step'] = get_timestep(pv.simulation)
                 
                 tmp_file.flush()
     
@@ -818,7 +818,7 @@ def state_property_download(request, state_name, property_name):
             dset.attrs['simulation_length'] = pv.simulation.length
             dset.attrs['data_units'] = prop.units
             dset.attrs['time_units'] = 's'
-            dset.attrs['downsample_step'] = get_downsample_step(pv.simulation)
+            dset.attrs['downsample_step'] = get_timestep(pv.simulation)
             
             tmp_file.flush()
     
@@ -854,7 +854,7 @@ def state_property_row_download(request, state_name, property_name, row_name):
             dset.attrs['simulation_length'] = pv.simulation.length
             dset.attrs['data_units'] = prop.units
             dset.attrs['time_units'] = 's'
-            dset.attrs['downsample_step'] = get_downsample_step(pv.simulation)
+            dset.attrs['downsample_step'] = get_timestep(pv.simulation)
             
             tmp_file.flush()
     
@@ -896,7 +896,7 @@ def state_property_row_col_batch_download(request, state_name, property_name, ro
             dset.attrs['simulation_length'] = sim.length
             dset.attrs['data_units'] = prop.units
             dset.attrs['time_units'] = 's'
-            dset.attrs['downsample_step'] = get_downsample_step(sim)
+            dset.attrs['downsample_step'] = get_timestep(sim)
             
             tmp_file.flush()
             
@@ -947,7 +947,7 @@ def state_property_row_col_batch_download(request, state_name, property_name, ro
                     'simulation_length': sim.length,
                     'data_units': prop.units,
                     'time_units': 's',
-                    'downsample_step': get_downsample_step(batch.simulations.all()[0]) * float(downsample_step)
+                    'downsample_step': get_timestep(batch.simulations.all()[0]) * float(downsample_step)
                     },
                 })        
         if format == 'json':
@@ -973,17 +973,21 @@ def investigator_download(request, id):
 ### SED-ML    
 def simulation_batch_sedml(request, id):
     batch = models.SimulationBatch.objects.get(id=id)
-
-    response = render_to_response('sedml.xml', 
+    
+    timestep = get_timestep(batch.simulations.all()[0])
+    length = batch.simulations.all().values().annotate(max_length=Max('length'))[0]['max_length']
+    
+    response = render_to_response('sedml.xml',
         {
             'batch': batch,
-            'batch__lengthSec': batch.options.get(name='lengthSec', state__isnull=True, process__isnull=True).value,
+            'output_end_time': length,
+            'number_of_points': length / timestep + 1, 
             'batch__options__seeds': batch.options.filter(name='seed'),
             'simulation': None,
             'model': {
                 'language': 'urn:sedml:language:matlab',
                 'source': 'http://covertlab.stanford.edu/svn/WholeCell/simulation/?p=%s' % batch.organism_version
-                }, 
+                },
         }, context_instance = RequestContext(request), mimetype = 'application/xml')
     response['Content-Disposition'] = ("attachment; filename=simulation_batch-%d.sed-ml.xml" % batch.id)
     response['X-Robots-Tag'] = 'noindex'
@@ -992,17 +996,21 @@ def simulation_batch_sedml(request, id):
 def simulation_sedml(request, id):
     simulation = models.Simulation.objects.get(id=id)
     batch = simulation.batch
-
-    response = render_to_response('sedml.xml', 
+    
+    length = simulation.length
+    timestep = get_timestep(simulation)
+    
+    response = render_to_response('sedml.xml',
         {
             'batch': batch,
-            'batch__lengthSec': batch.options.get(name='lengthSec', state__isnull=True, process__isnull=True).value,
+            'output_end_time': length,
+            'number_of_points': length / timestep + 1,
             'batch__options__seeds': batch.options.filter(name='seed'),
             'simulation': simulation,
             'model': {
                 'language': 'urn:sedml:language:matlab',
                 'source': 'http://covertlab.stanford.edu/svn/WholeCell/simulation/?p=%s' % batch.organism_version
-                }, 
+                },
         }, context_instance = RequestContext(request), mimetype = 'application/xml')
     response['Content-Disposition'] = ("attachment; filename=simulation-%d.sed-ml.xml" % simulation.id)
     response['X-Robots-Tag'] = 'noindex'
